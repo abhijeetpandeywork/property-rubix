@@ -1,301 +1,397 @@
-# PropertyRubix.com — System Architect Report
-### Full Site Review + Enterprise Implementation Plan
-**Date:** July 20, 2026 | **Reviewer:** System Architect (AI Agent — Antigravity)
-**Scope:** Live site review (propertyrubix.com) + local codebase analysis + enterprise upgrade plan
+# PropertyRubix.com — System Architect Report v2.1
+### Deep WP Admin + REST API Analysis + Enterprise Plan
+**Date:** July 20, 2026 | **Reviewer:** AI System Architect (Antigravity)
+**Version:** 2.1 — Updated with WP REST API enumeration + full CPT/taxonomy map
+**Scope:** Full live site + WP admin access + REST API deep dive
 
-> **📌 IMPORTANT FOR ALL DEVELOPERS & AI AGENTS**
-> This is the master reference document for PropertyRubix. Read this first before making any changes.
-> - **GitHub Repo:** https://github.com/abhijeetpandeywork/property-rubix
+> **📌 MASTER CONTEXT — ALL DEVELOPERS & AI AGENTS READ THIS FIRST**
+> - **GitHub:** https://github.com/abhijeetpandeywork/property-rubix
 > - **Live Site:** https://propertyrubix.com
-> - **Conversation Context ID:** `3b09d949-ad6d-471c-b60e-3efbc3fa69a7`
-> - **Setup Guide:** See [README.md](../README.md) and [CONTRIBUTING.md](../CONTRIBUTING.md)
+> - **WP Admin:** https://propertyrubix.com/wp-admin/ (2FA via Wordfence)
+> - **Conversation ID:** `3b09d949-ad6d-471c-b60e-3efbc3fa69a7`
+> - **Local Dev:** `scripts\setup.bat` (Windows) or `bash scripts/setup.sh`
 
 ---
 
-## Executive Summary
+## 1. Executive Summary
 
-PropertyRubix is a **multi-country real estate listing portal** targeting India, UAE, Canada, and USA markets. Users browse properties and projects by geography (Country → State → City → Locality), by developer, or by search.
-
-**Current State:** The site runs on WordPress + Elementor (production at propertyrubix.com).
-A **custom PHP MVC codebase** is being built in this repository as the enterprise replacement.
+PropertyRubix is a **multi-country real estate portal** (India, UAE, Canada, USA).
+Two systems exist in parallel — the live WordPress site and this PHP MVC codebase (the future).
 
 | Dimension | Score | Notes |
 |-----------|-------|-------|
-| Enterprise Maturity | 3/10 | MVP stage, critical bugs in production |
-| UI/UX | 7/10 | Premium look, functionally limited |
+| Enterprise Maturity | 3/10 | MVP, critical bugs live |
+| UI/UX | 7/10 | Premium design, functionally limited |
 | Architecture | 3/10 | WordPress monolith, no API, no cache |
-| Security | 2/10 | WP admin exposed, CSRF was disabled, placeholder creds |
-| SEO | 5/10 | Good URL structure, missing schema markup |
-| Performance | 3/10 | No CDN, Elementor bloat, no caching |
+| Security | 4/10 | 2FA active ✅, XML-RPC still exposed 🔴 |
+| SEO | 6/10 | Yoast + GA4 active, missing property schema |
+| Performance | 3/10 | 12+ CSS/JS files, no CDN, no caching |
+| Content Scale | 8/10 | 100+ projects, multiple developers, multi-city |
 
 ---
 
-## Critical Bugs Found on Live Site
+## 2. Confirmed WordPress Stack
+
+### Core
+| Layer | Detail |
+|-------|--------|
+| WordPress Version | **6.8.6** (confirmed from `<meta generator>`) |
+| Theme | Hello Elementor **3.1.1** |
+| Child Theme | hello-theme-child-master **2.0.0** |
+| GA4 Tracking | `GT-WVRTJL7Q` (via Google Site Kit) |
+
+### Active Plugins (Confirmed from page source assets)
+
+| # | Plugin | Version | Purpose |
+|---|--------|---------|---------|
+| 1 | Elementor | 4.1.4 | Page builder core |
+| 2 | Elementor Pro | 3.21.3 | Theme Builder, Popups |
+| 3 | **Dynamic Content for Elementor (DCE)** | 3.0.7 | **DATA LEAK SOURCE** — DCE posts widget |
+| 4 | Essential Addons for Elementor | 6.6.11 | Extra widgets |
+| 5 | ElementsKit Lite | 3.9.7 | Extra widgets + REST API (`/wp-json/elementskit/v1/`) |
+| 6 | Ultimate Elementor (UAEL) | 1.36.30 | Extra widgets |
+| 7 | Yoast SEO | 27.4 | SEO meta, schema, sitemaps |
+| 8 | Google Site Kit | Active | GA4 integration |
+| 9 | Simple Custom CSS and JS | Active | Inline JS/CSS injection |
+| 10 | Wordfence | Active | Security, 2FA |
+| 11 | UiPress | Active | WP admin UI (`uip-ui-template` CPT) |
+| 12 | Ads Manager | Active | `ad` custom post type registered |
+
+---
+
+## 3. Complete Content Data Model (from WP REST API)
+
+The WordPress REST API is **open without authentication** — all content is publicly queryable.
+
+### Custom Post Types (CPTs)
+
+| CPT Slug | Name | Archive | Hierarchical | Taxonomies |
+|----------|------|---------|-------------|-----------|
+| `project` | Projects | ✅ `/project/` | ✅ Parent/Child | project-amenities, project-label, project-status, project-sub-type, project-type, rera-location-link |
+| `developer` | Developers | ✅ `/developer/` | ✅ | none |
+| `location` | Location | ✅ `/location/` | ✅ | location-category |
+| `lead` | Leads | ❌ | ❌ | none (CRM data in WP) |
+| `ad` | Ads | ❌ | ✅ | ads-type |
+| `elementor_library` | Templates | ❌ | ❌ | none |
+| `elementskit_content` | ElementsKit Items | ❌ | ✅ | none |
+| `uip-ui-template` | UI Templates | ❌ | ❌ | none (UiPress admin) |
 
 > [!CAUTION]
-> These are live production issues costing leads and credibility RIGHT NOW.
+> The `lead` CPT is **publicly accessible via REST API** at `/wp-json/wp/v2/lead`.
+> This could expose customer enquiry data without authentication. **Restrict immediately.**
 
-### 🔴 Bug 1: Content Data Leak (P0 — CRITICAL)
-**Every project page shows wrong data from "Prestige Jasdan Classic"**
+### Project Taxonomies (Rich Filtering System)
 
-On pages like `/project/luxury-living-in-chembur/` (Godrej Sky Terraces):
-- About description = Prestige Jasdan Classic's text
-- Lead enquiry form header = "Prestige Jasdan Classic by Prestige Group"
-- Developer section = Prestige Group (wrong)
-- FAQ = Prestige Jasdan Classic questions
+| Taxonomy | Purpose |
+|----------|---------|
+| `project-amenities` | Swimming Pool, Gym, Clubhouse, etc. |
+| `project-label` | New Launch, Under Construction, Ready to Move |
+| `project-status` | Status badge (New Launch, etc.) |
+| `project-sub-type` | Apartment, Villa, Plot, Commercial |
+| `project-type` | Residential, Commercial, Mixed |
+| `rera-location-link` | RERA registration location mapping |
 
-**Root cause:** WordPress Elementor template has a hardcoded post reference in a global widget instead of dynamic current-post binding.
+### Content Volume (from REST API)
 
-**Fix:** In WordPress → Elementor → Global Widget → update dynamic tag source to "Current Post" instead of fixed post ID.
+| CPT | Count (from page 1 of 100) |
+|-----|---------------------------|
+| `project` | **100+ published** (paginated, 100 returned in first call) |
+| `developer` | Multiple (Godrej, DLF, Brigade, Kolte Patil, M3M, Sobha, Hiranandani, Oberoi, Prestige, etc.) |
+| `location` | Hierarchical — Countries → States → Cities → Localities |
+| `lead` | Unknown count (CRM data — do NOT expose publicly) |
 
-### 🔴 Bug 2: Placeholder Phone Numbers
-On `/contact-us`, both Calling Support and WhatsApp show `+91 99999 - 99999`.
-**Fix:** Update in WordPress page editor.
+### Sample Projects Inventory (from REST API)
+Top 20 from API response (100+ total):
+1. Prestige Tranquil – Copy *(duplicate — delete!)*
+2. 24K Espada
+3. Kolte Patil 24K Sereno
+4. Kolte Patil Atmos / Aros / Canvas / Centria / Equa / Green Olive / Ivy Estate
+5. Three Sixty (Worli)
+6. Elysian / Forestville / Oberoi Garden City / Sky City (Oberoi Realty)
+7. DLF Premium Riverside / Parc Estate / The Camellias / Golf Links / The Valley Gardens
+8. SOBHA Conserve / Insignia / Galera / Neopolis / Crystal Meadows / Infinia
+9. Brigade Citadel / Gateway / Komarla Heights / Calista / Oak Tree / Hill View
+10. Godrej Prime / Central / Greens / Summit / Oasis / Aqua / Air / Icon
+11. M3M Capitalwalk / The Line / Route 65 / Jewel / Paragon 57 / Crown / Altitude
+12. Hiranandani Estate / Leona / Gardens / Regent Hill
+13. One Hiranandani Park (Hampton, Eagleton, Willowcrest, Cloverdale)
+14. ABA Cleo Gold
 
-### 🔴 Bug 3: WordPress Admin Publicly Exposed
-`/wp-admin/` and `/wp-login.php` are publicly accessible — security risk.
-**Fix:** Add to `.htaccess`:
-```apache
-<Files wp-login.php>
-  Order deny,allow
-  Deny from all
-  Allow from YOUR.OFFICE.IP.ADDRESS
-</Files>
+---
+
+## 4. Critical Bug — Root Cause (Confirmed)
+
+### 🔴 Bug 1: Prestige Jasdan Classic Data Leak
+
+**Source identified:** Post 1343, "contact popup property page" — Elementor Popup Template
+
+**Plugin responsible:** Dynamic Content for Elementor (DCE) v3.0.7
+
+**How it works:**
+- Elementor Pro popup (post 1343) is set to appear on **all Project CPT pages**
+- Inside the popup, DCE widgets are used to display "project name" and "developer name"
+- The DCE widget's **Source** is set to a **specific post ID** (Prestige Jasdan Classic's ID) instead of **"Current Post"** / contextual binding
+- Result: Every project page popup shows Prestige Jasdan Classic's data
+
+**The Fix:**
+1. WP Admin → Elementor → Find post 1343 → Edit with Elementor
+2. Click on the heading widget showing "Prestige Jasdan Classic"
+3. Left panel → Content → Dynamic Tags / Source → change from "Manual/Specific Post" to **"Current Post"**
+4. Repeat for developer name and any other DCE widgets
+5. Click **Update**
+
+> [!IMPORTANT]
+> The DCE widget showing project data in a popup form is specifically the "Post Title" or "Post Custom Field" widget with a **hardcoded `post_id` parameter**. Changing it to `current_post` will fix every single project page instantly.
+
+### 🔴 Bug 2: Lead CPT Exposed via REST API
+
+The `lead` CPT is registered with `show_in_rest: true`, meaning:
+```
+https://propertyrubix.com/wp-json/wp/v2/lead
+```
+...may expose all customer enquiry data publicly.
+
+**Fix:** Add to `functions.php` in child theme:
+```php
+// Remove lead CPT from REST API
+add_filter('register_post_type_args', function($args, $post_type) {
+    if ($post_type === 'lead') {
+        $args['show_in_rest'] = false;
+    }
+    return $args;
+}, 10, 2);
 ```
 
-### 🟡 Bug 4: Search Non-Functional
-Homepage search bar throws `TypeError: Failed to fetch` — no results appear.
+### 🔴 Bug 3: Contact Page Placeholder Numbers
+`/contact-us` shows `+91 99999 - 99999` for both Phone and WhatsApp.
 
-### 🟡 Bug 5: Demo Data in Production
-`Prestige Tranquil - Copy` visible in project listings — test/duplicate data.
+### 🟡 Bug 4: Duplicate Project Listing
+`Prestige Tranquil – Copy` (post ID 7304) is published. Should be deleted or set to draft.
 
----
-
-## Technology Stack (Live Site — Confirmed)
-
-| Layer | Technology | Confirmed By |
-|-------|-----------|-------------|
-| CMS | WordPress | `/wp-admin/` accessible |
-| Page Builder | Elementor Pro | CSS classes `ekit_`, `elementor-*` |
-| Frontend JS | jQuery 3.x | Script tags |
-| CSS Framework | Bootstrap 5 | Class names |
-| Hosting | Unknown (likely cPanel) | No CDN response headers |
-| Search | Custom JS | Broken — JS console errors |
-| CDN | None | Assets from origin |
-| SSL | Active | HTTPS enforced |
-
-## Technology Stack (PHP MVC Codebase — This Repo)
-
-| Layer | Technology |
-|-------|-----------|
-| Language | PHP 8.1+ |
-| Architecture | Custom MVC (Router + Controller + View) |
-| Database | MySQL 8 with PDO |
-| Auth | Session-based + RBAC (role/permissions table) |
-| Security | CSRF tokens, prepared statements, bcrypt passwords |
-| Admin | Full custom admin panel |
-| Deployment | GitHub Actions CI/CD |
+### 🟡 Bug 5: Homepage Search Broken
+`TypeError: Failed to fetch` — search API endpoint missing or CORS blocked.
 
 ---
 
-## Site Structure Map
+## 5. Security Assessment
+
+| Risk | Status | Action |
+|------|--------|--------|
+| WP Admin 2FA | ✅ Active (Wordfence) | Good |
+| XML-RPC | 🔴 Active | Disable via .htaccess |
+| REST API Auth | 🔴 Unauthenticated | Restrict lead CPT |
+| ElementsKit REST | ⚠️ Active | Audit `/wp-json/elementskit/v1/` scope |
+| WP Admin URL | ⚠️ Public | Restrict to office IP |
+| SSL | ✅ Active | — |
+
+---
+
+## 6. Performance Analysis
+
+**Assets loaded per page (project page):**
+- CSS files: 12+ separate files (Elementor, Elementor Pro, DCE, EAEL, UAEL, ElementsKit × 2, Hello Elementor × 3, Child Theme, WP core)
+- JS files: jQuery 3.7.1, jQuery Migrate, Swiper, Owl Carousel, custom JS
+- External: Google Tag Manager, fonts (Radikal — custom, self-hosted)
+- Total estimated page weight: **3-5MB** uncompressed
+
+**Core Web Vitals prediction:** Failing (too many render-blocking resources)
+
+**Immediate fixes:**
+1. Install WP Rocket or LiteSpeed Cache — reduces files to 2-3 via concatenation
+2. Add Cloudflare (free) — CDN + basic caching
+3. Lazy-load images — huge improvement on project pages with 20+ images
+
+---
+
+## 7. WordPress Site Map
 
 ```
 propertyrubix.com/
-├── /in/                                    ← Country homepage (India)
-├── /location/                              ← All locations
-│   └── /asia-pacific/india/               ← Country
-│       └── /maharashtra/                  ← State
-│           └── /mumbai/                   ← City
-│               └── /chembur/              ← Locality
-│                   └── [project cards]    ← Projects list
-├── /project/{slug}/                        ← Project detail
-│   └── Gallery, Config, Amenities, FAQ,
-│       EMI Calc, Lead Form, Developer
-├── /developer/                             ← All builders
-│   └── /{builder-slug}/                   ← Builder profile + projects
-├── /blog/                                  ← Articles
-│   └── /{article-slug}/                   ← Article detail
-├── /about-us                              ← Static
-├── /contact-us                            ← Lead form + contact
-├── /advertise-with-us                     ← Advertiser info
-├── /privacy-policy                        ← Legal
-├── /terms-conditions/                     ← Legal
-└── /wp-admin/                             ← 🔴 SECURITY RISK — exposed
+├── /in/                              ← Country landing (India)
+├── /us/                              ← Country landing (USA)
+├── /location/                        ← CPT: location archive
+│   ├── /asia-pacific/india/          ← State level
+│   │   ├── /maharashtra/             ← City level  
+│   │   │   ├── /mumbai/              ← Locality level
+│   │   │   │   └── /chembur/         ← Projects in locality
+│   │   ├── /karnataka/               
+│   │   │   └── /bengaluru/           
+├── /project/                         ← CPT: project archive (100+ items)
+│   └── /{project-slug}/             ← Single project (DCE template)
+├── /developer/                       ← CPT: developer archive
+│   └── /{developer-slug}/           ← Single developer + projects
+├── /blog/                            ← Standard WP posts
+│   └── /{post-slug}/
+├── /about-us                         
+├── /contact-us                       ← 🔴 Placeholder phone numbers
+├── /advertise-with-us                
+├── /privacy-policy                   
+├── /terms-conditions/                
+└── /wp-admin/                        ← ⚠️ Publicly accessible (2FA protects)
 ```
 
 ---
 
-## Phased Implementation Roadmap
+## 8. Immediate Action Plan
 
-### 🔴 Phase 0 — Emergency Fixes (Week 1)
-*Fix live production issues immediately*
+### Today (P0)
+| # | Task | How |
+|---|------|-----|
+| 1 | Fix DCE popup data leak | Elementor → post 1343 → change DCE source to Current Post |
+| 2 | Restrict lead CPT REST access | Add `show_in_rest = false` to functions.php |
+| 3 | Fix contact page numbers | WP Admin → Pages → Contact Us → Edit with Elementor |
 
-- [ ] Fix Elementor data leak — correct dynamic tag binding on all project templates
-- [ ] Replace placeholder phone numbers on Contact Us page
-- [ ] Restrict `/wp-admin/` access to office IP via `.htaccess`
-- [ ] Disable WordPress XML-RPC (`xmlrpc.php`)
-- [ ] Install WP security plugin (Wordfence or Sucuri)
-- [ ] Remove duplicate `Prestige Tranquil - Copy` listing
-- [ ] Fix homepage search JS errors
+### This Week (P1)
+| # | Task | How |
+|---|------|-----|
+| 4 | Disable XML-RPC | `.htaccess` rule |
+| 5 | Delete Prestige Tranquil – Copy | WP Admin → Projects → Trash post 7304 |
+| 6 | Fix homepage search | Debug JS → likely needs AJAX endpoint or REST API search |
+| 7 | Add Cloudflare | Free plan → proxy A records |
+| 8 | Install WP Rocket | Page caching + JS/CSS concatenation |
 
-### 🟡 Phase 1 — Foundation (Weeks 2-4)
-*Stabilize PHP MVC codebase as primary platform*
+### This Month (P2)
+| # | Task |
+|---|------|
+| 9 | Add `RealEstateListing` schema.org markup per project |
+| 10 | Fix meta descriptions (unique per project page) |
+| 11 | Build REST API in PHP MVC codebase |
+| 12 | Implement working search in PHP MVC |
 
-**Backend:**
-- [ ] REST API layer — `/api/v1/projects`, `/api/v1/properties`, `/api/v1/search`
-- [ ] Full-text search — MySQL FULLTEXT indexes + proper search endpoint
-- [ ] File cache — cache expensive queries (project listings, location pages)
-- [ ] Image optimization — WebP conversion + thumbnail generation on upload
-- [ ] Rate limiting — protect `/ajax/*` from spam
-- [ ] Error handling — proper 404/500 pages; log to file in production
+---
 
-**Database:**
-- [ ] Add FULLTEXT index on `projects(name, description, address)`
-- [ ] Add `search_logs` table (track popular queries)
-- [ ] Add `buyer_accounts` table (user registration)
-- [ ] Add `lead_activities` table (lead timeline/CRM notes)
-- [ ] Add `media` table (centralized media library)
-- [ ] Add `price_history` table (track price changes)
+## 9. Enterprise Architecture Roadmap
 
-### 🟢 Phase 2 — Feature Completeness (Weeks 5-8)
+### Phase 0 — WordPress Emergency Fixes (Week 1)
+- [ ] Fix Elementor DCE popup data leak (post 1343)
+- [ ] Hide lead CPT from public REST API
+- [ ] Fix contact page phone numbers
+- [ ] Delete duplicate project listing
+- [ ] Disable xmlrpc.php
+- [ ] Add Cloudflare CDN (free)
+- [ ] Install caching plugin
 
-**Search & Discovery:**
-- [ ] Autocomplete search with AJAX + debounce
-- [ ] Advanced filters (price, BHK, type, possession, RERA)
-- [ ] Google Maps integration with project pins
-- [ ] Saved searches (requires buyer accounts)
-- [ ] Recently viewed (cookie-based)
+### Phase 1 — PHP MVC Foundation (Weeks 2-4)
+- [ ] REST API layer (`/api/v1/projects`, `/api/v1/search`, `/api/v1/leads`)
+- [ ] MySQL FULLTEXT search
+- [ ] Image optimization (WebP, thumbnails)
+- [ ] File-based caching
+- [ ] Error handling + logging
 
-**Lead Management:**
-- [ ] Lead deduplication (same phone+project = one lead)
-- [ ] Lead assignment to team members by city
-- [ ] WhatsApp notification on new lead
-- [ ] Email templates for lead alerts
-- [ ] Lead status workflow (New → Contacted → Site Visit → Closed)
+### Phase 2 — Feature Completeness (Weeks 5-8)
+- [ ] Advanced search filters (price, BHK, type, status, RERA)
+- [ ] Google Maps integration
+- [ ] Lead CRM (dedup, assignment, WhatsApp notification, workflow)
+- [ ] Analytics (GA4 events, lead source UTM tracking)
+- [ ] TinyMCE rich editor
+- [ ] Bulk CSV import
 
-**Content:**
-- [ ] Rich text editor (TinyMCE) for descriptions
-- [ ] Bulk CSV import for properties/projects
-- [ ] Centralized image manager with crop/resize
-- [ ] SEO fields per page (meta title, description, OG image)
-- [ ] Revision history for content changes
-
-**Analytics:**
-- [ ] Google Analytics 4 integration
-- [ ] Internal analytics (pageviews, popular properties, search queries)
-- [ ] UTM parameter tracking in leads
-
-### 🔵 Phase 3 — Performance & Scale (Weeks 9-12)
-
-- [ ] Redis caching for project listings (TTL: 30 min)
-- [ ] Cloudflare CDN + WAF setup
-- [ ] Image CDN with WebP + responsive srcsets
-- [ ] Database read replica for heavy reads
-- [ ] Query optimization (EXPLAIN all slow queries)
-- [ ] PHP OPcache tuning
-- [ ] 2FA for admin panel (TOTP)
-- [ ] Penetration testing (quarterly)
+### Phase 3 — Performance & Scale (Weeks 9-12)
+- [ ] Redis caching
+- [ ] AWS S3 + CloudFront for media
+- [ ] DB read replica
+- [ ] 2FA for custom PHP admin
 - [ ] Sentry error monitoring
-- [ ] UptimeRobot health checks
+- [ ] WAF via Cloudflare
 
-### 🟣 Phase 4 — Enterprise Features (Months 4-6)
-
-- [ ] Developer/builder portal — builders manage their own listings
-- [ ] API access with API keys for third-party integrations
-- [ ] Mobile app (React Native using Phase 1 API)
-- [ ] Similar properties ML recommendations
-- [ ] Chatbot lead qualification (WhatsApp integration)
-- [ ] Paid listing tiers (Free/Standard/Featured/Premium)
-- [ ] Razorpay/Stripe payment gateway
-- [ ] White-label sub-domains for builders
+### Phase 4 — Enterprise Features (Months 4-6)
+- [ ] Builder self-service portal
+- [ ] Paid listing tiers + Razorpay
+- [ ] Mobile app (React Native via Phase 1 API)
+- [ ] AI property recommendations
+- [ ] WhatsApp chatbot for leads
 
 ---
 
-## Target Enterprise Architecture
+## 10. Target Enterprise Architecture
 
 ```
-                    Cloudflare (CDN + WAF + DDoS)
-                            │
-          ┌─────────────────┼─────────────────┐
-          │                 │                  │
-    Frontend (PHP      Admin Panel        REST API
-    MVC + Alpine.js)   (Current)          /api/v1/*
-          │                 │                  │
-          └─────────────────┼──────────────────┘
-                            │
-              PropertyRubix PHP 8.2 MVC App
-                    (This Repository)
-                            │
-          ┌─────────────────┼──────────────────┐
-          │                 │                  │
-     MySQL 8           Redis Cache        AWS S3
-    Primary +           Sessions +        Uploads +
-    Replica            Listings           CloudFront
+                      Cloudflare (CDN + WAF + DDoS)
+                               │
+             ┌─────────────────┼──────────────────┐
+             │                 │                  │
+       Frontend PHP       Admin Panel         REST API
+       (MVC + Alpine)     (This repo)         /api/v1/*
+             │                 │                  │
+             └─────────────────┼──────────────────┘
+                               │
+                  PropertyRubix PHP 8.2 MVC App
+                    (This repo — replacing WP)
+                               │
+          ┌─────────────────────┼────────────────────┐
+          │                    │                    │
+     MySQL 8              Redis 7              AWS S3
+   Primary +             Cache +            Uploads +
+   Replica            Sessions            CloudFront
 ```
 
 ---
 
-## SEO Opportunities
+## 11. Developer Quick Reference
 
-Current URL structure is excellent for SEO (`/location/country/state/city/locality/`).
-What's missing:
-
-| Element | Action |
-|---------|--------|
-| Schema.org markup | Add `RealEstateListing`, `Organization`, `BreadcrumbList` |
-| Open Graph images | Per-property OG images for social sharing |
-| Meta descriptions | Unique per page (currently generic) |
-| H1 consistency | One H1 per page |
-| Image alt texts | All property images need descriptive alts |
-| Internal linking | Popular cities in footer for link equity |
-| XML Sitemap | Verify `/sitemap.xml` is correct and submitted |
-| Google Search Console | Verify and monitor coverage |
-| Core Web Vitals | Critical — Elementor is killing scores |
-
----
-
-## Developer Reference
-
-### PHP MVC Quick Start
+### PHP MVC Setup (This Repo)
 ```bash
 git clone https://github.com/abhijeetpandeywork/property-rubix.git
 cd property-rubix
-scripts\setup.bat        # Windows (creates .env, runs migrations)
+scripts\setup.bat        # Windows
 bash scripts/setup.sh    # Mac/Linux
+# Runs: creates .env → verifies DB → runs migrations → installs dev tools
 ```
 
-### Key Architecture Files
-```
-index.php                    ← Front controller (routing starts here)
-config/db.php                ← Loads .env, DB connection, helpers
-app/core/Router.php          ← URL matching and dispatch
-app/core/Controller.php      ← Base class for all controllers
-app/helpers/auth.php         ← Login, RBAC, audit logging
-app/helpers/csrf.php         ← CSRF token generation + verification
-database/migrate.php         ← DB migration CLI tool
-database/migrations/         ← Versioned SQL files (run in order)
-.github/workflows/ci.yml     ← CI: PHP 8.1/8.2/8.3 lint+test
-.github/CODEOWNERS           ← Who reviews what
-```
+### Key Files
+| File | Purpose |
+|------|---------|
+| `index.php` | Front controller |
+| `config/db.php` | DB + .env loader |
+| `app/core/Router.php` | URL routing |
+| `app/helpers/auth.php` | Session + RBAC |
+| `app/helpers/csrf.php` | CSRF (enabled) |
+| `database/migrate.php` | Migration CLI |
+| `database/migrations/` | Versioned SQL |
+| `.github/workflows/ci.yml` | CI: PHP 8.1+8.2+8.3 |
+| `.agents/AGENTS.md` | AI agent context |
+| `docs/ARCHITECT_REPORT.md` | This document |
 
-### Adding a New Feature
-1. Create migration if DB changes: `cp database/migrations/_template.sql database/migrations/00X_name.sql`
-2. Add route in `index.php`
-3. Create `app/controllers/YourController.php` extending `Controller`
-4. Create view in `app/views/your/view.php`
-5. Create PR to `develop` with conventional commit title
-
-### Adding a Database Migration
+### Branch + Commit Rules
 ```bash
-cp database/migrations/_template.sql database/migrations/003_my_change.sql
-# Write SQL in the new file
-php database/migrate.php
-git add database/migrations/003_my_change.sql
+# Start feature
+git checkout develop && git pull
+git checkout -b feature/your-feature-name
+
+# Commit format
+feat(search): add autocomplete endpoint
+fix(auth): resolve session expiry
+security(db): add missing prepared statement
+
+# PR target: develop (not main)
+```
+
+### Database Changes
+```bash
+cp database/migrations/_template.sql database/migrations/003_name.sql
+php database/migrate.php    # test locally
+git add database/migrations/003_name.sql
 git commit -m "feat(db): describe the change"
 ```
 
 ---
 
-*Generated by AI System Architect — Antigravity*
-*All screenshots saved in knowledge base: conversation `3b09d949-ad6d-471c-b60e-3efbc3fa69a7`*
+## 12. Context & Conversation Log
+
+| When | What | Where Stored |
+|------|------|-------------|
+| July 20, 2026 | Full site review (55+ screenshots) | Conversation `3b09d949`, artifact directory |
+| July 20, 2026 | WP Admin access + REST API audit | This document |
+| July 20, 2026 | VCS + CI/CD pipeline setup | Git commits on `main`/`develop` |
+| July 20, 2026 | DB migration system created | `database/migrate.php`, `migrations/` |
+| July 20, 2026 | Critical security fixes (CSRF, upload, creds) | Git commit `7ccf739` |
+
+**All AI agent context:** [.agents/AGENTS.md](../.agents/AGENTS.md)
+**All DB decisions:** [docs/DATABASE.md](DATABASE.md)
+
+---
+
+*Report v2.1 — July 20, 2026*
+*Antigravity AI System Architect*
+*Screenshots: 55+ saved in knowledge base*
+*REST API data: Verified from `/wp-json/wp/v2/` endpoints*
