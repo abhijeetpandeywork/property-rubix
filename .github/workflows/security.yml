@@ -1,0 +1,45 @@
+name: 🔒 Security & Dependency Audit
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"  # Every Monday at 3 AM UTC
+  workflow_dispatch:
+
+jobs:
+  audit:
+    name: Dependency & Secret Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog Secret Scan (full history)
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          extra_args: --debug --only-verified
+
+      - name: Composer Audit
+        run: |
+          if [ -f composer.json ]; then
+            composer audit --no-interaction
+          else
+            echo "No composer.json — skipping"
+          fi
+
+      - name: OWASP Dependency Check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: "property-rubix"
+          path: "."
+          format: "HTML"
+
+      - name: Upload Dependency Check Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dependency-check-report
+          path: reports/

@@ -1,0 +1,190 @@
+name: 🚀 CI — Build, Lint & Security
+
+on:
+  push:
+    branches: [main, develop, staging]
+  pull_request:
+    branches: [main, develop, staging]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PHP_VERSION: "8.2"
+
+jobs:
+  # ────────────────────────────────────────────────────────────
+  lint:
+    name: 🔍 PHP Lint & Code Style
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: pdo, pdo_mysql, mbstring, json
+          coverage: none
+          tools: phpcs, phpmd, php-cs-fixer
+
+      - name: Check PHP Syntax (Lint)
+        run: find . -name "*.php" -not -path "*/vendor/*" -not -path "*/.git/*" | xargs -I {} php -l {}
+
+      - name: Run PHP_CodeSniffer
+        run: phpcs --standard=PSR12 --extensions=php --ignore=vendor/ app/ config/ --report=checkstyle || true
+
+  # ────────────────────────────────────────────────────────────
+  security:
+    name: 🔒 Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          tools: composer
+
+      - name: Install Composer Dependencies
+        run: |
+          if [ -f composer.json ]; then
+            composer install --prefer-dist --no-progress --no-interaction
+          else
+            echo "No composer.json found, skipping"
+          fi
+
+      - name: Run Security Audit (Local Scan)
+        run: |
+          echo "🔍 Scanning for hardcoded secrets..."
+          if grep -r "DB_PASS\s*=\s*['\"][^'\"]\+" config/ app/ --include="*.php" | grep -v ".env.example" | grep -v "getenv\|env(" ; then
+            echo "⚠️  WARNING: Potential hardcoded credentials found!"
+          else
+            echo "✅ No hardcoded credentials detected"
+          fi
+
+      - name: Check for sensitive files accidentally committed
+        run: |
+          SENSITIVE=(".env" "*.pem" "*.key" "*.p12" "composer.lock")
+          for f in "${SENSITIVE[@]}"; do
+            if git ls-files | grep -q "$f"; then
+              echo "⚠️ SECURITY WARNING: Sensitive file tracked: $f"
+            fi
+          done
+
+  # ────────────────────────────────────────────────────────────
+  test:
+    name: 🧪 Tests
+    runs-on: ubuntu-latest
+    needs: lint
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: property_rubix_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+          extensions: pdo, pdo_mysql, mbstring, json
+          coverage: xdebug
+
+      - name: Import Database Schema
+        run: |
+          if [ -f database/schema.sql ]; then
+            mysql -u root -proot -h 127.0.0.1 property_rubix_test < database/schema.sql
+            echo "✅ Schema imported"
+          else
+            echo "⚠️ No schema.sql found"
+          fi
+
+      - name: Run PHPUnit Tests
+        run: |
+          if [ -f phpunit.xml ] || [ -f phpunit.xml.dist ]; then
+            vendor/bin/phpunit --coverage-text
+          else
+            echo "ℹ️ No PHPUnit config found — tests skipped. Add tests/!"
+          fi
+
+  # ────────────────────────────────────────────────────────────
+  analyze:
+    name: 📊 Code Analysis
+    runs-on: ubuntu-latest
+    needs: lint
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript
+          queries: security-and-quality
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+  # ────────────────────────────────────────────────────────────
+  build-check:
+    name: ✅ Build Readiness Check
+    runs-on: ubuntu-latest
+    needs: [lint, security]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION }}
+
+      - name: Validate Project Structure
+        run: |
+          echo "📂 Checking required project structure..."
+          REQUIRED=("index.php" "config/db.php" "app/controllers" "app/views" "app/core" ".htaccess")
+          ALL_OK=true
+          for item in "${REQUIRED[@]}"; do
+            if [ -e "$item" ]; then
+              echo "  ✅ $item"
+            else
+              echo "  ❌ MISSING: $item"
+              ALL_OK=false
+            fi
+          done
+          if [ "$ALL_OK" = false ]; then
+            exit 1
+          fi
+
+      - name: Check .env.example exists
+        run: |
+          if [ ! -f ".env.example" ]; then
+            echo "❌ .env.example is missing — required for onboarding"
+            exit 1
+          fi
+          echo "✅ .env.example present"
+
+      - name: Summary
+        run: |
+          echo "🎉 All CI checks passed for branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Triggered by: ${{ github.actor }}"

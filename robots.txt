@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /config/
+Disallow: /app/
+
+Sitemap: http://localhost/property-rubix/sitemap.xml
