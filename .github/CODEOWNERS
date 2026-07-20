@@ -1,0 +1,26 @@
+# CODEOWNERS — PropertyRubix
+# Automatically requests review from specified owners
+# when matching files are changed in a PR.
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# ── Default: all files require review ───────────────────────
+* @abhijeetpandeywork
+
+# ── Critical: config and database — always needs lead review ─
+/config/              @abhijeetpandeywork
+/database/            @abhijeetpandeywork
+/database/migrations/ @abhijeetpandeywork
+
+# ── CI/CD pipelines — sensitive, always needs lead review ────
+/.github/workflows/   @abhijeetpandeywork
+/.github/CODEOWNERS   @abhijeetpandeywork
+
+# ── Security-critical files ──────────────────────────────────
+/app/helpers/auth.php   @abhijeetpandeywork
+/app/helpers/csrf.php   @abhijeetpandeywork
+/app/helpers/upload.php @abhijeetpandeywork
+/admin/login.php        @abhijeetpandeywork
+/admin/logout.php       @abhijeetpandeywork
+
+# ── Core framework ───────────────────────────────────────────
+/app/core/ @abhijeetpandeywork

@@ -24,7 +24,7 @@ uploads/
 
 # ── PHP / Composer ──────────────────────────────────────────
 vendor/
-composer.lock          # Only exclude if you don't want lock file committed
+composer.lock          # Uncomment to track lock file for reproducible builds
 *.cache
 
 # ── OS artifacts ────────────────────────────────────────────

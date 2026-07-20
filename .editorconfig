@@ -1,0 +1,55 @@
+# ============================================================
+# .editorconfig — PropertyRubix
+# Forces consistent formatting across VS Code, PhpStorm,
+# Sublime, Vim, etc. regardless of developer OS.
+# ============================================================
+
+root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# PHP files
+[*.php]
+indent_style = space
+indent_size = 4
+max_line_length = 160
+
+# CSS/JS — 2 space indent (common convention)
+[*.{css,js,json}]
+indent_style = space
+indent_size = 2
+
+# HTML/PHP views
+[*.html]
+indent_style = space
+indent_size = 2
+
+# YAML / GitHub Actions
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
+
+# Markdown
+[*.md]
+trim_trailing_whitespace = false
+indent_size = 2
+
+# SQL
+[*.sql]
+indent_style = space
+indent_size = 2
+
+# Windows batch files
+[*.{bat,cmd}]
+end_of_line = crlf
+
+# Makefile requires real tabs
+[Makefile]
+indent_style = tab

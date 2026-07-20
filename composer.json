@@ -1,0 +1,38 @@
+{
+    "name": "property-rubix/app",
+    "description": "PropertyRubix — Enterprise PHP Real Estate Portal",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.1"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.9",
+        "phpmd/phpmd": "^2.15",
+        "phpunit/phpunit": "^11.0",
+        "friendsofphp/php-cs-fixer": "^3.57"
+    },
+    "scripts": {
+        "lint":        "phpcs --standard=phpcs.xml app/ config/ admin/ index.php",
+        "lint:fix":    "phpcbf --standard=phpcs.xml app/ config/ admin/ index.php",
+        "test":        "phpunit --configuration phpunit.xml",
+        "analyse":     "phpmd app/ text phpmd.xml",
+        "check":       ["@lint", "@test"]
+    },
+    "scripts-descriptions": {
+        "lint":     "Check code style (PSR-12)",
+        "lint:fix": "Auto-fix code style issues",
+        "test":     "Run PHPUnit test suite",
+        "analyse":  "Run PHP Mess Detector",
+        "check":    "Run lint + tests"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

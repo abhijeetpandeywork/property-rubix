@@ -18,7 +18,7 @@ function uploadImage(array $file, string $subdir = 'misc'): array {
 }
 
 function uploadPdf(array $file, string $subdir = 'brochures'): array {
-    return uploadFile($file, ALLOWED_PDF_TYPES, $subdir);
+    return uploadFile($file, $subdir, ALLOWED_PDF_TYPES);
 }
 
 function uploadFile(array $file, string $subdir, array $allowedMimes): array {

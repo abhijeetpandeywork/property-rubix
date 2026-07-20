@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<ruleset name="PropertyRubix-PSR12"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
+
+    <description>PropertyRubix PHP coding standard — PSR-12 with project-specific overrides</description>
+
+    <!-- Scan these paths -->
+    <file>app/</file>
+    <file>config/</file>
+    <file>index.php</file>
+
+    <!-- Exclude paths -->
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/database/*</exclude-pattern>
+    <exclude-pattern>*/uploads/*</exclude-pattern>
+    <exclude-pattern>*/assets/*</exclude-pattern>
+    <exclude-pattern>admin/test_post.php</exclude-pattern>
+    <exclude-pattern>admin/generate_cruds.php</exclude-pattern>
+
+    <!-- Use PSR-12 base -->
+    <rule ref="PSR12"/>
+
+    <!-- Allow long lines in views (HTML templates) -->
+    <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="160"/>
+            <property name="absoluteLineLimit" value="200"/>
+        </properties>
+    </rule>
+
+    <!-- Allow short open tags in view files -->
+    <rule ref="Generic.PHP.DisallowShortOpenTag.EchoFound">
+        <exclude-pattern>*/views/*</exclude-pattern>
+        <exclude-pattern>*/admin/*</exclude-pattern>
+    </rule>
+
+    <!-- Severity -->
+    <arg name="severity" value="5"/>
+    <arg name="tab-width" value="4"/>
+    <arg value="sp"/>
+    <arg name="colors"/>
+    <arg name="extensions" value="php"/>
+
+</ruleset>

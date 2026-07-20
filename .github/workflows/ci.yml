@@ -10,36 +10,63 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  PHP_VERSION: "8.2"
-
 jobs:
   # ────────────────────────────────────────────────────────────
   lint:
-    name: 🔍 PHP Lint & Code Style
+    name: 🔍 PHP Lint (${{ matrix.php }})
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ["8.1", "8.2", "8.3"]
+      fail-fast: false
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup PHP
+      - name: Setup PHP ${{ matrix.php }}
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ env.PHP_VERSION }}
+          php-version: ${{ matrix.php }}
           extensions: pdo, pdo_mysql, mbstring, json
           coverage: none
-          tools: phpcs, phpmd, php-cs-fixer
+          tools: composer
 
-      - name: Check PHP Syntax (Lint)
-        run: find . -name "*.php" -not -path "*/vendor/*" -not -path "*/.git/*" | xargs -I {} php -l {}
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ matrix.php }}-${{ hashFiles('composer.json') }}
+          restore-keys: ${{ runner.os }}-php-${{ matrix.php }}-
 
-      - name: Run PHP_CodeSniffer
-        run: phpcs --standard=PSR12 --extensions=php --ignore=vendor/ app/ config/ --report=checkstyle || true
+      - name: Install Composer dev tools
+        run: |
+          if [ -f composer.json ]; then
+            composer install --dev --prefer-dist --no-progress --no-interaction
+          fi
+
+      - name: PHP Syntax Check (all PHP files)
+        run: |
+          echo "→ Checking syntax across all PHP files..."
+          find . -name "*.php" \
+            -not -path "*/vendor/*" \
+            -not -path "*/.git/*" \
+            | xargs -I {} php -l {}
+          echo "✅ No syntax errors found"
+
+      - name: PHP_CodeSniffer (PSR-12)
+        run: |
+          if [ -f vendor/bin/phpcs ]; then
+            vendor/bin/phpcs --standard=phpcs.xml --report=checkstyle app/ config/ index.php || true
+          else
+            echo "ℹ phpcs not available — install composer deps"
+          fi
 
   # ────────────────────────────────────────────────────────────
   security:
     name: 🔒 Security Scan
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,38 +74,66 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ env.PHP_VERSION }}
+          php-version: "8.2"
           tools: composer
 
-      - name: Install Composer Dependencies
+      - name: Install Composer
         run: |
           if [ -f composer.json ]; then
-            composer install --prefer-dist --no-progress --no-interaction
-          else
-            echo "No composer.json found, skipping"
+            composer install --dev --prefer-dist --no-progress --no-interaction
           fi
 
-      - name: Run Security Audit (Local Scan)
+      - name: Scan for hardcoded secrets
         run: |
-          echo "🔍 Scanning for hardcoded secrets..."
-          if grep -r "DB_PASS\s*=\s*['\"][^'\"]\+" config/ app/ --include="*.php" | grep -v ".env.example" | grep -v "getenv\|env(" ; then
-            echo "⚠️  WARNING: Potential hardcoded credentials found!"
-          else
+          echo "🔍 Scanning for hardcoded credentials..."
+          FOUND=0
+
+          # Check for hardcoded passwords (not in .env.example or docs)
+          if grep -rn "DB_PASS\s*=\s*['\"][^'\"]\+" --include="*.php" config/ app/ \
+              | grep -v "env(" | grep -v "getenv" | grep -v ".env.example"; then
+            echo "⚠️ WARNING: Possible hardcoded DB password found"
+            FOUND=1
+          fi
+
+          # Check for hardcoded admin passwords in form values
+          if grep -rn 'value="admin123"' --include="*.php" admin/; then
+            echo "❌ CRITICAL: Hardcoded admin password in HTML!"
+            FOUND=1
+          fi
+
+          if [ $FOUND -eq 0 ]; then
             echo "✅ No hardcoded credentials detected"
           fi
 
-      - name: Check for sensitive files accidentally committed
+      - name: Check CSRF is not disabled
         run: |
-          SENSITIVE=(".env" "*.pem" "*.key" "*.p12" "composer.lock")
+          if grep -n "return true; // CSRF disabled" app/helpers/csrf.php; then
+            echo "❌ CRITICAL: CSRF protection is disabled!"
+            exit 1
+          fi
+          echo "✅ CSRF protection is active"
+
+      - name: Check sensitive files not tracked
+        run: |
+          SENSITIVE=(".env" "composer.lock")
           for f in "${SENSITIVE[@]}"; do
-            if git ls-files | grep -q "$f"; then
-              echo "⚠️ SECURITY WARNING: Sensitive file tracked: $f"
+            if git ls-files | grep -qx "$f"; then
+              echo "⚠️ WARNING: Sensitive file tracked: $f"
             fi
           done
+          echo "✅ Sensitive file check complete"
+
+      - name: Composer Security Audit
+        run: |
+          if [ -f composer.json ] && [ -f vendor/autoload.php ]; then
+            composer audit --no-interaction 2>&1 || true
+          else
+            echo "ℹ️ Composer audit skipped (no vendor)"
+          fi
 
   # ────────────────────────────────────────────────────────────
   test:
-    name: 🧪 Tests
+    name: 🧪 Tests + Migrations
     runs-on: ubuntu-latest
     needs: lint
 
@@ -88,9 +143,14 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: property_rubix_test
+          MYSQL_ALLOW_EMPTY_PASSWORD: "no"
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
 
     steps:
       - name: Checkout
@@ -99,30 +159,54 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ env.PHP_VERSION }}
+          php-version: "8.2"
           extensions: pdo, pdo_mysql, mbstring, json
           coverage: xdebug
 
-      - name: Import Database Schema
+      - name: Create test .env
         run: |
-          if [ -f database/schema.sql ]; then
-            mysql -u root -proot -h 127.0.0.1 property_rubix_test < database/schema.sql
-            echo "✅ Schema imported"
-          else
-            echo "⚠️ No schema.sql found"
-          fi
+          cat > .env << EOF
+          DB_HOST=127.0.0.1
+          DB_PORT=3306
+          DB_NAME=property_rubix_test
+          DB_USER=root
+          DB_PASS=root
+          APP_ENV=testing
+          APP_DEBUG=true
+          EOF
+          echo "✅ Test .env created"
+
+      - name: Wait for MySQL
+        run: |
+          echo "Waiting for MySQL..."
+          for i in {1..30}; do
+            if mysql -u root -proot -h 127.0.0.1 -e "SELECT 1" &>/dev/null; then
+              echo "✅ MySQL ready"
+              break
+            fi
+            echo "  Attempt $i/30..."
+            sleep 2
+          done
+
+      - name: Run Database Migrations
+        run: |
+          echo "→ Running migrations on test database..."
+          php database/migrate.php
+          echo "✅ Migrations complete"
+          php database/migrate.php --status
 
       - name: Run PHPUnit Tests
         run: |
           if [ -f phpunit.xml ] || [ -f phpunit.xml.dist ]; then
             vendor/bin/phpunit --coverage-text
           else
-            echo "ℹ️ No PHPUnit config found — tests skipped. Add tests/!"
+            echo "ℹ️ No PHPUnit config found — skipping unit tests"
+            echo "  Add tests/ and phpunit.xml to enable this step"
           fi
 
   # ────────────────────────────────────────────────────────────
   analyze:
-    name: 📊 Code Analysis
+    name: 📊 CodeQL Analysis
     runs-on: ubuntu-latest
     needs: lint
     permissions:
@@ -145,7 +229,7 @@ jobs:
 
   # ────────────────────────────────────────────────────────────
   build-check:
-    name: ✅ Build Readiness Check
+    name: ✅ Build Readiness
     runs-on: ubuntu-latest
     needs: [lint, security]
 
@@ -156,12 +240,26 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ env.PHP_VERSION }}
+          php-version: "8.2"
 
       - name: Validate Project Structure
         run: |
-          echo "📂 Checking required project structure..."
-          REQUIRED=("index.php" "config/db.php" "app/controllers" "app/views" "app/core" ".htaccess")
+          echo "📂 Checking required files..."
+          REQUIRED=(
+            "index.php"
+            "config/db.php"
+            ".env.example"
+            ".htaccess"
+            ".editorconfig"
+            "composer.json"
+            "database/migrate.php"
+            "database/migrations/001_initial_schema.sql"
+            "app/controllers"
+            "app/views"
+            "app/core"
+            "README.md"
+            "CONTRIBUTING.md"
+          )
           ALL_OK=true
           for item in "${REQUIRED[@]}"; do
             if [ -e "$item" ]; then
@@ -171,20 +269,13 @@ jobs:
               ALL_OK=false
             fi
           done
-          if [ "$ALL_OK" = false ]; then
-            exit 1
-          fi
-
-      - name: Check .env.example exists
-        run: |
-          if [ ! -f ".env.example" ]; then
-            echo "❌ .env.example is missing — required for onboarding"
-            exit 1
-          fi
-          echo "✅ .env.example present"
+          $ALL_OK || exit 1
 
       - name: Summary
         run: |
-          echo "🎉 All CI checks passed for branch: ${{ github.ref_name }}"
-          echo "Commit: ${{ github.sha }}"
-          echo "Triggered by: ${{ github.actor }}"
+          echo ""
+          echo "🎉 All CI checks passed!"
+          echo "Branch:  ${{ github.ref_name }}"
+          echo "Commit:  ${{ github.sha }}"
+          echo "Actor:   ${{ github.actor }}"
+          echo "PHP Matrix: 8.1, 8.2, 8.3 all tested"

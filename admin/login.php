@@ -93,8 +93,8 @@ body { font-family:'Inter',sans-serif; background:linear-gradient(135deg,#111 0%
       <label class="form-label fw-600" style="font-size:0.875rem">Password</label>
       <div class="input-group">
         <span class="input-group-text"><i class="fas fa-lock text-muted"></i></span>
-        <input type="password" name="password" class="form-control" placeholder="Enter your password" 
-               value="admin123" required id="pwdInput">
+        <input type="password" name="password" class="form-control" placeholder="Enter your password"
+               required id="pwdInput">
         <button class="btn btn-outline-secondary" type="button" onclick="togglePwd()">
           <i class="fas fa-eye" id="pwdIcon"></i>
         </button>
@@ -105,13 +105,6 @@ body { font-family:'Inter',sans-serif; background:linear-gradient(135deg,#111 0%
     </button>
   </form>
 
-  <div class="hint-box mt-3">
-    <i class="fas fa-info-circle me-1"></i>
-    <strong>Default credentials:</strong><br>
-    Email: <code>admin@propertyrubix.com</code><br>
-    Password: <code>admin123</code><br>
-    <span class="text-danger fw-600">⚠ Change immediately after first login!</span>
-  </div>
 
   <p class="text-center mt-4 mb-0">
     <a href="<?= PUBLIC_URL ?>" class="text-muted" style="font-size:0.8rem">

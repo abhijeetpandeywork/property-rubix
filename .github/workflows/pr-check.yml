@@ -1,0 +1,146 @@
+name: 🔍 PR Checks
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  # ────────────────────────────────────────────────────────────
+  validate-pr:
+    name: ✅ Validate PR
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate PR Title (Conventional Commits)
+        run: |
+          TITLE="${{ github.event.pull_request.title }}"
+          echo "PR Title: $TITLE"
+
+          PATTERN="^(feat|fix|docs|style|refactor|test|chore|security|perf|hotfix|revert)(\(.+\))?: .{3,}"
+          if echo "$TITLE" | grep -qE "$PATTERN"; then
+            echo "✅ PR title follows conventional commits format"
+          else
+            echo "❌ PR title doesn't follow conventional commits format!"
+            echo ""
+            echo "Expected format: type(scope): description"
+            echo "Examples:"
+            echo "  feat(property): add virtual tour URL"
+            echo "  fix(auth): resolve session expiry"
+            echo "  chore(ci): update PHP version matrix"
+            echo ""
+            echo "Valid types: feat, fix, docs, style, refactor, test, chore, security, perf, hotfix"
+            exit 1
+          fi
+
+      - name: Check branch name convention
+        run: |
+          BRANCH="${{ github.head_ref }}"
+          echo "Branch: $BRANCH"
+          PATTERN="^(feature|feat|fix|hotfix|release|chore|docs|refactor|test|security)/"
+          if echo "$BRANCH" | grep -qE "$PATTERN"; then
+            echo "✅ Branch name follows convention"
+          else
+            echo "⚠️ Branch name doesn't follow convention."
+            echo "Expected prefix: feature/, fix/, hotfix/, release/, chore/, docs/"
+            echo "Example: feature/add-property-search"
+            # Warning only — don't fail
+          fi
+
+      - name: Check PR size
+        run: |
+          ADDITIONS="${{ github.event.pull_request.additions }}"
+          DELETIONS="${{ github.event.pull_request.deletions }}"
+          TOTAL=$((ADDITIONS + DELETIONS))
+          echo "PR size: +$ADDITIONS / -$DELETIONS = $TOTAL lines"
+
+          if [ "$TOTAL" -gt 1000 ]; then
+            echo "⚠️ Large PR ($TOTAL lines changed)."
+            echo "  Consider breaking this into smaller PRs for easier review."
+          elif [ "$TOTAL" -gt 500 ]; then
+            echo "⚠️ Medium-large PR ($TOTAL lines). Reviewers may need extra time."
+          else
+            echo "✅ PR size is reasonable ($TOTAL lines)"
+          fi
+
+      - name: Check migration files
+        run: |
+          # Detect if PHP files changed that might affect the DB schema
+          CHANGED=$(git diff --name-only origin/${{ github.base_ref }}...HEAD)
+          echo "Changed files:"
+          echo "$CHANGED"
+
+          # Check if admin/schema-related files changed without a migration
+          if echo "$CHANGED" | grep -q "database/schema.sql"; then
+            if ! echo "$CHANGED" | grep -q "database/migrations/"; then
+              echo "⚠️ database/schema.sql was changed but no migration file was added."
+              echo "  Add a migration file in database/migrations/"
+            else
+              echo "✅ Migration file included with schema changes"
+            fi
+          fi
+
+      - name: Post welcome comment (first-time contributors)
+        if: github.event.action == 'opened'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'all',
+              creator: context.payload.pull_request.user.login
+            });
+
+            if (prs.length === 1) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.pull_request.number,
+                body: `👋 Thanks for your first PR, @${context.payload.pull_request.user.login}!
+
+            Before your code is merged, please make sure:
+
+            - [ ] Your branch is up-to-date with \`develop\` (\`git pull origin develop\`)
+            - [ ] You've run \`make lint\` and fixed any issues
+            - [ ] You've run \`make migrate\` if you added DB changes
+            - [ ] Your commits follow the [conventional commits](../blob/main/CONTRIBUTING.md) format
+            - [ ] The PR description is filled out
+
+            Check out our [CONTRIBUTING.md](../blob/main/CONTRIBUTING.md) for the full guide. 🚀`
+              });
+            }
+
+  # ────────────────────────────────────────────────────────────
+  auto-assign:
+    name: 👤 Auto Assign Reviewer
+    runs-on: ubuntu-latest
+    if: github.event.action == 'opened'
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Auto-assign reviewer
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prAuthor = context.payload.pull_request.user.login;
+            const reviewer = 'abhijeetpandeywork';
+
+            // Don't assign yourself as reviewer
+            if (prAuthor !== reviewer) {
+              await github.rest.pulls.requestReviewers({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+                reviewers: [reviewer]
+              });
+              console.log(`Assigned ${reviewer} as reviewer`);
+            }
