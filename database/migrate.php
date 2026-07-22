@@ -64,24 +64,27 @@ function runMigration(PDO $pdo, string $file): bool {
         return true;
     }
 
-    try {
-        // Split on semicolons but keep statements intact
-        $statements = array_filter(
-            array_map('trim', explode(';', $sql)),
-            fn($s) => $s !== '' && !preg_match('/^--/', trim($s))
-        );
+    // Strip line comments and block comments first
+    $sqlCleaned = preg_replace('/--(.*)$/m', '', $sql);
+    $sqlCleaned = preg_replace('/\/\*(.*)\*\//sU', '', $sqlCleaned);
 
-        $pdo->beginTransaction();
+    // Split on semicolons
+    $statements = array_filter(
+        array_map('trim', explode(';', $sqlCleaned)),
+        fn($s) => $s !== ''
+    );
+
+    $stmt = '';
+    try {
         foreach ($statements as $stmt) {
             if (trim($stmt)) {
                 $pdo->exec($stmt);
             }
         }
-        $pdo->commit();
         return true;
     } catch (Throwable $e) {
-        if ($pdo->inTransaction()) $pdo->rollBack();
         cli("  ✗ SQL Error: " . $e->getMessage(), 'red');
+        cli("  ✗ Failed Statement: " . $stmt, 'yellow');
         return false;
     }
 }

@@ -14,6 +14,7 @@ require_once APP_PATH . 'helpers/csrf.php';
 require_once APP_PATH . 'helpers/upload.php';
 require_once APP_PATH . 'helpers/pagination.php';
 require_once APP_PATH . 'helpers/settings.php';
+require_once APP_PATH . 'helpers/api_auth.php';
 require_once APP_PATH . 'core/View.php';
 require_once APP_PATH . 'core/Controller.php';
 require_once APP_PATH . 'core/Router.php';
@@ -69,6 +70,19 @@ $router->get('/ajax/search', 'AjaxController', 'search');
 $router->post('/ajax/submit-enquiry', 'AjaxController', 'submitEnquiry');
 $router->post('/ajax/submit-site-visit', 'AjaxController', 'submitSiteVisit');
 $router->post('/ajax/subscribe', 'AjaxController', 'subscribe');
+
+// ============================================================
+// API v1 REST Endpoints
+// ============================================================
+$router->get('/api/v1/projects', 'ApiProjectController', 'index');
+$router->get('/api/v1/projects/{id}', 'ApiProjectController', 'show');
+$router->get('/api/v1/properties', 'ApiPropertyController', 'index');
+$router->get('/api/v1/properties/{id}', 'ApiPropertyController', 'show');
+$router->get('/api/v1/builders', 'ApiBuilderController', 'index');
+$router->get('/api/v1/locations', 'ApiLocationController', 'index');
+$router->post('/api/v1/leads', 'ApiLeadController', 'store');
+$router->get('/api/v1/feeds/trovit', 'ApiFeedController', 'trovitXml');
+$router->get('/api/v1/feeds/propertyfinder', 'ApiFeedController', 'propertyfinderXml');
 
 // Sitemap
 $router->get('/sitemap.xml', 'SitemapController', 'xml');

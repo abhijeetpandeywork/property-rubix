@@ -1,4 +1,4 @@
-﻿-- ============================================================
+-- ============================================================
 -- Migration 001: Initial Schema
 -- PropertyRubix — Full database schema
 -- Run: php database/migrate.php
