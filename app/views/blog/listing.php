@@ -149,9 +149,9 @@
           <p class="small mb-4" style="color:#94a3b8; line-height: 1.5;">Get curated real estate trends, layout psychology reviews, and investment reports delivered weekly.</p>
           
           <div id="newsletter-form-container">
-            <form onsubmit="event.preventDefault(); document.getElementById('newsletter-form-container').style.display = 'none'; document.getElementById('newsletter-success-message').style.display = 'block';">
+            <form onsubmit="event.preventDefault(); const btn = this.querySelector('button'); const email = this.querySelector('input').value; btn.innerHTML = 'Subscribing...'; fetch('<?= PUBLIC_URL ?>ajax/subscribe', { method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: 'email=' + encodeURIComponent(email) }).then(r => r.json()).then(data => { if(data.success) { document.getElementById('newsletter-form-container').style.display = 'none'; document.getElementById('newsletter-success-message').style.display = 'block'; } else { alert(data.message); btn.innerHTML = 'Subscribe Free'; } }).catch(() => { alert('An error occurred.'); btn.innerHTML = 'Subscribe Free'; });">
               <div class="mb-3">
-                <input type="email" class="form-control border-0 newsletter-input" placeholder="Your email address" required style="border-radius: 8px; padding: 12px; font-size: 0.9rem;">
+                <input type="email" name="email" class="form-control border-0 newsletter-input" placeholder="Your email address" required style="border-radius: 8px; padding: 12px; font-size: 0.9rem;">
               </div>
               <button class="btn btn-primary w-100 py-2.5 fw-bold" type="submit" style="background:var(--pr-primary); color:#000; border-radius: 8px; font-size: 0.9rem; transition: transform 0.2s;">
                 Subscribe Free
