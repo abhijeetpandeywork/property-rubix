@@ -8,8 +8,11 @@
 INSERT IGNORE INTO `builders` (`id`, `name`, `slug`, `established_year`, `total_projects`, `status`, `description`) 
 VALUES (3, 'Prestige Group', 'prestige-group', 1986, 210, 'active', 'Prestige Group is a premier real estate developer known for luxury and excellence.');
 
-INSERT IGNORE INTO `cities` (`id`, `country_id`, `name`, `slug`, `status`) 
-VALUES (1, 5, 'Mumbai', 'mumbai', 'active');
+INSERT IGNORE INTO `states` (`id`, `country_id`, `name`, `slug`) 
+VALUES (1, 5, 'Maharashtra', 'maharashtra');
+
+INSERT IGNORE INTO `cities` (`id`, `state_id`, `name`, `slug`, `status`) 
+VALUES (1, 1, 'Mumbai', 'mumbai', 'active');
 
 INSERT IGNORE INTO `locations` (`id`, `city_id`, `name`, `slug`, `status`) 
 VALUES (1, 1, 'Byculla (Jacob Circle)', 'byculla-jacob-circle', 'active');
