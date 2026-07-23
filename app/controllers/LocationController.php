@@ -136,8 +136,8 @@ class LocationController extends Controller {
         $status = $_GET['status'] ?? '';
         $budget = $_GET['budget'] ?? '';
 
-        $where  = ['p.city_id = ?', 'p.location_area = ?'];
-        $args   = [$city['id'], $matchedLocality];
+        $where  = ['p.city_id = ?', 'p.locality_id = ?'];
+        $args   = [$city['id'], $localityId];
 
         if ($type)   { $where[] = 'p.type = ?';   $args[] = $type; }
         if ($status) { $where[] = 'p.status = ?';  $args[] = $status; }
