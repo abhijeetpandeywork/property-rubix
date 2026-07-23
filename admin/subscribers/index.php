@@ -72,14 +72,26 @@ require __DIR__ . '/../includes/header.php';
   </div>
   <div class="table-responsive">
     <table class="adm-table">
-      <thead><tr><th>ID</th><th>Details</th><th>Actions</th></tr></thead>
+      <thead><tr>
+        <th>ID</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Subscribed On</th>
+        <th>Actions</th>
+      </tr></thead>
       <tbody>
         <?php foreach ($list['rows'] as $p): ?>
         <tr>
           <td><?= $p['id'] ?></td>
+          <td><strong><?= htmlspecialchars($p['email'] ?? '') ?></strong></td>
           <td>
-            <pre style="margin:0; font-size:0.75rem; max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars(json_encode($p)) ?></pre>
+            <?php if (($p['status'] ?? '') === 'active'): ?>
+              <span class="badge bg-success">Active</span>
+            <?php else: ?>
+              <span class="badge bg-secondary"><?= htmlspecialchars(ucfirst($p['status'] ?? '')) ?></span>
+            <?php endif; ?>
           </td>
+          <td><?= !empty($p['subscribed_at']) ? date('M j, Y h:i A', strtotime($p['subscribed_at'])) : 'N/A' ?></td>
           <td>
             <div class="actions">
               <a href="?action=edit&id=<?= $p['id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
