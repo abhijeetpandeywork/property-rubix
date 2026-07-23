@@ -150,7 +150,7 @@
           
           <form onsubmit="event.preventDefault(); alert('Subscribed successfully!');">
             <div class="mb-3">
-              <input type="email" class="form-control border-0 bg-dark-input text-white" placeholder="Your email address" required style="border-radius: 8px; padding: 12px; font-size: 0.9rem; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1) !important;">
+              <input type="email" class="form-control border-0 newsletter-input" placeholder="Your email address" required style="border-radius: 8px; padding: 12px; font-size: 0.9rem;">
             </div>
             <button class="btn btn-primary w-100 py-2.5 fw-bold" type="submit" style="background:var(--pr-primary); color:#000; border-radius: 8px; font-size: 0.9rem; transition: transform 0.2s;">
               Subscribe Free
@@ -167,6 +167,23 @@
 <style>
 /* Custom animations & typography styles */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
+
+.newsletter-input {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  transition: all 0.3s ease;
+}
+.newsletter-input::placeholder {
+  color: #94a3b8 !important;
+  opacity: 1 !important;
+}
+.newsletter-input:focus {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #ffffff !important;
+  border-color: var(--pr-primary) !important;
+  box-shadow: 0 0 0 3px rgba(234, 179, 8, 0.25) !important;
+}
 
 .blog-card {
   transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
