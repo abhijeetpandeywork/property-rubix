@@ -14,7 +14,7 @@ VALUES (1, 5, 'Maharashtra', 'maharashtra');
 INSERT IGNORE INTO `cities` (`id`, `state_id`, `name`, `slug`, `status`) 
 VALUES (1, 1, 'Mumbai', 'mumbai', 'active');
 
-INSERT IGNORE INTO `locations` (`id`, `city_id`, `name`, `slug`, `status`) 
+INSERT IGNORE INTO `localities` (`id`, `city_id`, `name`, `slug`, `status`) 
 VALUES (1, 1, 'Byculla (Jacob Circle)', 'byculla-jacob-circle', 'active');
 
 -- 2. Fully Populate Project ID 1
