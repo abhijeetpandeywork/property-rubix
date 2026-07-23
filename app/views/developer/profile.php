@@ -11,47 +11,51 @@
   </div>
 </div>
 
-<div class="container py-5" style="max-width: 1100px;">
-  <!-- Premium Ad Banner -->
+<div class="container py-4" style="max-width: 1000px;">
+
+  <!-- Premium Ad Banner — same max-width as content below -->
   <?php require __DIR__ . '/../partials/_advertise_banner.php'; ?>
 
-  <div class="row gx-5 mb-5">
-    <!-- Left Column: Logo & Highlights -->
-    <div class="col-lg-5 mb-4 mb-lg-0">
-      <div class="d-flex flex-column align-items-start">
-        <?php if ($builder['logo']): ?>
-        <div class="mb-4" style="background:white; border-radius:8px; padding:10px; border: 1px solid #eaeaea; display:flex; align-items:center; justify-content:center; width:120px; height:120px;">
-          <img src="<?= upload($builder['logo']) ?>" alt="<?= e($builder['name']) ?>" style="max-height:100px; max-width:100px; object-fit:contain;">
-        </div>
-        <?php else: ?>
-        <div class="mb-4 d-flex align-items-center justify-content-center" style="background:#f1f1f1; border-radius:8px; width:120px; height:120px; font-size:2rem; font-weight:bold; color:#555; border: 1px solid #eaeaea;">
-          <?= e(substr($builder['name'],0,2)) ?>
-        </div>
-        <h1 class="fw-bold mb-4" style="font-size: 2rem; color: #000; letter-spacing: -0.5px;"><?= e($builder['name']) ?></h1>
-        <?php endif; ?>
+  <!-- Developer Info Card -->
+  <div class="row g-0 mb-5" style="background: #fff; border: 1px solid #eaeaea; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
 
-        <h5 class="fw-bold mb-3" style="font-size: 1rem; color: #000;">Developer Highlights</h5>
-        
-        <div class="d-flex gap-5">
+    <!-- Left: Logo + Highlights -->
+    <div class="col-lg-4 d-flex flex-column align-items-center justify-content-center text-center" style="padding: 40px 30px; border-right: 1px solid #f0f0f0;">
+      <?php if ($builder['logo']): ?>
+      <div style="background: #fff; border-radius: 12px; padding: 15px; border: 1px solid #eaeaea; display: flex; align-items: center; justify-content: center; width: 140px; height: 140px; margin-bottom: 20px;">
+        <img src="<?= upload($builder['logo']) ?>" alt="<?= e($builder['name']) ?>" style="max-height: 110px; max-width: 110px; object-fit: contain;">
+      </div>
+      <?php else: ?>
+      <div style="background: #f8f8f8; border-radius: 12px; width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 800; color: #555; border: 1px solid #eaeaea; margin-bottom: 20px;">
+        <?= e(strtoupper(substr($builder['name'], 0, 2))) ?>
+      </div>
+      <h2 class="fw-bold mb-0" style="font-size: 1.6rem; color: #0f172a; letter-spacing: -0.5px;"><?= e($builder['name']) ?></h2>
+      <?php endif; ?>
+
+      <div style="width: 100%; margin-top: 24px; padding-top: 20px; border-top: 1px solid #f0f0f0;">
+        <h6 class="fw-bold mb-3" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #999;">Developer Highlights</h6>
+        <div class="d-flex justify-content-center gap-4">
           <div>
-            <div class="text-decoration-underline mb-1" style="font-size: 0.9rem; font-weight: 500;">Total Projects</div>
-            <div class="fw-bold"><?= (int)$builder['total_projects'] ?></div>
+            <div style="font-size: 1.4rem; font-weight: 800; color: #0f172a;"><?= (int)$builder['total_projects'] ?></div>
+            <div style="font-size: 0.75rem; color: #888; font-weight: 500;">Projects</div>
           </div>
+          <div style="border-left: 1px solid #eee;"></div>
           <div>
-            <div class="text-decoration-underline mb-1" style="font-size: 0.9rem; font-weight: 500;">Total Years</div>
-            <div class="fw-bold"><?= (int)$builder['established_year'] ? (date('Y') - $builder['established_year']) : 'N/A' ?></div>
+            <div style="font-size: 1.4rem; font-weight: 800; color: #0f172a;"><?= (int)$builder['established_year'] ? (date('Y') - $builder['established_year']) : 'N/A' ?></div>
+            <div style="font-size: 0.75rem; color: #888; font-weight: 500;">Years</div>
           </div>
+          <div style="border-left: 1px solid #eee;"></div>
           <div>
-            <div class="text-decoration-underline mb-1" style="font-size: 0.9rem; font-weight: 500;">Ongoing Projects</div>
-            <div class="fw-bold">0</div>
+            <div style="font-size: 1.4rem; font-weight: 800; color: #0f172a;">0</div>
+            <div style="font-size: 0.75rem; color: #888; font-weight: 500;">Ongoing</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Right Column: Description -->
-    <div class="col-lg-7">
-      <div style="font-size: 0.95rem; line-height: 1.8; color: #444;">
+    <!-- Right: Description -->
+    <div class="col-lg-8 d-flex align-items-start" style="padding: 40px 35px;">
+      <div style="font-size: 0.95rem; line-height: 1.9; color: #555;">
         <?php if (trim($builder['description'])): ?>
           <p style="margin-top: 0;"><?= nl2br(e($builder['description'])) ?></p>
         <?php else: ?>
