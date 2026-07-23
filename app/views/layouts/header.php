@@ -15,13 +15,17 @@ $siteName = getSetting('site_name') ?: 'PropertyRubix';
   <div class="header-inner container-fluid px-3 px-md-4 justify-content-between">
 
     <!-- Logo -->
-    <a href="<?= PUBLIC_URL ?>" class="header-logo d-flex flex-column align-items-start text-decoration-none" aria-label="<?= e($siteName) ?> home" style="gap: 1px;">
-      <div class="logo-main d-flex align-items-center" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.5rem; line-height: 1; letter-spacing: -1px; user-select: none;">
-        <span style="color: #0f172a;">property</span><span style="color: #eab308;">rubi</span><span style="color: #22c55e;">x</span><span class="logo-dot-com" style="font-size: 0.55rem; font-weight: 700; color: #0f172a; writing-mode: vertical-rl; transform: rotate(180deg); margin-left: 2px; letter-spacing: 0;">.com</span>
-      </div>
-      <div class="logo-tagline" style="background: #eab308; color: #0f172a; font-family: 'Inter', sans-serif; font-weight: 800; font-size: 0.45rem; padding: 2px 4px; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1;">
-        THE <span style="color: #22c55e;">X</span> FACTOR IN PROPERTY SEARCH
-      </div>
+    <a href="<?= PUBLIC_URL ?>" class="header-logo d-flex flex-column align-items-start justify-content-center text-decoration-none" aria-label="<?= e($siteName) ?> home" style="gap: 1px; min-height: 40px;">
+      <?php if (!empty($headerLogo)): ?>
+        <img src="<?= upload($headerLogo) ?>" alt="<?= e($headerTitle ?? $siteName) ?>" style="max-height: 40px; width: auto; object-fit: contain;">
+      <?php else: ?>
+        <div class="logo-main d-flex align-items-center" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.5rem; line-height: 1; letter-spacing: -1px; user-select: none;">
+          <span style="color: #0f172a;">property</span><span style="color: #eab308;">rubi</span><span style="color: #22c55e;">x</span><span class="logo-dot-com" style="font-size: 0.55rem; font-weight: 700; color: #0f172a; writing-mode: vertical-rl; transform: rotate(180deg); margin-left: 2px; letter-spacing: 0;">.com</span>
+        </div>
+        <div class="logo-tagline" style="background: #eab308; color: #0f172a; font-family: 'Inter', sans-serif; font-weight: 800; font-size: 0.45rem; padding: 2px 4px; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1;">
+          THE <span style="color: #22c55e;">X</span> FACTOR IN PROPERTY SEARCH
+        </div>
+      <?php endif; ?>
     </a>
 
     <!-- Right actions -->
