@@ -18,6 +18,10 @@ $siteName = getSetting('site_name') ?: 'PropertyRubix';
     <a href="<?= PUBLIC_URL ?>" class="header-logo d-flex flex-column align-items-start justify-content-center text-decoration-none" aria-label="<?= e($siteName) ?> home" style="gap: 1px; min-height: 40px;">
       <?php if (!empty($headerLogo)): ?>
         <img src="<?= upload($headerLogo) ?>" alt="<?= e($headerTitle ?? $siteName) ?>" style="max-height: 40px; width: auto; object-fit: contain;">
+      <?php elseif (!empty($headerTitle)): ?>
+        <div class="logo-main d-flex align-items-center" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.3rem; line-height: 1; letter-spacing: -0.5px; user-select: none;">
+          <span style="color: #0f172a;"><?= e($headerTitle) ?></span>
+        </div>
       <?php else: ?>
         <div class="logo-main d-flex align-items-center" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.5rem; line-height: 1; letter-spacing: -1px; user-select: none;">
           <span style="color: #0f172a;">property</span><span style="color: #eab308;">rubi</span><span style="color: #22c55e;">x</span><span class="logo-dot-com" style="font-size: 0.55rem; font-weight: 700; color: #0f172a; writing-mode: vertical-rl; transform: rotate(180deg); margin-left: 2px; letter-spacing: 0;">.com</span>
