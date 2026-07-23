@@ -3,7 +3,18 @@
  * File Upload Helper — whitelist extensions, randomize filenames.
  */
 
-define('ALLOWED_IMAGE_TYPES', ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/svg+xml']);
+define('ALLOWED_IMAGE_TYPES', [
+    'image/jpeg', 
+    'image/png', 
+    'image/webp', 
+    'image/gif', 
+    'image/svg+xml', 
+    'image/avif', 
+    'image/heic', 
+    'image/heif', 
+    'image/bmp', 
+    'image/x-icon'
+]);
 define('ALLOWED_PDF_TYPES',   ['application/pdf']);
 define('MAX_UPLOAD_SIZE', 10 * 1024 * 1024); // 10 MB
 
