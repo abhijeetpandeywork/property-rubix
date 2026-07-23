@@ -41,7 +41,7 @@ VALUES (
     1,
     'Super Admin',
     'admin@propertyrubix.com',
-    '$2y$12$xhWQf2X8DcF5S2V6K7V.2e0LHNFqY1G5mRBHPQ1MzBVMuWOzDUWVG',
+    '$2y$10$M1pXMFaMYvWLgJXLR5J5iuDbGcssFZQ7iaEyjwZ3J1lGMgRzEWCTG',
     'super_admin',
     'active'
 );
