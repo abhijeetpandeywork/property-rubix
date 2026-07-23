@@ -51,7 +51,7 @@ body {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.8;
+    opacity: 1;
     transition: opacity 0.5s ease;
 }
 .hero-swiper .swiper-slide-active img {
@@ -62,8 +62,8 @@ body {
 .luxury-hero-gallery::after {
     content: '';
     position: absolute;
-    bottom: 0; left: 0; width: 100%; height: 60%;
-    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+    bottom: 0; left: 0; width: 100%; height: 40%;
+    background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);
     z-index: 1;
     pointer-events: none;
 }
