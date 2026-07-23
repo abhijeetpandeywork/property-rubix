@@ -149,5 +149,11 @@ function asset(string $path): string {
 function upload(?string $path): string {
     if (!$path) return '';
     if (str_starts_with($path, 'http')) return $path;
-    return UPLOAD_URL . ltrim($path, '/');
+    $path = ltrim($path, '/\\');
+    if (str_starts_with(strtolower($path), 'uploads/')) {
+        $path = substr($path, 8);
+    } elseif (str_starts_with(strtolower($path), 'uploads\\')) {
+        $path = substr($path, 8);
+    }
+    return UPLOAD_URL . ltrim($path, '/\\');
 }
