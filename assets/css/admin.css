@@ -3,12 +3,12 @@
    ========================================================= */
 
 :root {
-  --adm-sidebar-bg:    #0a1628;
+  --adm-sidebar-bg:    #0f172a;
   --adm-sidebar-w:     260px;
   --adm-header-h:      60px;
-  --adm-primary:       #a9804b;
-  --adm-primary-hover: #8f6b3d;
-  --adm-primary-light: #f2e2ba;
+  --adm-primary:       #eab308;
+  --adm-primary-hover: #c2910c;
+  --adm-primary-light: #fef08a;
   --adm-accent:        #22c55e;
   --adm-text:          #e2e8f0;
   --adm-text-muted:    #94a3b8;

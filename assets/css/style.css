@@ -5,12 +5,12 @@
 
 /* ── CSS Variables ──────────────────────────────────────── */
 :root {
-  --pr-primary:       #ebaf4b;
-  --pr-primary-dark:  #c89640;
-  --pr-primary-light: #f5e4c8;
-  --pr-secondary:     #1a1a1a;
-  --pr-accent:        #ebaf4b;
-  --pr-text:          #1a1a1a;
+  --pr-primary:       #eab308;
+  --pr-primary-dark:  #c2910c;
+  --pr-primary-light: #fef08a;
+  --pr-secondary:     #0f172a;
+  --pr-accent:        #22c55e;
+  --pr-text:          #0f172a;
   --pr-text-muted:    #64748b;
   --pr-border:        #e2e8f0;
   --pr-bg:            #f8fafc;

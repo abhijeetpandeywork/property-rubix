@@ -13,9 +13,16 @@ function adminLink(string $href, string $icon, string $label, string $curDir = '
 }
 ?>
 <aside class="adm-sidebar" id="adminSidebar">
-  <div class="adm-logo">
-    <a href="<?= $adminBase ?>"><?= htmlspecialchars($siteName) ?></a>
-    <p>Admin Control Panel</p>
+  <div class="adm-logo d-flex flex-column align-items-start" style="padding: 15px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); gap: 2px;">
+    <a href="<?= $adminBase ?>" class="text-decoration-none d-flex flex-column align-items-start" style="gap: 1px;">
+      <div class="logo-main d-flex align-items-center" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.3rem; line-height: 1; letter-spacing: -1px; user-select: none;">
+        <span style="color: #ffffff;">property</span><span style="color: #eab308;">rubi</span><span style="color: #22c55e;">x</span><span class="logo-dot-com" style="font-size: 0.5rem; font-weight: 700; color: #ffffff; writing-mode: vertical-rl; transform: rotate(180deg); margin-left: 2px; letter-spacing: 0;">.com</span>
+      </div>
+      <div class="logo-tagline" style="background: #eab308; color: #0f172a; font-family: 'Inter', sans-serif; font-weight: 800; font-size: 0.4rem; padding: 1px 3px; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.3px; line-height: 1;">
+        THE <span style="color: #22c55e;">X</span> FACTOR IN PROPERTY SEARCH
+      </div>
+    </a>
+    <span style="font-size: 0.65rem; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-top: 4px;">Admin Control Panel</span>
   </div>
 
   <nav class="adm-nav">
@@ -53,6 +60,7 @@ function adminLink(string $href, string $icon, string $label, string $curDir = '
     <!-- System -->
     <div class="adm-nav-section">System</div>
     <?= adminLink($adminBase . 'settings/', '⚙️', 'Settings', $curDir, 'settings') ?>
+    <?= adminLink($adminBase . 'api-tokens/', '🔑', 'API Tokens', $curDir, 'api-tokens') ?>
     <?php /* 
     <?= adminLink($adminBase . 'field-setup/', '🔧', 'Field Setup', $curDir, 'field-setup') ?>
     <?= adminLink($adminBase . 'crm-sync/', '🔄', 'CRM Sync', $curDir, 'crm-sync') ?>

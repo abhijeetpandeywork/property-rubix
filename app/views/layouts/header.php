@@ -15,24 +15,13 @@ $siteName = getSetting('site_name') ?: 'PropertyRubix';
   <div class="header-inner container-fluid px-3 px-md-4 justify-content-between">
 
     <!-- Logo -->
-    <a href="<?= PUBLIC_URL ?>" class="header-logo" aria-label="<?= e($siteName) ?> home">
-      <?php 
-        if (isset($headerLogo) && !empty($headerLogo)):
-      ?>
-        <img src="<?= upload($headerLogo) ?>" alt="Logo" style="height: 44px; width: auto; object-fit: contain;">
-      <?php elseif (isset($headerTitle) && !empty($headerTitle)): ?>
-        <h2 class="logo-text fw-bold mb-0 text-dark" style="font-size:1.5rem; letter-spacing:-0.5px;"><?= e($headerTitle) ?></h2>
-      <?php else: 
-        $siteLogo = getSetting('site_logo') ?: ($branding['logo'] ?? '');
-        if (!empty($siteLogo)): 
-      ?>
-        <img src="<?= upload($siteLogo) ?>" alt="<?= e($siteName) ?>" style="height: 44px; width: auto; object-fit: contain;">
-      <?php else: ?>
-        <h2 class="logo-text fw-bold mb-0 text-dark" style="font-size:1.8rem; letter-spacing:-0.5px;">property<span style="color:var(--pr-primary);">rubix</span></h2>
-      <?php 
-        endif; 
-      endif;
-      ?>
+    <a href="<?= PUBLIC_URL ?>" class="header-logo d-flex flex-column align-items-start text-decoration-none" aria-label="<?= e($siteName) ?> home" style="gap: 1px;">
+      <div class="logo-main d-flex align-items-center" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.5rem; line-height: 1; letter-spacing: -1px; user-select: none;">
+        <span style="color: #0f172a;">property</span><span style="color: #eab308;">rubi</span><span style="color: #22c55e;">x</span><span class="logo-dot-com" style="font-size: 0.55rem; font-weight: 700; color: #0f172a; writing-mode: vertical-rl; transform: rotate(180deg); margin-left: 2px; letter-spacing: 0;">.com</span>
+      </div>
+      <div class="logo-tagline" style="background: #eab308; color: #0f172a; font-family: 'Inter', sans-serif; font-weight: 800; font-size: 0.45rem; padding: 2px 4px; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1;">
+        THE <span style="color: #22c55e;">X</span> FACTOR IN PROPERTY SEARCH
+      </div>
     </a>
 
     <!-- Right actions -->
