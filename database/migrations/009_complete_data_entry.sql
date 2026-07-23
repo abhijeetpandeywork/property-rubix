@@ -52,7 +52,7 @@ INSERT INTO `projects` (
 INSERT INTO `properties` (
   `id`, `project_id`, `builder_id`, `city_id`, `title`, `slug`, `property_type`,
   `listing_type`, `status`, `price`, `price_unit`, `bedrooms`, `bathrooms`,
-  `balconies`, `carpet_area`, `builtup_area`, `furnishing_status`, `facing`,
+  `balconies`, `carpet_area`, `built_up_area`, `furnishing_status`, `facing`,
   `floor_number`, `total_floors`, `address`, `location_area`, `latitude`, `longitude`,
   `map_embed_url`, `short_description`, `description`, `amenities`,
   `banner_image`, `thumbnail_image`, `video_url`, `360_tour_url`,
@@ -62,7 +62,7 @@ INSERT INTO `properties` (
 ) VALUES (
   1, 1, 3, 1, 'Ultra-Luxury 4 BHK Suite at Prestige Jasdan Classic', 'ultra-luxury-4-bhk-prestige-jasdan', 'apartment',
   'sale', 'active', 75000000.00, 'INR', 4, 5,
-  3, '2100 Sq.Ft.', '2800 Sq.Ft.', 'semi_furnished', 'East',
+  3, 2100, 2800, 'semi_furnished', 'East',
   35, 45, 'Tower 1, Prestige Jasdan Classic, Jacob Circle, Mahalaxmi', 'Mahalaxmi, Mumbai', 18.9818, 72.8276,
   'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3772.637775553077!2d72.8276!3d18.9818!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7ce0000000001%3A0x123456789abcdef!2sPrestige%20Jasdan%20Classic!5e0!3m2!1sen!2sin!4v1700000000000',
   'Experience unparalleled luxury with sweeping sea views in this premium 4 BHK residence.',
@@ -71,12 +71,12 @@ INSERT INTO `properties` (
   'assets/images/placeholder/property-banner.jpg', 'assets/images/placeholder/property-thumb.jpg', 'https://www.youtube.com/embed/dQw4w9WgXcQ', 'https://my.matterport.com/show/?m=example',
   'Arjun Kapoor', 'arjun@prestige.com', '+919876543210', '+919876543210',
   1, 1, 'Buy 4 BHK Luxury Flat in Mahalaxmi | Prestige Jasdan Classic', 'Purchase a premium 4 BHK sea-facing apartment in Prestige Jasdan Classic. 2100 SqFt carpet, semi-furnished with world-class amenities.',
-  'assets/images/placeholder/gallery1.jpg,assets/images/placeholder/gallery2.jpg',
-  'assets/images/placeholder/floor1.jpg'
+  '["assets/images/placeholder/gallery1.jpg","assets/images/placeholder/gallery2.jpg"]',
+  '["assets/images/placeholder/floor1.jpg"]'
 ) ON DUPLICATE KEY UPDATE
   project_id=VALUES(project_id), builder_id=VALUES(builder_id), city_id=VALUES(city_id), title=VALUES(title), slug=VALUES(slug), property_type=VALUES(property_type),
   listing_type=VALUES(listing_type), status=VALUES(status), price=VALUES(price), price_unit=VALUES(price_unit), bedrooms=VALUES(bedrooms), bathrooms=VALUES(bathrooms),
-  balconies=VALUES(balconies), carpet_area=VALUES(carpet_area), builtup_area=VALUES(builtup_area), furnishing_status=VALUES(furnishing_status), facing=VALUES(facing),
+  balconies=VALUES(balconies), carpet_area=VALUES(carpet_area), built_up_area=VALUES(built_up_area), furnishing_status=VALUES(furnishing_status), facing=VALUES(facing),
   floor_number=VALUES(floor_number), total_floors=VALUES(total_floors), address=VALUES(address), location_area=VALUES(location_area), latitude=VALUES(latitude), longitude=VALUES(longitude),
   map_embed_url=VALUES(map_embed_url), short_description=VALUES(short_description), description=VALUES(description), amenities=VALUES(amenities),
   banner_image=VALUES(banner_image), thumbnail_image=VALUES(thumbnail_image), video_url=VALUES(video_url), `360_tour_url`=VALUES(`360_tour_url`),
