@@ -148,15 +148,23 @@
           <h4 class="fw-bold mb-2" style="font-family: 'Outfit', sans-serif;">Join 15K+ Smart Investors</h4>
           <p class="small mb-4" style="color:#94a3b8; line-height: 1.5;">Get curated real estate trends, layout psychology reviews, and investment reports delivered weekly.</p>
           
-          <form onsubmit="event.preventDefault(); alert('Subscribed successfully!');">
-            <div class="mb-3">
-              <input type="email" class="form-control border-0 newsletter-input" placeholder="Your email address" required style="border-radius: 8px; padding: 12px; font-size: 0.9rem;">
-            </div>
-            <button class="btn btn-primary w-100 py-2.5 fw-bold" type="submit" style="background:var(--pr-primary); color:#000; border-radius: 8px; font-size: 0.9rem; transition: transform 0.2s;">
-              Subscribe Free
-            </button>
-            <p class="mb-0 mt-3" style="font-size:0.7rem; color:#64748b;">No spam. Unsubscribe anytime in 1-click.</p>
-          </form>
+          <div id="newsletter-form-container">
+            <form onsubmit="event.preventDefault(); document.getElementById('newsletter-form-container').style.display = 'none'; document.getElementById('newsletter-success-message').style.display = 'block';">
+              <div class="mb-3">
+                <input type="email" class="form-control border-0 newsletter-input" placeholder="Your email address" required style="border-radius: 8px; padding: 12px; font-size: 0.9rem;">
+              </div>
+              <button class="btn btn-primary w-100 py-2.5 fw-bold" type="submit" style="background:var(--pr-primary); color:#000; border-radius: 8px; font-size: 0.9rem; transition: transform 0.2s;">
+                Subscribe Free
+              </button>
+              <p class="mb-0 mt-3" style="font-size:0.7rem; color:#64748b;">No spam. Unsubscribe anytime in 1-click.</p>
+            </form>
+          </div>
+          
+          <div id="newsletter-success-message" style="display: none; padding: 20px 10px; background: rgba(34, 197, 94, 0.1); border-radius: 8px; border: 1px solid rgba(34, 197, 94, 0.2); animation: fadeIn 0.5s;">
+            <i class="fas fa-check-circle mb-2" style="font-size: 2rem; color: var(--pr-primary);"></i>
+            <h5 class="fw-bold text-white mb-1">Thank You!</h5>
+            <p class="mb-0" style="font-size: 0.85rem; color: #94a3b8;">You've successfully subscribed to our newsletter.</p>
+          </div>
         </div>
 
       </div>
