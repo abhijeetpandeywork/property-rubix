@@ -22,19 +22,13 @@ $siteName = getSetting('site_name') ?: 'PropertyRubix';
     
     <!-- White Pill Header -->
     <div class="bg-white rounded-pill px-4 py-3 d-flex flex-wrap justify-content-between align-items-center mb-5 shadow-sm">
-      <a href="<?= PUBLIC_URL ?>" class="text-decoration-none d-flex flex-column">
-        <?php $siteLogo = getSetting('site_logo'); if (!empty($siteLogo)): ?>
-          <img src="<?= upload($siteLogo) ?>" alt="<?= e($siteName) ?>" style="height: 36px; width: auto; object-fit: contain;">
-        <?php elseif (!empty($branding['logo'])): ?>
-          <img src="<?= upload($branding['logo']) ?>" alt="<?= e($siteName) ?>" style="height: 36px; width: auto; object-fit: contain;">
-        <?php else: ?>
-          <div class="d-flex align-items-center">
-            <h2 class="fw-bold mb-0 text-dark m-0" style="font-size:1.8rem; letter-spacing:-0.5px;">property<span style="color:#a9804b;">rubix</span></h2>
-          </div>
-          <div style="margin-top: -2px;">
-            <span style="background: #ffc107; color: #000; font-size: 0.6rem; font-weight: 800; padding: 1px 6px; letter-spacing: 0.5px; border-radius: 2px;">THE X FACTOR IN PROPERTY SEARCH</span>
-          </div>
-        <?php endif; ?>
+      <a href="<?= PUBLIC_URL ?>" class="header-logo d-flex flex-column align-items-start text-decoration-none" aria-label="<?= e($siteName) ?> home" style="gap: 1px;">
+        <div class="logo-main d-flex align-items-center" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.5rem; line-height: 1; letter-spacing: -1px; user-select: none;">
+          <span style="color: #0f172a;">property</span><span style="color: #eab308;">rubi</span><span style="color: #22c55e;">x</span><span class="logo-dot-com" style="font-size: 0.55rem; font-weight: 700; color: #0f172a; writing-mode: vertical-rl; transform: rotate(180deg); margin-left: 2px; letter-spacing: 0;">.com</span>
+        </div>
+        <div class="logo-tagline" style="background: #eab308; color: #0f172a; font-family: 'Inter', sans-serif; font-weight: 800; font-size: 0.45rem; padding: 2px 4px; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1;">
+          THE <span style="color: #22c55e;">X</span> FACTOR IN PROPERTY SEARCH
+        </div>
       </a>
       
       <div class="d-flex gap-4">

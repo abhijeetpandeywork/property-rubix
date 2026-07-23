@@ -77,15 +77,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
         }
 
         // Handle single image uploads
+        if (!empty($_POST['delete_banner_image'])) {
+            $data['banner_image'] = null;
+        }
         if (!empty($_FILES['banner_image']['name'])) {
             $up = uploadImage($_FILES['banner_image'], 'projects');
             if ($up['success']) $data['banner_image'] = $up['path'];
             else $errors[] = 'Banner: ' . $up['error'];
         }
+
+        if (!empty($_POST['delete_thumbnail_image'])) {
+            $data['thumbnail_image'] = null;
+        }
         if (!empty($_FILES['thumbnail_image']['name'])) {
             $up = uploadImage($_FILES['thumbnail_image'], 'projects');
             if ($up['success']) $data['thumbnail_image'] = $up['path'];
             else $errors[] = 'Thumbnail: ' . $up['error'];
+        }
+
+        if (!empty($_POST['delete_brochure_pdf'])) {
+            $data['brochure_pdf'] = null;
         }
         if (!empty($_FILES['brochure_pdf']['name'])) {
             $up = uploadPdf($_FILES['brochure_pdf'], 'brochures');
@@ -115,18 +126,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
         };
 
         // Handle gallery images
+        $existingGallery = $id && !empty($row['gallery_images']) ? json_decode($row['gallery_images'], true) : [];
+        if (!is_array($existingGallery)) $existingGallery = [];
+
+        $deleteGallery = $_POST['delete_gallery_images'] ?? [];
+        if (!empty($deleteGallery)) {
+            $existingGallery = array_values(array_filter($existingGallery, fn($img) => !in_array($img, $deleteGallery)));
+        }
+
         $newGallery = $processMultiUpload('gallery_images', 'projects/gallery');
-        if ($newGallery) {
-            $existingGallery = $id && $row['gallery_images'] ? json_decode($row['gallery_images'], true) : [];
-            if (!is_array($existingGallery)) $existingGallery = [];
+        if ($newGallery || isset($_POST['delete_gallery_images'])) {
             $data['gallery_images'] = json_encode(array_merge($existingGallery, $newGallery));
         }
 
         // Handle floor plan images
+        $existingFloorPlans = $id && !empty($row['floor_plan_images']) ? json_decode($row['floor_plan_images'], true) : [];
+        if (!is_array($existingFloorPlans)) $existingFloorPlans = [];
+
+        $deleteFloorPlans = $_POST['delete_floor_plan_images'] ?? [];
+        if (!empty($deleteFloorPlans)) {
+            $existingFloorPlans = array_values(array_filter($existingFloorPlans, fn($img) => !in_array($img, $deleteFloorPlans)));
+        }
+
         $newFloorPlans = $processMultiUpload('floor_plan_images', 'projects/floor_plans');
-        if ($newFloorPlans) {
-            $existingFloorPlans = $id && $row['floor_plan_images'] ? json_decode($row['floor_plan_images'], true) : [];
-            if (!is_array($existingFloorPlans)) $existingFloorPlans = [];
+        if ($newFloorPlans || isset($_POST['delete_floor_plan_images'])) {
             $data['floor_plan_images'] = json_encode(array_merge($existingFloorPlans, $newFloorPlans));
         }
     }
@@ -429,14 +452,24 @@ require __DIR__ . '/../includes/header.php';
         <div class="mb-3">
           <label class="adm-form-label">Banner Image</label>
           <?php if (!empty($row['banner_image'])): ?>
-          <img src="<?= upload($row['banner_image']) ?>" class="img-fluid rounded mb-2" style="height:80px;object-fit:cover">
+          <div class="mb-2">
+            <img src="<?= upload($row['banner_image']) ?>" class="img-fluid rounded" style="height:80px;object-fit:cover">
+            <label style="font-size:12px;cursor:pointer;display:block;margin-top:4px;">
+              <input type="checkbox" name="delete_banner_image" value="1"> Delete Image
+            </label>
+          </div>
           <?php endif; ?>
           <input type="file" name="banner_image" class="form-control" accept="image/*">
         </div>
         <div class="mb-3">
           <label class="adm-form-label">Thumbnail</label>
           <?php if (!empty($row['thumbnail_image'])): ?>
-          <img src="<?= upload($row['thumbnail_image']) ?>" class="img-fluid rounded mb-2" style="height:60px;object-fit:cover">
+          <div class="mb-2">
+            <img src="<?= upload($row['thumbnail_image']) ?>" class="img-fluid rounded" style="height:60px;object-fit:cover">
+            <label style="font-size:12px;cursor:pointer;display:block;margin-top:4px;">
+              <input type="checkbox" name="delete_thumbnail_image" value="1"> Delete Image
+            </label>
+          </div>
           <?php endif; ?>
           <input type="file" name="thumbnail_image" class="form-control" accept="image/*">
         </div>
@@ -447,9 +480,14 @@ require __DIR__ . '/../includes/header.php';
         <div class="mb-3">
           <label class="adm-form-label">Gallery Images (Multiple)</label>
           <?php if (!empty($row['gallery_images'])): $gArr = json_decode($row['gallery_images'], true); if (is_array($gArr) && count($gArr)): ?>
-          <div class="d-flex flex-wrap gap-2 mb-2">
+          <div class="d-flex flex-wrap gap-3 mb-2">
             <?php foreach ($gArr as $gi): ?>
-            <img src="<?= upload($gi) ?>" style="height:40px;width:40px;object-fit:cover;border-radius:4px;">
+            <div class="text-center">
+              <img src="<?= upload($gi) ?>" style="height:50px;width:50px;object-fit:cover;border-radius:4px;display:block;margin-bottom:4px;">
+              <label style="font-size:11px;cursor:pointer;">
+                 <input type="checkbox" name="delete_gallery_images[]" value="<?= htmlspecialchars($gi) ?>"> Delete
+              </label>
+            </div>
             <?php endforeach; ?>
           </div>
           <?php endif; endif; ?>
@@ -458,9 +496,14 @@ require __DIR__ . '/../includes/header.php';
         <div class="mb-3">
           <label class="adm-form-label">Floor Plan Images (Multiple)</label>
           <?php if (!empty($row['floor_plan_images'])): $fArr = json_decode($row['floor_plan_images'], true); if (is_array($fArr) && count($fArr)): ?>
-          <div class="d-flex flex-wrap gap-2 mb-2">
+          <div class="d-flex flex-wrap gap-3 mb-2">
             <?php foreach ($fArr as $fi): ?>
-            <img src="<?= upload($fi) ?>" style="height:40px;width:40px;object-fit:cover;border-radius:4px;">
+            <div class="text-center">
+              <img src="<?= upload($fi) ?>" style="height:50px;width:50px;object-fit:cover;border-radius:4px;display:block;margin-bottom:4px;">
+              <label style="font-size:11px;cursor:pointer;">
+                 <input type="checkbox" name="delete_floor_plan_images[]" value="<?= htmlspecialchars($fi) ?>"> Delete
+              </label>
+            </div>
             <?php endforeach; ?>
           </div>
           <?php endif; endif; ?>
@@ -468,6 +511,14 @@ require __DIR__ . '/../includes/header.php';
         </div>
         <div>
           <label class="adm-form-label">Brochure PDF</label>
+          <?php if (!empty($row['brochure_pdf'])): ?>
+          <div class="mb-2">
+            <a href="<?= upload($row['brochure_pdf']) ?>" target="_blank" style="font-size:12px;"><i class="fas fa-file-pdf me-1"></i>View PDF</a>
+            <label style="font-size:12px;cursor:pointer;display:block;margin-top:4px;">
+              <input type="checkbox" name="delete_brochure_pdf" value="1"> Delete PDF
+            </label>
+          </div>
+          <?php endif; ?>
           <input type="file" name="brochure_pdf" class="form-control" accept="application/pdf">
         </div>
       </div>
