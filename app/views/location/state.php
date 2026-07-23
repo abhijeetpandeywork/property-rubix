@@ -13,18 +13,7 @@
 
 <div class="container-fluid px-3 px-md-5 py-5">
   <!-- Premium Ad Banner -->
-  <div class="w-100 mb-5 d-flex justify-content-center">
-    <div style="width: 100%; max-width: 1000px; background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%); display: flex; align-items: center; justify-content: space-between; padding: 30px 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-left: 4px solid var(--pr-primary); flex-wrap: wrap; gap: 20px;">
-      <div>
-        <h2 class="fw-900 mb-1 text-white" style="font-size: 1.8rem; letter-spacing: -0.5px;">ADVERTISE WITH US</h2>
-        <p class="mb-0 text-white-50" style="font-weight: 500; font-size: 0.95rem;">Showcase your premium projects to global investors.</p>
-      </div>
-      <div class="d-flex align-items-center gap-4">
-        <h2 class="fw-bold mb-0 text-white d-none d-md-block" style="font-size: 1.8rem; letter-spacing: -0.5px; opacity: 0.8;">property<span style="color:var(--pr-primary);">rubix</span></h2>
-        <a href="<?= PUBLIC_URL ?>advertise-with-us" class="btn btn-primary fw-600 px-4 py-2" style="border-radius: 50px; text-decoration: none;">Know More</a>
-      </div>
-    </div>
-  </div>
+  <?php require __DIR__ . '/../partials/_advertise_banner.php'; ?>
 
   <!-- Search Filter -->
   <div class="mb-5">
