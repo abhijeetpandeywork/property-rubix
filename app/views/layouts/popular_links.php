@@ -2,42 +2,41 @@
 <?php
 $pdo = db();
 
-// Fetch active cities that have projects, grouped by country
-$popularCities = $pdo->query(
+$countries = $pdo->query("SELECT id, name, slug FROM countries WHERE status='active' ORDER BY sort_order, name ASC")->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch active cities (regardless of project count)
+$allCities = $pdo->query(
     "SELECT c.name AS city_name, c.slug AS city_slug, 
-            s.slug AS state_slug, co.name AS country_name, co.slug AS country_slug,
-            COUNT(p.id) as proj_count
+            s.slug AS state_slug, co.id AS country_id, co.slug AS country_slug
      FROM cities c
      JOIN states s ON s.id = c.state_id
      JOIN countries co ON co.id = s.country_id
-     JOIN projects p ON p.city_id = c.id
      WHERE c.status='active'
-     GROUP BY c.id
-     ORDER BY co.sort_order, proj_count DESC"
+     ORDER BY c.name ASC"
 )->fetchAll(PDO::FETCH_ASSOC);
 
-$citiesByCountry = [];
-foreach ($popularCities as $row) {
-    $citiesByCountry[$row['country_name']][] = $row;
-}
-
-// Fetch active builders grouped by the country of their listed projects
-$popularBuilders = $pdo->query(
-    "SELECT b.name AS builder_name, b.slug AS builder_slug, co.name AS country_name, COUNT(p.id) as proj_count
+// Fetch active builders grouped by the country of their listed projects (from before), but we will also fall back to builder's base country if no projects? Actually, the previous query joined projects.
+// Let's just use the builder's country_id or project countries.
+$allBuilders = $pdo->query(
+    "SELECT DISTINCT b.name AS builder_name, b.slug AS builder_slug, co.id AS country_id
      FROM builders b
      JOIN projects p ON p.builder_id = b.id
      JOIN cities c ON p.city_id = c.id
      JOIN states s ON c.state_id = s.id
      JOIN countries co ON s.country_id = co.id
      WHERE b.status='active'
-     GROUP BY b.id, co.id
-     ORDER BY co.sort_order, b.name ASC"
+     ORDER BY b.name ASC"
 )->fetchAll(PDO::FETCH_ASSOC);
 
+$citiesByCountry = [];
 $buildersByCountry = [];
-foreach ($popularBuilders as $row) {
-    $buildersByCountry[$row['country_name']][] = $row;
+
+foreach ($countries as $country) {
+    $cName = $country['name'];
+    $citiesByCountry[$cName] = array_filter($allCities, fn($c) => $c['country_id'] == $country['id']);
+    $buildersByCountry[$cName] = array_filter($allBuilders, fn($b) => $b['country_id'] == $country['id']);
 }
+
 ?>
 
 <section style="background-color: #e5af53; padding: 70px 0; min-height: 50vh;">

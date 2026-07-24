@@ -91,14 +91,14 @@ $canonicalUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https
     </button>
     <a href="tel:<?= e(preg_replace('/[^+\d]/', '', $phone)) ?>"
        class="btn d-flex align-items-center shadow-lg"
-       style="background: var(--pr-secondary); color: var(--pr-primary); border-radius: 30px; font-weight: bold; padding: 8px 20px;"
+       style="background: #007bff; color: #ffffff; border-radius: 30px; font-weight: bold; padding: 8px 20px;"
        title="Call Us">
         <i class="fas fa-phone-alt me-2"></i> Call Us
     </a>
     <a href="https://wa.me/<?= e($wa) ?>?text=<?= urlencode('Hi, I found you on PropertyRubix. I need help with a property.') ?>"
        class="btn d-flex align-items-center shadow-lg"
        target="_blank" rel="noopener"
-       style="background: var(--pr-secondary); color: var(--pr-primary); border-radius: 30px; font-weight: bold; padding: 8px 20px;"
+       style="background: #25D366; color: #ffffff; border-radius: 30px; font-weight: bold; padding: 8px 20px;"
        title="WhatsApp Us">
         <i class="fab fa-whatsapp me-2 fs-5"></i> WhatsApp
     </a>
