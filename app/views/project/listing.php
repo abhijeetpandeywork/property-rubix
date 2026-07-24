@@ -220,7 +220,7 @@
           <div class="mb-4">
             <span class="filter-section-title">Keyword Search</span>
             <div class="input-group">
-                <span class="input-group-text bg-white border-end-0 text-muted"><i class="fas fa-search"></i></span>
+                <span class="input-group-text glass-panel border-end-0 text-muted"><i class="fas fa-search"></i></span>
                 <input type="text" name="q" class="form-control border-start-0 ps-0 shadow-none" placeholder="City, developer, project..." value="<?= e($filters['q']) ?>">
             </div>
           </div>

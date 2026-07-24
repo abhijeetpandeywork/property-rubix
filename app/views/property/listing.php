@@ -181,7 +181,7 @@ $title = "Premium Properties";
     </p>
     
     <div class="mt-5 mx-auto anim-fade-up" style="max-width: 700px; animation-delay: 0.2s;">
-      <form action="<?= PUBLIC_URL ?>properties" method="get" class="d-flex bg-white rounded-pill p-2 shadow-lg">
+      <form action="<?= PUBLIC_URL ?>properties" method="get" class="d-flex glass-panel rounded-pill p-2 shadow-lg">
         <input type="text" name="q" value="<?= htmlspecialchars($search) ?>" class="form-control border-0 bg-transparent shadow-none px-4" placeholder="Search by property title, project or city..." style="font-size: 1.1rem;">
         <button type="submit" class="btn btn-primary rounded-pill px-4 py-2 fw-bold" style="background: #aa7d46; border:none;">Search</button>
       </form>

@@ -17,11 +17,11 @@ $ytUrl  = getSetting('social_youtube',   '#');
 $igUrl  = getSetting('social_instagram', '#');
 $siteName = getSetting('site_name') ?: 'PropertyRubix';
 ?>
-<footer class="site-footer" id="siteFooter" style="background-color: #000; padding: 40px 0 20px;">
+<footer class="site-footer glass-card-dark" id="siteFooter" style="padding: 40px 0 20px; border-radius: 0; border-bottom: none; border-left: none; border-right: none;">
   <div class="container-fluid px-3 px-md-5">
     
     <!-- White Pill Header -->
-    <div class="bg-white rounded-pill px-4 py-3 d-flex flex-wrap justify-content-between align-items-center mb-5 shadow-sm">
+    <div class="glass-card px-4 py-3 d-flex flex-wrap justify-content-between align-items-center mb-5 shadow-sm" style="border-radius: 50px;">
       <a href="<?= PUBLIC_URL ?>" class="header-logo d-flex flex-column align-items-start text-decoration-none" aria-label="<?= e($siteName) ?> home" style="gap: 1px;">
         <div class="logo-main d-flex align-items-center" style="font-family: 'Inter', sans-serif; font-weight: 800; font-size: 1.5rem; line-height: 1; letter-spacing: -1px; user-select: none;">
           <span style="color: #0f172a;">property</span><span style="color: #eab308;">rubi</span><span style="color: #22c55e;">x</span><span class="logo-dot-com" style="font-size: 0.55rem; font-weight: 700; color: #0f172a; writing-mode: vertical-rl; transform: rotate(180deg); margin-left: 2px; letter-spacing: 0;">.com</span>

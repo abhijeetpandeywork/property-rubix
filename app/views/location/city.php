@@ -32,7 +32,7 @@ $bannerImg = $city['banner_image'] ? upload($city['banner_image']) : 'https://im
 </div>
 
 <!-- Breadcrumb over white -->
-<div class="bg-white border-bottom sticky-top" style="z-index: 10; top: 76px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+<div class="glass-panel border-bottom sticky-top" style="z-index: 10; top: 76px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
   <div class="container-fluid px-3 px-md-5">
     <nav aria-label="breadcrumb">
       <ol class="breadcrumb mb-0 py-3" style="font-size: 0.9rem; font-weight: 500;">

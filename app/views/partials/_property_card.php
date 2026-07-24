@@ -19,7 +19,7 @@ $type = !empty($p['type']) ? ucfirst($p['type']) : 'Apartment';
 $configs = !empty($p['unit_types']) ? $p['unit_types'] : 'N/A';
 ?>
 
-<article class="p-card shadow-sm">
+<article class="p-card glass-card">
     <div class="p-card-img-wrapper">
         <a href="<?= PUBLIC_URL ?>project/<?= e($p['slug']) ?>">
             <img src="<?= e($img) ?>" alt="<?= e($p['name']) ?>">
