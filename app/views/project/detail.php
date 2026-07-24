@@ -33,12 +33,12 @@ body {
 /* --- Custom Project Header --- */
 .custom-proj-header {
     background: #fff; border-bottom: 1px solid #eaeaea; position: sticky; top: 0; z-index: 1000;
-    padding: 10px 0;
+    padding: 15px 0;
 }
 .custom-proj-header .container-fluid {
     display: flex; align-items: center; justify-content: space-between;
 }
-.cph-logo img { max-height: 45px; object-fit: contain; }
+.cph-logo img { max-height: 70px; object-fit: contain; }
 .cph-actions { display: flex; align-items: center; gap: 15px; }
 .cph-btn {
     display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: #fff;
@@ -234,10 +234,10 @@ body {
     <div class="container-fluid px-3 px-md-5">
         <div class="cph-logo d-flex align-items-center gap-3">
             <?php if ($p['project_logo']): ?>
-                <a href="<?= PUBLIC_URL ?>"><img src="<?= upload($p['project_logo']) ?>" alt="<?= e($p['name']) ?>" style="height:50px; width:auto; object-fit:contain;"></a>
+                <a href="<?= PUBLIC_URL ?>"><img src="<?= upload($p['project_logo']) ?>" alt="<?= e($p['name']) ?>" style="height:70px; width:auto; object-fit:contain;"></a>
             <?php endif; ?>
             <?php if ($p['builder_logo']): ?>
-                <a href="<?= PUBLIC_URL ?>"><img src="<?= upload($p['builder_logo']) ?>" alt="<?= e($p['builder_name']) ?>" style="<?= $p['project_logo'] ? 'height:40px; border-left:2px solid #ddd; padding-left:15px;' : 'height:50px;' ?> width:auto; object-fit:contain;"></a>
+                <a href="<?= PUBLIC_URL ?>"><img src="<?= upload($p['builder_logo']) ?>" alt="<?= e($p['builder_name']) ?>" style="<?= $p['project_logo'] ? 'height:55px; border-left:2px solid #ddd; padding-left:15px;' : 'height:70px;' ?> width:auto; object-fit:contain;"></a>
             <?php elseif (!$p['project_logo']): ?>
                 <a href="<?= PUBLIC_URL ?>" class="text-dark fw-bold text-decoration-none fs-4"><?= e($p['builder_name']) ?></a>
             <?php endif; ?>
@@ -395,7 +395,7 @@ body {
             <?php $tabIndex++; endforeach; ?>
           </ul>
 
-          <div class="tab-content" id="connTabsContent">
+        <div class="tab-content" id="connTabsContent">
             <?php $tabIndex = 0; foreach ($connData as $tabName => $tabContent): ?>
             <div class="tab-pane fade <?= $tabIndex === 0 ? 'show active' : '' ?>" id="conn-tab-<?= $tabIndex ?>" role="tabpanel">
                 <ul class="conn-list">
@@ -403,17 +403,10 @@ body {
                     $lines = explode("\n", $tabContent);
                     foreach ($lines as $line): 
                         if(trim($line)):
-                            // Try to split by '::' or '-' for name/dist
-                            $parts = explode('::', $line);
-                            if(count($parts) < 2) $parts = explode('-', $line);
-                            
-                            $name = trim($parts[0]);
-                            $dist = isset($parts[1]) ? trim($parts[1]) : '';
                     ?>
                     <li>
                         <i class="fas fa-map-marker-alt pin-icon"></i>
-                        <div class="conn-name"><?= html_entity_decode(e($name)) ?><?= $dist ? '::' : '' ?></div>
-                        <?php if($dist): ?><div class="conn-dist"><?= html_entity_decode(e($dist)) ?></div><?php endif; ?>
+                        <div class="conn-name"><?= html_entity_decode(e(trim($line))) ?></div>
                     </li>
                     <?php endif; endforeach; ?>
                 </ul>
@@ -704,9 +697,14 @@ body {
 <div class="modal fade" id="enquiryModal" tabindex="-1" aria-labelledby="enquiryModalLabel" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content" style="border-radius:24px; border:none; box-shadow:0 30px 60px rgba(0,0,0,0.2);">
-      <div class="modal-header border-0 pb-0 justify-content-center position-relative pt-4">
-        <h4 class="modal-title fw-900" id="enquiryModalLabel">Enquire Now</h4>
+      <div class="modal-header border-0 pb-0 flex-column justify-content-center position-relative pt-4">
         <button type="button" class="btn-close position-absolute" data-bs-dismiss="modal" aria-label="Close" style="right:20px; top:20px;"></button>
+        <?php if ($p['project_logo']): ?>
+            <img src="<?= upload($p['project_logo']) ?>" alt="Logo" style="max-height:60px; object-fit:contain; margin-bottom:15px;">
+        <?php elseif ($p['builder_logo']): ?>
+            <img src="<?= upload($p['builder_logo']) ?>" alt="Logo" style="max-height:60px; object-fit:contain; margin-bottom:15px;">
+        <?php endif; ?>
+        <h4 class="modal-title fw-900" id="enquiryModalLabel">Enquire Now</h4>
       </div>
       <div class="modal-body p-4 p-md-5">
         <p class="text-center text-muted mb-4">Leave your details and our property experts will contact you immediately regarding <strong><?= e($p['name']) ?></strong>.</p>
