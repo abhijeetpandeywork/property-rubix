@@ -144,7 +144,7 @@ body {
 /* --- Connectivity Tabs --- */
 .conn-tabs .nav-link {
     color: #5e452a; background: #fff; border: 1px solid #d4af37; border-radius: 4px;
-    padding: 10px 20px; font-size: 1rem; margin-right: 10px; font-weight: 600;
+    padding: 10px 20px; font-size: 1rem; margin-right: 10px; font-weight: 600; white-space: nowrap;
 }
 .conn-tabs .nav-link.active {
     color: #fff; background: #a67b45; border-color: #a67b45;
@@ -237,7 +237,7 @@ body {
                 <a href="<?= PUBLIC_URL ?>"><img src="<?= upload($p['project_logo']) ?>" alt="<?= e($p['name']) ?>" style="height:70px; width:auto; object-fit:contain;"></a>
             <?php endif; ?>
             <?php if ($p['builder_logo']): ?>
-                <a href="<?= PUBLIC_URL ?>"><img src="<?= upload($p['builder_logo']) ?>" alt="<?= e($p['builder_name']) ?>" style="<?= $p['project_logo'] ? 'height:55px; border-left:2px solid #ddd; padding-left:15px;' : 'height:70px;' ?> width:auto; object-fit:contain;"></a>
+                <a href="<?= PUBLIC_URL ?>"><img src="<?= upload($p['builder_logo']) ?>" alt="<?= e($p['builder_name']) ?>" style="<?= $p['project_logo'] ? 'height:70px; border-left:2px solid #ddd; padding-left:15px;' : 'height:70px;' ?> width:auto; object-fit:contain;"></a>
             <?php elseif (!$p['project_logo']): ?>
                 <a href="<?= PUBLIC_URL ?>" class="text-dark fw-bold text-decoration-none fs-4"><?= e($p['builder_name']) ?></a>
             <?php endif; ?>
@@ -700,9 +700,9 @@ body {
       <div class="modal-header border-0 pb-0 flex-column justify-content-center position-relative pt-4">
         <button type="button" class="btn-close position-absolute" data-bs-dismiss="modal" aria-label="Close" style="right:20px; top:20px;"></button>
         <?php if ($p['project_logo']): ?>
-            <img src="<?= upload($p['project_logo']) ?>" alt="Logo" style="max-height:60px; object-fit:contain; margin-bottom:15px;">
+            <img src="<?= upload($p['project_logo']) ?>" alt="Logo" style="max-height:100px; object-fit:contain; margin-bottom:15px;">
         <?php elseif ($p['builder_logo']): ?>
-            <img src="<?= upload($p['builder_logo']) ?>" alt="Logo" style="max-height:60px; object-fit:contain; margin-bottom:15px;">
+            <img src="<?= upload($p['builder_logo']) ?>" alt="Logo" style="max-height:100px; object-fit:contain; margin-bottom:15px;">
         <?php endif; ?>
         <h4 class="modal-title fw-900" id="enquiryModalLabel">Enquire Now</h4>
       </div>
