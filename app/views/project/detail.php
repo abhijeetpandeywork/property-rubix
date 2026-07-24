@@ -483,7 +483,7 @@ body {
               <button type="button" class="btn btn-sm text-white" style="background: var(--pr-primary); font-weight: 600;" data-bs-toggle="modal" data-bs-target="#enquiryModal"><i class="fas fa-download me-1"></i> Download Connectivity</button>
           </div>
           
-          <ul class="nav nav-pills conn-tabs mb-4 flex-nowrap overflow-auto" id="connTabs" role="tablist" style="padding-bottom: 10px; border-bottom: 5px solid #888;">
+          <ul class="nav nav-pills conn-tabs mb-4 flex-nowrap overflow-auto" id="connTabs" role="tablist" style="padding-bottom: 10px;">
             <?php foreach ($connData as $tabName => $tabContent): ?>
             <li class="nav-item" role="presentation">
               <button class="nav-link <?= $tabIndex === 0 ? 'active' : '' ?>" data-bs-toggle="tab" data-bs-target="#conn-tab-<?= $tabIndex ?>" type="button"><?= e($tabName) ?></button>
