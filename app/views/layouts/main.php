@@ -50,7 +50,7 @@ $canonicalUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
 
 <!-- Custom CSS -->
-<link rel="stylesheet" href="<?= asset('css/style.css') ?>?v=<?= @filemtime(__DIR__ . '/../../assets/css/style.css') ?>">
+<link rel="stylesheet" href="<?= asset('css/style.css') ?>?v=<?= @filemtime(__DIR__ . '/../../../assets/css/style.css') ?>">
 
 <!-- Dynamic brand colors -->
 <style>
@@ -167,7 +167,7 @@ $canonicalUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
 <script>window.BASE_URL = '<?= PUBLIC_URL ?>';</script>
-<script src="<?= asset('js/app.js') ?>?v=<?= @filemtime(__DIR__ . '/../../assets/js/app.js') ?>"></script>
+<script src="<?= asset('js/app.js') ?>?v=<?= @filemtime(__DIR__ . '/../../../assets/js/app.js') ?>"></script>
 
 <?= isset($extraScripts) ? $extraScripts : '' ?>
 </body>
