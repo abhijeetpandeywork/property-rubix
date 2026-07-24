@@ -72,7 +72,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
             'whatsapp_number'  => trim($_POST['whatsapp_number']  ?? ''),
             'virtual_tour_url' => trim($_POST['virtual_tour_url'] ?? ''),
             'marquee_text'     => trim($_POST['marquee_text']     ?? ''),
-            'connectivity'     => $_POST['connectivity'] ?? '',
+            'connectivity'     => isset($_POST['conn_main']) ? json_encode([
+                'Connectivity' => trim($_POST['conn_main']),
+                'Education Hub' => trim($_POST['conn_edu'] ?? ''),
+                'Corporate & Business' => trim($_POST['conn_corp'] ?? ''),
+                'Hospitals' => trim($_POST['conn_hosp'] ?? ''),
+                'Commercial' => trim($_POST['conn_comm'] ?? '')
+            ]) : ($_POST['connectivity'] ?? ''),
             'highlights'       => $_POST['highlights'] ?? '',
         ];
 
@@ -430,9 +436,30 @@ require __DIR__ . '/../includes/header.php';
           <label class="adm-form-label">Full Description (Plain Text)</label>
           <textarea name="description" class="form-control" rows="6"><?= htmlspecialchars($row['description'] ?? '') ?></textarea>
         </div>
+        <?php
+        $cMain = $cEdu = $cCorp = $cHosp = $cComm = '';
+        if (!empty($row['connectivity'])) {
+            $cArr = json_decode($row['connectivity'], true);
+            if (is_array($cArr)) {
+                $cMain = $cArr['Connectivity'] ?? '';
+                $cEdu  = $cArr['Education Hub'] ?? '';
+                $cCorp = $cArr['Corporate & Business'] ?? '';
+                $cHosp = $cArr['Hospitals'] ?? '';
+                $cComm = $cArr['Commercial'] ?? '';
+            } else {
+                $cMain = $row['connectivity']; // Legacy fallback
+            }
+        }
+        ?>
         <div class="mb-3">
-          <label class="adm-form-label">Connectivity (One per line or HTML)</label>
-          <textarea name="connectivity" class="form-control" rows="4"><?= htmlspecialchars($row['connectivity'] ?? '') ?></textarea>
+          <label class="adm-form-label fw-bold text-primary">Connectivity (Tabs format, 1 item per line e.g., "School Name::2 km")</label>
+          <div class="row g-2 mt-1">
+              <div class="col-md-6"><label class="small">Main Connectivity</label><textarea name="conn_main" class="form-control" rows="2"><?= htmlspecialchars($cMain) ?></textarea></div>
+              <div class="col-md-6"><label class="small">Education Hub</label><textarea name="conn_edu" class="form-control" rows="2"><?= htmlspecialchars($cEdu) ?></textarea></div>
+              <div class="col-md-6"><label class="small">Corporate & Business</label><textarea name="conn_corp" class="form-control" rows="2"><?= htmlspecialchars($cCorp) ?></textarea></div>
+              <div class="col-md-6"><label class="small">Hospitals</label><textarea name="conn_hosp" class="form-control" rows="2"><?= htmlspecialchars($cHosp) ?></textarea></div>
+              <div class="col-12"><label class="small">Commercial</label><textarea name="conn_comm" class="form-control" rows="2"><?= htmlspecialchars($cComm) ?></textarea></div>
+          </div>
         </div>
         <div>
           <label class="adm-form-label">Project Highlights (One per line or HTML)</label>

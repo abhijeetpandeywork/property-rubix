@@ -24,10 +24,11 @@ $projectAmenities = !empty($p['amenities']) ? json_decode($p['amenities'], true)
 body {
     background-color: #f8f9fa;
     font-family: 'Outfit', sans-serif;
+    padding-top: 0 !important; /* Fix header whitespace */
 }
-
 /* --- Hide global header --- */
 #siteHeader { display: none !important; }
+.main-wrapper { padding-top: 0 !important; } /* In case main.php has padding */
 
 /* --- Custom Project Header --- */
 .custom-proj-header {
@@ -140,14 +141,50 @@ body {
 .bento-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: #64748b; font-weight: 700; margin-bottom: 5px; }
 .bento-value { font-size: 1.25rem; font-weight: 800; color: #0f172a; }
 
-/* --- Connectivity Matrix & Highlights --- */
-.highlight-list { list-style: none; padding: 0; margin: 0; }
-.highlight-list li {
-    padding: 15px 0; border-bottom: 1px dashed #e2e8f0; display: flex; align-items: flex-start; gap: 15px;
-    font-size: 1.1rem; color: #334155;
+/* --- Connectivity Tabs --- */
+.conn-tabs .nav-link {
+    color: #5e452a; background: #fff; border: 1px solid #d4af37; border-radius: 4px;
+    padding: 10px 20px; font-size: 1rem; margin-right: 10px; font-weight: 600;
 }
-.highlight-list li:last-child { border-bottom: none; }
-.highlight-list li i { color: var(--pr-primary); margin-top: 5px; }
+.conn-tabs .nav-link.active {
+    color: #fff; background: #a67b45; border-color: #a67b45;
+}
+.conn-list { list-style: none; padding: 0; margin: 0; }
+.conn-list li {
+    padding: 20px 0; border-bottom: 1px dashed #e2e8f0; display: flex; flex-direction: column; align-items: flex-start;
+}
+.conn-list li:last-child { border-bottom: none; }
+.conn-list li .pin-icon { font-size: 2.5rem; color: #111; margin-bottom: 15px; }
+.conn-list li .conn-name { font-size: 1.1rem; color: #334155; margin-bottom: 10px; }
+.conn-list li .conn-dist { font-size: 1.1rem; color: #64748b; }
+
+/* --- Virtual Tour Grid Styles --- */
+.vt-btn { background: #4a3424; color: #fff; border: none; padding: 8px 24px; border-radius: 4px; font-weight: 600; text-transform: uppercase; font-size: 0.9rem; margin-top: 15px; display: inline-block; transition: 0.3s; }
+.vt-btn:hover { background: #35251a; color: #fff; }
+.vt-box { background: #fff; border-radius: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+.vt-title { font-size: 1.1rem; color: #111; margin-bottom: 15px; font-weight: 500; }
+.vt-img-wrap { position: relative; width: 100%; aspect-ratio: 16/9; background: #eee; overflow: hidden; }
+.vt-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.vt-img-wrap iframe { width: 100%; height: 100%; border: 0; }
+.vt-play-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3rem; color: #fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); z-index: 2; pointer-events: none; }
+.vt-mag-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2.5rem; color: #fff; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); z-index: 2; pointer-events: none; }
+.fp-item-override { cursor: pointer; display: block; position: relative; width: 100%; height: 100%; }
+.fp-item-override::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.1); pointer-events: none; }
+
+/* --- Book Site Visit Banner --- */
+.site-visit-banner {
+    background: #e6e4dc; position: relative; overflow: hidden; padding: 60px 0 120px 0; text-align: center;
+}
+.site-visit-banner::before {
+    content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 200px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23d1d5db" fill-opacity="1" d="M0,192L48,176C96,160,192,128,288,144C384,160,480,224,576,213.3C672,203,768,117,864,106.7C960,96,1056,160,1152,186.7C1248,213,1344,203,1392,197.3L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom;
+    background-size: cover; z-index: 1; opacity: 0.5;
+}
+.site-visit-title { font-size: 2.5rem; color: #111; font-weight: 500; margin-bottom: 30px; position: relative; z-index: 2; }
+.site-visit-btn { background: #684b2c; color: #fff; border: none; padding: 15px 40px; font-size: 1.2rem; font-weight: 600; border-radius: 4px; position: relative; z-index: 2; transition: 0.3s; }
+.site-visit-btn:hover { background: #4a3424; color: #fff; }
+.site-visit-car { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 3; width: 300px; max-width: 90%; }
+.site-visit-road { position: absolute; bottom: 0; left: 0; width: 100%; height: 40px; background: #333; z-index: 2; border-top: 4px dashed #fff; }
 
 /* --- Amenities Grid --- */
 .lux-amenities-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
@@ -332,19 +369,62 @@ body {
         </div>
         <?php endif; ?>
 
-        <!-- Connectivity -->
-        <?php if ($p['connectivity']): ?>
+        <!-- Connectivity (Tabbed as per Image 2) -->
+        <?php 
+        $connData = [];
+        if (!empty($p['connectivity'])) {
+            $decoded = json_decode($p['connectivity'], true);
+            if (is_array($decoded)) {
+                // Filter out empty tabs
+                foreach($decoded as $k => $v) {
+                    if (trim($v)) $connData[$k] = trim($v);
+                }
+            } else {
+                $connData = ['Connectivity' => trim($p['connectivity'])];
+            }
+        }
+        if (!empty($connData)): 
+            $tabIndex = 0;
+        ?>
         <div class="lux-section">
-          <h2 class="lux-section-title"><i class="fas fa-route"></i> Location & Connectivity</h2>
-          <ul class="highlight-list">
-              <?php 
-              $clines = explode("\n", $p['connectivity']);
-              foreach ($clines as $cl): 
-                  if(trim($cl)):
-              ?>
-              <li><i class="fas fa-map-marker-alt"></i> <span><?= html_entity_decode(e(trim($cl))) ?></span></li>
-              <?php endif; endforeach; ?>
+          <div class="d-flex justify-content-between align-items-center mb-4">
+              <h2 class="lux-section-title mb-0" style="font-size: 1.5rem;"><i class="fas fa-route"></i> Connectivity</h2>
+              <button class="btn btn-sm text-white" style="background: #b08d55; font-weight: 600;"><i class="fas fa-download me-1"></i> Download Connectivity</button>
+          </div>
+          
+          <ul class="nav nav-pills conn-tabs mb-4 flex-nowrap overflow-auto" id="connTabs" role="tablist" style="padding-bottom: 10px; border-bottom: 5px solid #888;">
+            <?php foreach ($connData as $tabName => $tabContent): ?>
+            <li class="nav-item" role="presentation">
+              <button class="nav-link <?= $tabIndex === 0 ? 'active' : '' ?>" data-bs-toggle="tab" data-bs-target="#conn-tab-<?= $tabIndex ?>" type="button"><?= e($tabName) ?></button>
+            </li>
+            <?php $tabIndex++; endforeach; ?>
           </ul>
+
+          <div class="tab-content" id="connTabsContent">
+            <?php $tabIndex = 0; foreach ($connData as $tabName => $tabContent): ?>
+            <div class="tab-pane fade <?= $tabIndex === 0 ? 'show active' : '' ?>" id="conn-tab-<?= $tabIndex ?>" role="tabpanel">
+                <ul class="conn-list">
+                    <?php 
+                    $lines = explode("\n", $tabContent);
+                    foreach ($lines as $line): 
+                        if(trim($line)):
+                            // Try to split by '::' or '-' for name/dist
+                            $parts = explode('::', $line);
+                            if(count($parts) < 2) $parts = explode('-', $line);
+                            
+                            $name = trim($parts[0]);
+                            $dist = isset($parts[1]) ? trim($parts[1]) : '';
+                    ?>
+                    <li>
+                        <i class="fas fa-map-marker-alt pin-icon"></i>
+                        <div class="conn-name"><?= html_entity_decode(e($name)) ?><?= $dist ? '::' : '' ?></div>
+                        <?php if($dist): ?><div class="conn-dist"><?= html_entity_decode(e($dist)) ?></div><?php endif; ?>
+                    </li>
+                    <?php endif; endforeach; ?>
+                </ul>
+            </div>
+            <?php $tabIndex++; endforeach; ?>
+          </div>
         </div>
         <?php endif; ?>
 
@@ -429,63 +509,74 @@ body {
         </div>
         <?php endif; ?>
 
-        <!-- Custom 2x2 Virtual Tour Grid (Image 1 mapping) -->
+        <!-- Custom 2x2 Virtual Tour Grid (Image 3 mapping) -->
         <?php if ($p['video_url'] || $p['virtual_tour_url'] || count($floorPlanImages) > 0): ?>
         <div class="lux-section" style="background:#f4f4f4; border:none; padding:40px 30px;">
-          <h2 class="lux-section-title"><i class="fas fa-vr-cardboard"></i> Virtual Tour</h2>
-          <div class="row g-5 mt-2">
+          <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+              <h2 class="mb-0" style="font-size: 1.2rem; font-weight: 500; color: #111;">Virtual Tour</h2>
+              <button class="btn btn-sm text-white" style="background: #4a3424; font-weight: 600;"><i class="fas fa-download me-1"></i> View Video</button>
+          </div>
+          <div class="row g-4 mt-2">
               
               <!-- Sample Tour -->
               <?php if($p['video_url']): ?>
-              <div class="col-md-6 text-center">
-                  <h5 class="mb-3 text-dark fw-bold">Sample Tour</h5>
-                  <div class="position-relative mb-3 rounded" style="overflow:hidden; height:250px; background:#000; box-shadow:0 10px 20px rgba(0,0,0,0.1);">
-                      <iframe src="<?= e($p['video_url']) ?>" style="width:100%; height:100%; border:0;" allowfullscreen></iframe>
+              <div class="col-md-6">
+                  <div class="vt-box">
+                      <div class="vt-title">Sample Tour</div>
+                      <div class="vt-img-wrap">
+                          <iframe src="<?= e($p['video_url']) ?>"></iframe>
+                      </div>
+                      <button type="button" class="vt-btn" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request for video</button>
                   </div>
-                  <button type="button" class="btn text-white fw-bold px-4 py-2" style="background:#b08d55; border-radius:8px;" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request for video</button>
               </div>
               <?php endif; ?>
 
               <!-- Drone Tour -->
               <?php if($p['virtual_tour_url']): ?>
-              <div class="col-md-6 text-center">
-                  <h5 class="mb-3 text-dark fw-bold">Drone Tour</h5>
-                  <div class="position-relative mb-3 rounded" style="overflow:hidden; height:250px; background:#000; box-shadow:0 10px 20px rgba(0,0,0,0.1);">
-                      <?php if(strpos($p['virtual_tour_url'], '<iframe') !== false): ?>
-                          <?= $p['virtual_tour_url'] ?>
-                      <?php else: ?>
-                          <iframe src="<?= e($p['virtual_tour_url']) ?>" style="width:100%; height:100%; border:0;" allowfullscreen></iframe>
-                      <?php endif; ?>
+              <div class="col-md-6">
+                  <div class="vt-box">
+                      <div class="vt-title">Drone Tour</div>
+                      <div class="vt-img-wrap">
+                          <?php if(strpos($p['virtual_tour_url'], '<iframe') !== false): ?>
+                              <?= $p['virtual_tour_url'] ?>
+                          <?php else: ?>
+                              <iframe src="<?= e($p['virtual_tour_url']) ?>"></iframe>
+                          <?php endif; ?>
+                      </div>
+                      <button type="button" class="vt-btn" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request for video</button>
                   </div>
-                  <button type="button" class="btn text-white fw-bold px-4 py-2" style="background:#b08d55; border-radius:8px;" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request for video</button>
               </div>
               <?php endif; ?>
               
               <!-- Plot Tour -->
               <?php if(isset($floorPlanImages[0])): ?>
-              <div class="col-md-6 text-center mt-5">
-                  <h5 class="mb-3 text-dark fw-bold">Plot Tour</h5>
-                  <div class="position-relative mb-3 rounded fp-item" style="height:250px; border:1px solid #ccc; background:#fff; box-shadow:0 10px 20px rgba(0,0,0,0.1);">
-                      <a href="<?= upload($floorPlanImages[0]) ?>" target="_blank">
-                        <img src="<?= upload($floorPlanImages[0]) ?>" alt="Plot Tour" style="width:100%; height:100%; object-fit:contain;">
-                        <div class="fp-overlay"><i class="fas fa-search-plus fa-3x text-white"></i></div>
-                      </a>
+              <div class="col-md-6 mt-4">
+                  <div class="vt-box">
+                      <div class="vt-title">Plot Tour</div>
+                      <div class="vt-img-wrap">
+                          <a href="<?= upload($floorPlanImages[0]) ?>" target="_blank" class="fp-item-override">
+                              <img src="<?= upload($floorPlanImages[0]) ?>" alt="Plot Tour">
+                              <i class="fas fa-search-plus vt-mag-icon"></i>
+                          </a>
+                      </div>
+                      <button type="button" class="vt-btn" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request for plan</button>
                   </div>
-                  <button type="button" class="btn text-white fw-bold px-4 py-2" style="background:#b08d55; border-radius:8px;" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request for plan</button>
               </div>
               <?php endif; ?>
               
               <!-- Master Layout -->
               <?php if(isset($floorPlanImages[1])): ?>
-              <div class="col-md-6 text-center mt-5">
-                  <h5 class="mb-3 text-dark fw-bold">Master Layout</h5>
-                  <div class="position-relative mb-3 rounded fp-item" style="height:250px; border:1px solid #ccc; background:#fff; box-shadow:0 10px 20px rgba(0,0,0,0.1);">
-                      <a href="<?= upload($floorPlanImages[1]) ?>" target="_blank">
-                        <img src="<?= upload($floorPlanImages[1]) ?>" alt="Master Layout" style="width:100%; height:100%; object-fit:contain;">
-                        <div class="fp-overlay"><i class="fas fa-search-plus fa-3x text-white"></i></div>
-                      </a>
+              <div class="col-md-6 mt-4">
+                  <div class="vt-box">
+                      <div class="vt-title">Master Layout</div>
+                      <div class="vt-img-wrap">
+                          <a href="<?= upload($floorPlanImages[1]) ?>" target="_blank" class="fp-item-override">
+                              <img src="<?= upload($floorPlanImages[1]) ?>" alt="Master Layout">
+                              <i class="fas fa-search-plus vt-mag-icon"></i>
+                          </a>
+                      </div>
+                      <button type="button" class="vt-btn" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request for plan</button>
                   </div>
-                  <button type="button" class="btn text-white fw-bold px-4 py-2" style="background:#b08d55; border-radius:8px;" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request for plan</button>
               </div>
               <?php endif; ?>
 
@@ -585,6 +676,55 @@ body {
     </div>
   </div>
 </div>
+
+<!-- Book A Free Site Visit Banner (Image 4) -->
+<div class="site-visit-banner">
+    <div class="container text-center">
+        <h2 class="site-visit-title">Book A Free Site Visit</h2>
+        <button class="site-visit-btn" data-bs-toggle="modal" data-bs-target="#enquiryModal">Book Now</button>
+    </div>
+    <!-- Simple CSS Yellow Taxi representation -->
+    <div class="site-visit-car">
+        <svg viewBox="0 0 512 250" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 150 L100 80 L300 80 L380 150 L480 150 L480 200 L50 200 Z" fill="#ffc107" />
+            <rect x="180" y="50" width="80" height="30" rx="5" fill="#f8b400" />
+            <text x="200" y="72" font-family="Arial" font-size="20" font-weight="bold" fill="#000">TAXI</text>
+            <circle cx="120" cy="200" r="30" fill="#333" />
+            <circle cx="120" cy="200" r="15" fill="#ccc" />
+            <circle cx="380" cy="200" r="30" fill="#333" />
+            <circle cx="380" cy="200" r="15" fill="#ccc" />
+            <path d="M120 150 L350 150" stroke="#000" stroke-width="2" />
+        </svg>
+    </div>
+    <div class="site-visit-road"></div>
+</div>
+
+<!-- Similar Projects / Recent Projects -->
+<?php if (!empty($related)): ?>
+<div class="section py-5" style="background:#fff;">
+    <div class="container-fluid px-3 px-md-5">
+        <h2 class="fw-bold mb-4" style="font-family:'Outfit';">Similar Projects in <?= e($p['city_name']) ?></h2>
+        <div class="row g-4">
+            <?php foreach ($related as $rProj): ?>
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 border-0 shadow-sm" style="border-radius:12px; overflow:hidden; transition:0.3s;" onmouseover="this.style.transform='translateY(-5px)';" onmouseout="this.style.transform='translateY(0)';">
+                    <img src="<?= $rProj['thumbnail_image'] ? upload($rProj['thumbnail_image']) : 'https://placehold.co/600x400' ?>" class="card-img-top" alt="<?= e($rProj['name']) ?>" style="height:200px; object-fit:cover;">
+                    <div class="card-body p-4">
+                        <div class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-primary"></i> <?= e($rProj['location_area']) ?></div>
+                        <h5 class="card-title fw-bold mb-2"><?= e($rProj['name']) ?></h5>
+                        <p class="card-text text-muted mb-3" style="font-size:0.9rem;"><?= e($rProj['builder_name']) ?></p>
+                        <div class="d-flex justify-content-between align-items-center mt-auto border-top pt-3">
+                            <div class="fw-bold fs-5 text-dark"><?= View::priceRange($rProj['price_min'], $rProj['price_max'], (bool)$rProj['price_on_request']) ?></div>
+                            <a href="<?= PUBLIC_URL ?>project/<?= e($rProj['slug']) ?>" class="btn btn-outline-dark btn-sm rounded-pill px-3">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
 
 <!-- Auto-Open Enquiry Modal -->
 <div class="modal fade" id="enquiryModal" tabindex="-1" aria-labelledby="enquiryModalLabel" aria-hidden="true" data-bs-backdrop="static">
