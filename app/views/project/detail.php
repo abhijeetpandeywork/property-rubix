@@ -26,6 +26,29 @@ body {
     font-family: 'Outfit', sans-serif;
 }
 
+/* --- Hide global header --- */
+#siteHeader { display: none !important; }
+
+/* --- Custom Project Header --- */
+.custom-proj-header {
+    background: #fff; border-bottom: 1px solid #eaeaea; position: sticky; top: 0; z-index: 1000;
+    padding: 10px 0;
+}
+.custom-proj-header .container-fluid {
+    display: flex; align-items: center; justify-content: space-between;
+}
+.cph-logo img { max-height: 45px; object-fit: contain; }
+.cph-actions { display: flex; align-items: center; gap: 15px; }
+.cph-btn {
+    display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: #fff;
+    background: #111; padding: 8px 20px; border-radius: 6px; text-decoration: none;
+    border: 1px solid #b08d55; /* gold border matching image */
+    font-size: 0.95rem; transition: background 0.3s;
+}
+.cph-btn:hover { background: #b08d55; color: #fff; }
+.cph-hamburger { font-size: 1.5rem; color: #111; cursor: pointer; padding-left: 15px; border-left: 1px solid #ccc; display: flex; flex-direction: column; gap: 5px; }
+.cph-hamburger span { display: block; width: 25px; height: 3px; background: #111; }
+
 /* --- Marquee --- */
 .marquee-bar {
     background: var(--pr-primary);
@@ -92,21 +115,6 @@ body {
 .luxury-location {
     font-size: 1.25rem; font-weight: 500; opacity: 0.9; display: flex; align-items: center; gap: 10px;
 }
-
-/* --- Quick Contact Top Bar --- */
-.quick-contact-bar {
-    background: rgba(255,255,255,0.95); backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(0,0,0,0.05); padding: 15px 0;
-    position: sticky; top: 0; z-index: 50; box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-}
-.qc-btn {
-    border-radius: 50px; padding: 8px 25px; font-weight: 700; font-size: 0.95rem;
-    transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; text-decoration: none;
-}
-.qc-btn-wa { background: #25D366; color: white; box-shadow: 0 4px 15px rgba(37,211,102,0.3); }
-.qc-btn-wa:hover { background: #1ebd5a; color: white; transform: translateY(-2px); }
-.qc-btn-call { background: #111; color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-.qc-btn-call:hover { background: var(--pr-primary); color: white; transform: translateY(-2px); }
 
 /* --- Glassmorphic Sections --- */
 .lux-section {
@@ -175,13 +183,6 @@ body {
 .emi-calc-box { background: #f8fafc; border-radius: 20px; padding: 30px; border: 1px solid #e2e8f0; }
 .emi-result { background: var(--pr-primary); color: #fff; padding: 25px; border-radius: 16px; text-align: center; }
 
-/* --- RERA Block --- */
-.rera-block {
-    background: #fff; border: 1px dashed #cbd5e1; border-radius: 16px; padding: 25px;
-    display: flex; align-items: center; gap: 25px; margin-top: 25px;
-}
-.rera-qr { width: 100px; height: 100px; border-radius: 12px; object-fit: cover; border: 1px solid #eee; }
-
 /* --- Sticky Sidebar Form --- */
 .sticky-enquiry-wrapper { position: sticky; top: 100px; z-index: 10; }
 .glass-sidebar {
@@ -190,6 +191,30 @@ body {
 }
 .price-display { font-size: 2.25rem; font-weight: 900; color: #0f172a; margin-bottom: 25px; font-family: 'Outfit', sans-serif; }
 </style>
+
+<!-- 2. Custom Project Header (Image 2) -->
+<header class="custom-proj-header">
+    <div class="container-fluid px-3 px-md-5">
+        <div class="cph-logo">
+            <?php if ($p['builder_logo']): ?>
+                <a href="<?= PUBLIC_URL ?>"><img src="<?= upload($p['builder_logo']) ?>" alt="<?= e($p['builder_name']) ?>"></a>
+            <?php else: ?>
+                <a href="<?= PUBLIC_URL ?>" class="text-dark fw-bold text-decoration-none fs-4"><?= e($p['builder_name']) ?></a>
+            <?php endif; ?>
+        </div>
+        <div class="cph-actions d-none d-md-flex">
+            <a href="tel:<?= e(str_replace(' ','',$phone)) ?>" class="cph-btn">
+                <i class="fas fa-phone-alt" style="color:#b08d55;"></i> <?= e($phone) ?>
+            </a>
+            <a href="https://wa.me/<?= e(str_replace(['+',' '],'',$wa)) ?>?text=<?= urlencode("Hi, I'm interested in {$p['name']}.") ?>" target="_blank" class="cph-btn">
+                <i class="fab fa-whatsapp" style="color:#25D366;"></i> WhatsApp
+            </a>
+            <div class="cph-hamburger" onclick="document.getElementById('drawerToggle').click();">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </div>
+</header>
 
 <!-- Marquee Text -->
 <?php if (!empty($p['marquee_text'])): ?>
@@ -243,18 +268,6 @@ body {
   </div>
 </div>
 
-<!-- Quick Contact Bar -->
-<div class="quick-contact-bar d-none d-md-block">
-    <div class="container-fluid px-3 px-md-5 d-flex justify-content-between align-items-center">
-        <div class="fw-800 text-dark" style="font-size:1.25rem;">
-            <?= e($p['name']) ?> <span class="fw-normal text-muted" style="font-size:1rem; margin-left:10px;">by <?= e($p['builder_name']) ?></span>
-        </div>
-        <div class="d-flex gap-3">
-            <a href="tel:<?= e(str_replace(' ','',$phone)) ?>" class="qc-btn qc-btn-call"><i class="fas fa-phone-alt"></i> <?= e($phone) ?></a>
-            <a href="https://wa.me/<?= e(str_replace(['+',' '],'',$wa)) ?>?text=<?= urlencode("Hi, I'm interested in {$p['name']}.") ?>" target="_blank" class="qc-btn qc-btn-wa"><i class="fab fa-whatsapp"></i> WhatsApp</a>
-        </div>
-    </div>
-</div>
 
 <div class="section pt-5 pb-5">
   <div class="container-fluid px-3 px-md-5">
@@ -341,7 +354,6 @@ body {
           <h2 class="lux-section-title"><i class="fas fa-gem"></i> Premium Lifestyle Amenities</h2>
           <div class="lux-amenities-grid">
             <?php foreach ($projectAmenities as $am): 
-                // Very basic icon mapping for visual flair if images aren't used
                 $amL = strtolower($am);
                 $icon = 'fa-check';
                 if(strpos($amL, 'pool')!==false) $icon='fa-swimmer';
@@ -417,33 +429,66 @@ body {
         </div>
         <?php endif; ?>
 
-        <!-- Virtual Tour -->
-        <?php if ($p['virtual_tour_url']): ?>
-        <div class="lux-section">
-          <h2 class="lux-section-title"><i class="fas fa-vr-cardboard"></i> 360° Virtual Tour</h2>
-          <div class="w-100 rounded" style="overflow:hidden; height: 500px; border-radius: 20px;">
-              <?php if(strpos($p['virtual_tour_url'], '<iframe') !== false): ?>
-                  <?= $p['virtual_tour_url'] ?>
-              <?php else: ?>
-                  <iframe src="<?= e($p['virtual_tour_url']) ?>" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+        <!-- Custom 2x2 Virtual Tour Grid (Image 1 mapping) -->
+        <?php if ($p['video_url'] || $p['virtual_tour_url'] || count($floorPlanImages) > 0): ?>
+        <div class="lux-section" style="background:#f4f4f4; border:none; padding:40px 30px;">
+          <h2 class="lux-section-title"><i class="fas fa-vr-cardboard"></i> Virtual Tour</h2>
+          <div class="row g-5 mt-2">
+              
+              <!-- Sample Tour -->
+              <?php if($p['video_url']): ?>
+              <div class="col-md-6 text-center">
+                  <h5 class="mb-3 text-dark fw-bold">Sample Tour</h5>
+                  <div class="position-relative mb-3 rounded" style="overflow:hidden; height:250px; background:#000; box-shadow:0 10px 20px rgba(0,0,0,0.1);">
+                      <iframe src="<?= e($p['video_url']) ?>" style="width:100%; height:100%; border:0;" allowfullscreen></iframe>
+                  </div>
+                  <button type="button" class="btn text-white fw-bold px-4 py-2" style="background:#b08d55; border-radius:8px;" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request for video</button>
+              </div>
               <?php endif; ?>
-          </div>
-        </div>
-        <?php endif; ?>
 
-        <!-- Visual Floor Plans -->
-        <?php if (!empty($floorPlanImages)): ?>
-        <div class="lux-section">
-          <h2 class="lux-section-title"><i class="fas fa-ruler-combined"></i> Master Floor Plans</h2>
-          <div class="fp-grid">
-            <?php foreach ($floorPlanImages as $fp): ?>
-            <div class="fp-item">
-              <a href="<?= upload($fp) ?>" target="_blank">
-                <img src="<?= upload($fp) ?>" alt="Floor Plan" style="object-fit:contain; background:#f9f9f9;">
-                <div class="fp-overlay"><i class="fas fa-search-plus fa-2x text-white"></i></div>
-              </a>
-            </div>
-            <?php endforeach; ?>
+              <!-- Drone Tour -->
+              <?php if($p['virtual_tour_url']): ?>
+              <div class="col-md-6 text-center">
+                  <h5 class="mb-3 text-dark fw-bold">Drone Tour</h5>
+                  <div class="position-relative mb-3 rounded" style="overflow:hidden; height:250px; background:#000; box-shadow:0 10px 20px rgba(0,0,0,0.1);">
+                      <?php if(strpos($p['virtual_tour_url'], '<iframe') !== false): ?>
+                          <?= $p['virtual_tour_url'] ?>
+                      <?php else: ?>
+                          <iframe src="<?= e($p['virtual_tour_url']) ?>" style="width:100%; height:100%; border:0;" allowfullscreen></iframe>
+                      <?php endif; ?>
+                  </div>
+                  <button type="button" class="btn text-white fw-bold px-4 py-2" style="background:#b08d55; border-radius:8px;" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request for video</button>
+              </div>
+              <?php endif; ?>
+              
+              <!-- Plot Tour -->
+              <?php if(isset($floorPlanImages[0])): ?>
+              <div class="col-md-6 text-center mt-5">
+                  <h5 class="mb-3 text-dark fw-bold">Plot Tour</h5>
+                  <div class="position-relative mb-3 rounded fp-item" style="height:250px; border:1px solid #ccc; background:#fff; box-shadow:0 10px 20px rgba(0,0,0,0.1);">
+                      <a href="<?= upload($floorPlanImages[0]) ?>" target="_blank">
+                        <img src="<?= upload($floorPlanImages[0]) ?>" alt="Plot Tour" style="width:100%; height:100%; object-fit:contain;">
+                        <div class="fp-overlay"><i class="fas fa-search-plus fa-3x text-white"></i></div>
+                      </a>
+                  </div>
+                  <button type="button" class="btn text-white fw-bold px-4 py-2" style="background:#b08d55; border-radius:8px;" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request for plan</button>
+              </div>
+              <?php endif; ?>
+              
+              <!-- Master Layout -->
+              <?php if(isset($floorPlanImages[1])): ?>
+              <div class="col-md-6 text-center mt-5">
+                  <h5 class="mb-3 text-dark fw-bold">Master Layout</h5>
+                  <div class="position-relative mb-3 rounded fp-item" style="height:250px; border:1px solid #ccc; background:#fff; box-shadow:0 10px 20px rgba(0,0,0,0.1);">
+                      <a href="<?= upload($floorPlanImages[1]) ?>" target="_blank">
+                        <img src="<?= upload($floorPlanImages[1]) ?>" alt="Master Layout" style="width:100%; height:100%; object-fit:contain;">
+                        <div class="fp-overlay"><i class="fas fa-search-plus fa-3x text-white"></i></div>
+                      </a>
+                  </div>
+                  <button type="button" class="btn text-white fw-bold px-4 py-2" style="background:#b08d55; border-radius:8px;" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request for plan</button>
+              </div>
+              <?php endif; ?>
+
           </div>
         </div>
         <?php endif; ?>
@@ -487,7 +532,7 @@ body {
       <!-- ── RIGHT SIDEBAR (Sticky Glassmorphic) ── -->
       <div class="col-lg-4">
         <div class="sticky-enquiry-wrapper">
-          <div class="glass-sidebar">
+          <div class="glass-sidebar text-center">
             <h3 class="fw-800 mb-2">Interested?</h3>
             <p class="text-muted small mb-4">Request pricing details, a digital brochure, or schedule a priority site visit.</p>
 
@@ -495,24 +540,9 @@ body {
                 <?= View::priceRange($p['price_min'], $p['price_max'], (bool)$p['price_on_request']) ?>
             </div>
 
-            <form id="projectEnquiryForm" novalidate>
-              <?= csrfField() ?>
-              <input type="text" name="hp_name" style="display:none" tabindex="-1">
-              <input type="hidden" name="form_type" value="enquiry">
-              <input type="hidden" name="project_name" value="<?= e($p['name']) ?>">
-              <div class="mb-3">
-                <input type="text"  class="form-control form-control-lg shadow-none" name="name"  placeholder="Full Name" required style="border-radius:12px; background:#f9f9f9;">
-              </div>
-              <div class="mb-3">
-                <input type="tel"   class="form-control form-control-lg shadow-none" name="phone" placeholder="Phone Number" required style="border-radius:12px; background:#f9f9f9;">
-              </div>
-              <div class="mb-3">
-                <input type="email" class="form-control form-control-lg shadow-none" name="email" placeholder="Email Address" style="border-radius:12px; background:#f9f9f9;">
-              </div>
-              <button type="submit" class="btn btn-primary w-100 py-3 mb-3 fw-bold shadow-lg" style="border-radius:12px; font-size:1.1rem; background: var(--pr-primary); border:none;">
-                Request Information
-              </button>
-            </form>
+            <button type="button" class="btn w-100 py-3 mb-3 fw-bold shadow-lg text-white" style="border-radius:12px; font-size:1.1rem; background: var(--pr-primary); border:none;" data-bs-toggle="modal" data-bs-target="#enquiryModal">
+                Enquire Now
+            </button>
 
             <div class="d-grid gap-3 mt-4">
               <a href="https://wa.me/<?= e(str_replace(['+',' '],'',$wa)) ?>?text=<?= urlencode("Hi, I'm interested in {$p['name']}. Please share details.") ?>"
@@ -526,36 +556,26 @@ body {
               <?php endif; ?>
             </div>
             
-            <!-- RERA Block -->
-            <?php if ($p['rera_id'] || $p['rera_qr_code']): ?>
-            <div class="rera-block">
-                <?php if($p['rera_qr_code']): ?>
-                <img src="<?= upload($p['rera_qr_code']) ?>" alt="RERA QR" class="rera-qr">
+            <!-- RERA Block Centered (Image 3) -->
+            <?php if ($p['builder_name'] || $p['rera_id'] || $p['rera_qr_code']): ?>
+            <div class="text-center mt-5 pt-4 border-top" style="background:#fdfcf9; border-radius:16px; padding:20px; border:1px solid #f0eade;">
+                <?php if ($p['builder_logo']): ?>
+                    <img src="<?= upload($p['builder_logo']) ?>" alt="<?= e($p['builder_name']) ?>" style="max-height:80px; max-width:200px; object-fit:contain; margin-bottom:15px; border-radius:8px;">
+                <?php else: ?>
+                    <h4 class="fw-bold mb-3" style="color:#b08d55; text-transform:uppercase; letter-spacing:2px;"><?= e($p['builder_name']) ?></h4>
                 <?php endif; ?>
-                <div>
-                    <h5 class="fw-bold text-dark mb-1"><i class="fas fa-shield-alt text-success me-1"></i> RERA Approved</h5>
-                    <?php if($p['rera_id']): ?>
-                    <p class="text-muted mb-0 small" style="word-break:break-all;"><strong>Reg:</strong> <?= e($p['rera_id']) ?></p>
-                    <?php endif; ?>
-                </div>
-            </div>
-            <?php endif; ?>
-            
-            <!-- Developer Info in Sidebar -->
-            <?php if ($p['builder_name']): ?>
-            <div class="mt-4 pt-4 border-top">
-                <div class="text-muted small text-uppercase fw-bold mb-3">Developed By</div>
-                <div class="d-flex align-items-center gap-3">
-                    <?php if ($p['builder_logo']): ?>
-                    <div style="width: 60px; height:60px; border-radius:12px; background:#fff; border:1px solid #eaeaea; display:flex; align-items:center; justify-content:center; padding:5px;">
-                        <img src="<?= upload($p['builder_logo']) ?>" alt="<?= e($p['builder_name']) ?>" style="max-width:100%; max-height:100%; object-fit:contain">
-                    </div>
-                    <?php endif; ?>
-                    <div>
-                        <h5 class="fw-800 mb-1"><a href="<?= PUBLIC_URL ?>developer/<?= e($p['builder_slug']) ?>" class="text-dark text-decoration-none"><?= e($p['builder_name']) ?></a></h5>
-                        <a href="<?= PUBLIC_URL ?>developer/<?= e($p['builder_slug']) ?>" class="text-primary small fw-bold text-decoration-none">View Profile <i class="fas fa-arrow-right ms-1"></i></a>
-                    </div>
-                </div>
+                
+                <p class="mb-3 text-dark fw-bold" style="font-size:1.1rem;">This project is RERA registered.</p>
+                
+                <?php if($p['rera_qr_code']): ?>
+                <img src="<?= upload($p['rera_qr_code']) ?>" alt="RERA QR" style="width:180px; height:180px; object-fit:cover; border:3px solid #000; border-radius:12px; margin-bottom:15px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+                <?php endif; ?>
+                
+                <p class="mb-1 text-muted" style="font-size:0.9rem;">RERA Website:</p>
+                <a href="https://www.up-rera.in/verify" target="_blank" class="fw-bold text-decoration-none" style="color:#b08d55; word-break:break-all; font-size:1rem;">https://www.up-rera.in/verify</a>
+                <?php if($p['rera_id']): ?><p class="mt-2 text-dark small fw-bold"><strong>Reg:</strong> <?= e($p['rera_id']) ?></p><?php endif; ?>
+                
+                <p class="mt-4 text-muted" style="font-size:0.75rem; line-height:1.5;">The content presented on this website is solely for informational purposes and does not constitute a service offer.... <a class="cursor-pointer" style="color:#b08d55;">read more</a></p>
             </div>
             <?php endif; ?>
 
@@ -566,13 +586,52 @@ body {
   </div>
 </div>
 
+<!-- Auto-Open Enquiry Modal -->
+<div class="modal fade" id="enquiryModal" tabindex="-1" aria-labelledby="enquiryModalLabel" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:24px; border:none; box-shadow:0 30px 60px rgba(0,0,0,0.2);">
+      <div class="modal-header border-0 pb-0 justify-content-center position-relative pt-4">
+        <h4 class="modal-title fw-900" id="enquiryModalLabel">Enquire Now</h4>
+        <button type="button" class="btn-close position-absolute" data-bs-dismiss="modal" aria-label="Close" style="right:20px; top:20px;"></button>
+      </div>
+      <div class="modal-body p-4 p-md-5">
+        <p class="text-center text-muted mb-4">Leave your details and our property experts will contact you immediately regarding <strong><?= e($p['name']) ?></strong>.</p>
+        <form id="projectEnquiryForm" novalidate>
+          <?= csrfField() ?>
+          <input type="text" name="hp_name" style="display:none" tabindex="-1">
+          <input type="hidden" name="form_type" value="enquiry">
+          <input type="hidden" name="project_name" value="<?= e($p['name']) ?>">
+          <div class="mb-3">
+            <input type="text"  class="form-control form-control-lg shadow-none" name="name"  placeholder="Full Name" required style="border-radius:12px; background:#f9f9f9; border:1px solid #eaeaea;">
+          </div>
+          <div class="mb-3">
+            <input type="tel"   class="form-control form-control-lg shadow-none" name="phone" placeholder="Phone Number" required style="border-radius:12px; background:#f9f9f9; border:1px solid #eaeaea;">
+          </div>
+          <div class="mb-4">
+            <input type="email" class="form-control form-control-lg shadow-none" name="email" placeholder="Email Address" style="border-radius:12px; background:#f9f9f9; border:1px solid #eaeaea;">
+          </div>
+          <button type="submit" class="btn btn-primary w-100 py-3 fw-bold shadow-lg text-white" style="border-radius:12px; font-size:1.1rem; background: var(--pr-primary); border:none;">
+            Submit Enquiry
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <?php
 $ajaxUrl = PUBLIC_URL . 'ajax/submit-enquiry';
 ob_start();
 ?>
 <script>
-// Hero Gallery Swiper
+// Auto-Open Modal on Page Load
 document.addEventListener("DOMContentLoaded", function() {
+    setTimeout(function() {
+        var myModal = new bootstrap.Modal(document.getElementById('enquiryModal'));
+        myModal.show();
+    }, 1000); // Wait 1 second before popping up for better UX
+
+    // Hero Gallery Swiper
     if(typeof Swiper !== 'undefined') {
         new Swiper(".hero-swiper", {
             loop: true, effect: "fade", autoplay: { delay: 4500, disableOnInteraction: false },
@@ -627,11 +686,18 @@ document.getElementById("projectEnquiryForm")?.addEventListener("submit", async 
     const res  = await fetch("<?= $ajaxUrl ?>", { method:"POST", body:data, headers:{"X-Requested-With":"XMLHttpRequest"} });
     const json = await res.json();
     showToast(json.message, json.success ? "success" : "error");
-    if (json.success) { this.reset(); this.classList.remove("was-validated"); }
+    if (json.success) { 
+        this.reset(); this.classList.remove("was-validated"); 
+        setTimeout(() => {
+            const modalEl = document.getElementById('enquiryModal');
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if(modal) modal.hide();
+        }, 1500);
+    }
   } catch(e) { 
     showToast("Failed to send. Please try again.", "error"); 
   }
-  finally { btn.disabled = false; btn.innerHTML = 'Request Information'; }
+  finally { btn.disabled = false; btn.innerHTML = 'Submit Enquiry'; }
 });
 </script>
 <?php
