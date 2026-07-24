@@ -149,7 +149,7 @@ body {
 .conn-tabs .nav-link.active {
     color: #fff; background: #a67b45; border-color: #a67b45;
 }
-.conn-list { list-style: none; padding: 0; margin: 0; }
+.conn-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 30px; }
 .conn-list li {
     padding: 15px 0; border-bottom: 1px dashed #e2e8f0; display: flex; flex-direction: row; align-items: center; gap: 15px;
 }
@@ -384,7 +384,7 @@ body {
         <div class="lux-section glass-panel">
           <div class="d-flex justify-content-between align-items-center mb-4">
               <h2 class="lux-section-title mb-0" style="font-size: 1.5rem;"><i class="fas fa-route"></i> Connectivity</h2>
-              <button class="btn btn-sm text-white" style="background: #b08d55; font-weight: 600;"><i class="fas fa-download me-1"></i> Download Connectivity</button>
+              <button type="button" class="btn btn-sm text-white" style="background: #b08d55; font-weight: 600;" data-bs-toggle="modal" data-bs-target="#enquiryModal"><i class="fas fa-download me-1"></i> Download Connectivity</button>
           </div>
           
           <ul class="nav nav-pills conn-tabs mb-4 flex-nowrap overflow-auto" id="connTabs" role="tablist" style="padding-bottom: 10px; border-bottom: 5px solid #888;">
@@ -502,7 +502,7 @@ body {
         <div class="lux-section glass-panel" style="background:#f4f4f4; border:none; padding:40px 30px;">
           <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
               <h2 class="mb-0" style="font-size: 1.2rem; font-weight: 500; color: #111;">Virtual Tour</h2>
-              <button class="btn btn-sm text-white" style="background: #4a3424; font-weight: 600;"><i class="fas fa-download me-1"></i> View Video</button>
+              <button type="button" class="btn btn-sm text-white" style="background: #4a3424; font-weight: 600;" data-bs-toggle="modal" data-bs-target="#enquiryModal"><i class="fas fa-download me-1"></i> Download Video</button>
           </div>
           <div class="row g-4 mt-2">
               
