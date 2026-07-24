@@ -151,12 +151,12 @@ body {
 }
 .conn-list { list-style: none; padding: 0; margin: 0; }
 .conn-list li {
-    padding: 20px 0; border-bottom: 1px dashed #e2e8f0; display: flex; flex-direction: column; align-items: flex-start;
+    padding: 15px 0; border-bottom: 1px dashed #e2e8f0; display: flex; flex-direction: row; align-items: center; gap: 15px;
 }
 .conn-list li:last-child { border-bottom: none; }
-.conn-list li .pin-icon { font-size: 2.5rem; color: #111; margin-bottom: 15px; }
-.conn-list li .conn-name { font-size: 1.1rem; color: #334155; margin-bottom: 10px; }
-.conn-list li .conn-dist { font-size: 1.1rem; color: #64748b; }
+.conn-list li .pin-icon { font-size: 2.2rem; color: #111; }
+.conn-list li .conn-name { font-size: 1.1rem; color: #334155; margin-bottom: 0; font-weight: 500; }
+.conn-list li .conn-dist { font-size: 1.1rem; color: #64748b; margin-left: auto; }
 
 /* --- Virtual Tour Grid Styles --- */
 .vt-btn { background: #4a3424; color: #fff; border: none; padding: 8px 24px; border-radius: 4px; font-weight: 600; text-transform: uppercase; font-size: 0.9rem; margin-top: 15px; display: inline-block; transition: 0.3s; }
@@ -232,10 +232,13 @@ body {
 <!-- 2. Custom Project Header (Image 2) -->
 <header class="custom-proj-header">
     <div class="container-fluid px-3 px-md-5">
-        <div class="cph-logo">
+        <div class="cph-logo d-flex align-items-center gap-3">
+            <?php if ($p['project_logo']): ?>
+                <a href="<?= PUBLIC_URL ?>"><img src="<?= upload($p['project_logo']) ?>" alt="<?= e($p['name']) ?>" style="height:50px; width:auto; object-fit:contain;"></a>
+            <?php endif; ?>
             <?php if ($p['builder_logo']): ?>
-                <a href="<?= PUBLIC_URL ?>"><img src="<?= upload($p['builder_logo']) ?>" alt="<?= e($p['builder_name']) ?>"></a>
-            <?php else: ?>
+                <a href="<?= PUBLIC_URL ?>"><img src="<?= upload($p['builder_logo']) ?>" alt="<?= e($p['builder_name']) ?>" style="<?= $p['project_logo'] ? 'height:40px; border-left:2px solid #ddd; padding-left:15px;' : 'height:50px;' ?> width:auto; object-fit:contain;"></a>
+            <?php elseif (!$p['project_logo']): ?>
                 <a href="<?= PUBLIC_URL ?>" class="text-dark fw-bold text-decoration-none fs-4"><?= e($p['builder_name']) ?></a>
             <?php endif; ?>
         </div>
@@ -283,15 +286,7 @@ body {
   <div class="hero-content">
     <div class="container-fluid px-3 px-md-5">
       
-      <!-- Dual Logos -->
-      <div class="dual-logo-container">
-          <?php if ($p['builder_logo']): ?>
-              <div class="logo-box"><img src="<?= upload($p['builder_logo']) ?>" alt="<?= e($p['builder_name']) ?>"></div>
-          <?php endif; ?>
-          <?php if ($p['project_logo']): ?>
-              <div class="logo-box"><img src="<?= upload($p['project_logo']) ?>" alt="<?= e($p['name']) ?>"></div>
-          <?php endif; ?>
-      </div>
+      <!-- Dual Logos Moved to Header -->
 
       <span class="luxury-badge"><?= e(str_replace('_', ' ', ucfirst($p['status']))) ?></span>
       <span class="luxury-badge" style="background: var(--pr-primary); color: #111; border:none;"><?= e(ucfirst($p['type'])) ?></span>
@@ -677,27 +672,6 @@ body {
   </div>
 </div>
 
-<!-- Book A Free Site Visit Banner (Image 4) -->
-<div class="site-visit-banner">
-    <div class="container text-center">
-        <h2 class="site-visit-title">Book A Free Site Visit</h2>
-        <button class="site-visit-btn" data-bs-toggle="modal" data-bs-target="#enquiryModal">Book Now</button>
-    </div>
-    <!-- Simple CSS Yellow Taxi representation -->
-    <div class="site-visit-car">
-        <svg viewBox="0 0 512 250" xmlns="http://www.w3.org/2000/svg">
-            <path d="M50 150 L100 80 L300 80 L380 150 L480 150 L480 200 L50 200 Z" fill="#ffc107" />
-            <rect x="180" y="50" width="80" height="30" rx="5" fill="#f8b400" />
-            <text x="200" y="72" font-family="Arial" font-size="20" font-weight="bold" fill="#000">TAXI</text>
-            <circle cx="120" cy="200" r="30" fill="#333" />
-            <circle cx="120" cy="200" r="15" fill="#ccc" />
-            <circle cx="380" cy="200" r="30" fill="#333" />
-            <circle cx="380" cy="200" r="15" fill="#ccc" />
-            <path d="M120 150 L350 150" stroke="#000" stroke-width="2" />
-        </svg>
-    </div>
-    <div class="site-visit-road"></div>
-</div>
 
 <!-- Similar Projects / Recent Projects -->
 <?php if (!empty($related)): ?>

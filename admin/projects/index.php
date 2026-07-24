@@ -77,7 +77,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
                 'Education Hub' => trim($_POST['conn_edu'] ?? ''),
                 'Corporate & Business' => trim($_POST['conn_corp'] ?? ''),
                 'Hospitals' => trim($_POST['conn_hosp'] ?? ''),
-                'Commercial' => trim($_POST['conn_comm'] ?? '')
+                'Commercial' => trim($_POST['conn_comm'] ?? ''),
+                'Airports & Transit' => trim($_POST['conn_transit'] ?? ''),
+                'Shopping & Retail' => trim($_POST['conn_shop'] ?? ''),
+                'Entertainment' => trim($_POST['conn_ent'] ?? '')
             ]) : ($_POST['connectivity'] ?? ''),
             'highlights'       => $_POST['highlights'] ?? '',
         ];
@@ -437,7 +440,7 @@ require __DIR__ . '/../includes/header.php';
           <textarea name="description" class="form-control" rows="6"><?= htmlspecialchars($row['description'] ?? '') ?></textarea>
         </div>
         <?php
-        $cMain = $cEdu = $cCorp = $cHosp = $cComm = '';
+        $cMain = $cEdu = $cCorp = $cHosp = $cComm = $cTransit = $cShop = $cEnt = '';
         if (!empty($row['connectivity'])) {
             $cArr = json_decode($row['connectivity'], true);
             if (is_array($cArr)) {
@@ -446,6 +449,9 @@ require __DIR__ . '/../includes/header.php';
                 $cCorp = $cArr['Corporate & Business'] ?? '';
                 $cHosp = $cArr['Hospitals'] ?? '';
                 $cComm = $cArr['Commercial'] ?? '';
+                $cTransit = $cArr['Airports & Transit'] ?? '';
+                $cShop = $cArr['Shopping & Retail'] ?? '';
+                $cEnt = $cArr['Entertainment'] ?? '';
             } else {
                 $cMain = $row['connectivity']; // Legacy fallback
             }
@@ -458,7 +464,10 @@ require __DIR__ . '/../includes/header.php';
               <div class="col-md-6"><label class="small">Education Hub</label><textarea name="conn_edu" class="form-control" rows="2"><?= htmlspecialchars($cEdu) ?></textarea></div>
               <div class="col-md-6"><label class="small">Corporate & Business</label><textarea name="conn_corp" class="form-control" rows="2"><?= htmlspecialchars($cCorp) ?></textarea></div>
               <div class="col-md-6"><label class="small">Hospitals</label><textarea name="conn_hosp" class="form-control" rows="2"><?= htmlspecialchars($cHosp) ?></textarea></div>
-              <div class="col-12"><label class="small">Commercial</label><textarea name="conn_comm" class="form-control" rows="2"><?= htmlspecialchars($cComm) ?></textarea></div>
+              <div class="col-md-6"><label class="small">Commercial</label><textarea name="conn_comm" class="form-control" rows="2"><?= htmlspecialchars($cComm) ?></textarea></div>
+              <div class="col-md-6"><label class="small">Airports & Transit</label><textarea name="conn_transit" class="form-control" rows="2"><?= htmlspecialchars($cTransit) ?></textarea></div>
+              <div class="col-md-6"><label class="small">Shopping & Retail</label><textarea name="conn_shop" class="form-control" rows="2"><?= htmlspecialchars($cShop) ?></textarea></div>
+              <div class="col-md-6"><label class="small">Entertainment</label><textarea name="conn_ent" class="form-control" rows="2"><?= htmlspecialchars($cEnt) ?></textarea></div>
           </div>
         </div>
         <div>
