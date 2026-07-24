@@ -156,8 +156,28 @@ body {
 }
 
 @media (max-width: 768px) {
-    .hero-stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; }
-    .hero-stat-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .hero-content { padding-bottom: 40px; }
+    .luxury-title { font-size: 2.2rem; }
+    .luxury-location { font-size: 1rem; flex-wrap: wrap; }
+    
+    .hero-stats-banner { grid-template-columns: repeat(2, 1fr); padding: 15px; }
+    .hero-stat-item { border-right: 1px solid rgba(255,255,255,0.2); border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; }
+    .hero-stat-item:nth-child(even) { border-right: none; }
+    .hero-stat-item:nth-last-child(-n+2) { border-bottom: none; padding-bottom: 0; }
+    .hero-stat-val { font-size: 1.2rem; }
+
+    .lux-section { padding: 25px 20px; border-radius: 16px; margin-bottom: 20px; }
+    .lux-section-title { font-size: 1.4rem; margin-bottom: 20px; }
+    
+    .bento-grid { grid-template-columns: 1fr; gap: 10px; }
+    .conn-list { grid-template-columns: 1fr; }
+    
+    .logo-box img, .cph-logo img { max-height: 45px !important; }
+}
+@media (max-width: 480px) {
+    .hero-stats-banner { grid-template-columns: 1fr; }
+    .hero-stat-item { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.2) !important; padding-bottom: 15px !important; }
+    .hero-stat-item:last-child { border-bottom: none !important; padding-bottom: 0 !important; }
 }
 
 /* --- Glassmorphic Sections --- */
