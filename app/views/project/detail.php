@@ -117,6 +117,48 @@ body {
     font-size: 1.25rem; font-weight: 500; opacity: 0.9; display: flex; align-items: center; gap: 10px;
 }
 
+/* --- Hero Animations & Glass Banner --- */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-up { animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards; opacity: 0; }
+.delay-1 { animation-delay: 0.1s; }
+.delay-2 { animation-delay: 0.2s; }
+.delay-3 { animation-delay: 0.3s; }
+.delay-4 { animation-delay: 0.4s; }
+
+.hero-stats-banner {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 25px 30px;
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+}
+.hero-stat-item {
+    border-right: 1px solid rgba(255,255,255,0.2);
+}
+.hero-stat-item:last-child {
+    border-right: none;
+}
+.hero-stat-label {
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,0.8); margin-bottom: 5px; font-weight: 600;
+}
+.hero-stat-val {
+    font-size: 1.5rem; font-weight: 800; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+@media (max-width: 768px) {
+    .hero-stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; }
+    .hero-stat-item:last-child { border-bottom: none; padding-bottom: 0; }
+}
+
 /* --- Glassmorphic Sections --- */
 .lux-section {
     background: #fff; border-radius: 24px; border: 1px solid #f1f5f9;
@@ -288,13 +330,46 @@ body {
       
       <!-- Dual Logos Moved to Header -->
 
-      <span class="luxury-badge"><?= e(str_replace('_', ' ', ucfirst($p['status']))) ?></span>
-      <span class="luxury-badge" style="background: var(--pr-primary); color: #111; border:none;"><?= e(ucfirst($p['type'])) ?></span>
+      <div class="animate-fade-up">
+          <span class="luxury-badge"><?= e(str_replace('_', ' ', ucfirst($p['status']))) ?></span>
+          <span class="luxury-badge" style="background: var(--pr-primary); color: #111; border:none;"><?= e(ucfirst($p['type'])) ?></span>
+      </div>
       
-      <h1 class="luxury-title"><?= e($p['name']) ?></h1>
-      <div class="luxury-location">
+      <h1 class="luxury-title animate-fade-up delay-1"><?= e($p['name']) ?></h1>
+      <div class="luxury-location animate-fade-up delay-2">
         <i class="fas fa-map-marker-alt" style="color:var(--pr-primary);"></i> 
         <?= e($p['location_area']) ? e($p['location_area']) . ', ' : '' ?><?= e($p['city_name']) ?>
+      </div>
+
+      <!-- Glassmorphic Core Stats Banner -->
+      <div class="hero-stats-banner animate-fade-up delay-3">
+          <?php if (!empty($p['price_min'])): ?>
+          <div class="hero-stat-item">
+              <div class="hero-stat-label">Starting Price</div>
+              <div class="hero-stat-val"><?= View::priceRange($p['price_min'], $p['price_max'], (bool)$p['price_on_request']) ?> <?= $p['price_on_request'] ? '' : '*' ?></div>
+          </div>
+          <?php endif; ?>
+          
+          <?php if (!empty($p['unit_types'])): ?>
+          <div class="hero-stat-item">
+              <div class="hero-stat-label">Configurations</div>
+              <div class="hero-stat-val"><?= e($p['unit_types']) ?></div>
+          </div>
+          <?php endif; ?>
+          
+          <?php if (!empty($p['area_range'])): ?>
+          <div class="hero-stat-item">
+              <div class="hero-stat-label">Carpet Area</div>
+              <div class="hero-stat-val"><?= e($p['area_range']) ?></div>
+          </div>
+          <?php endif; ?>
+          
+          <?php if (!empty($p['possession_date'])): ?>
+          <div class="hero-stat-item">
+              <div class="hero-stat-label">Possession</div>
+              <div class="hero-stat-val"><?= e($p['possession_date']) ?></div>
+          </div>
+          <?php endif; ?>
       </div>
     </div>
   </div>
