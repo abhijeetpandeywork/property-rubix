@@ -1,27 +1,47 @@
-<?php /** City listing view with project cards + filters */ ?>
+<?php 
+/** City listing view with project cards + filters */ 
+$bannerImg = $city['banner_image'] ? upload($city['banner_image']) : 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1920&q=80';
+?>
 
-<!-- Elevated Cinematic Hero Section -->
-<div class="position-relative" style="height: 45vh; min-height: 350px; max-height: 450px; overflow: hidden; margin-top: -1px;">
-  <?php if ($city['banner_image']): ?>
-    <img src="<?= upload($city['banner_image']) ?>" alt="<?= e($city['name']) ?>" class="position-absolute w-100 h-100 object-fit-cover" style="top:0; left:0; z-index:0; filter: brightness(0.5);">
-  <?php else: ?>
-    <!-- Fallback high-quality cityscape if no banner is uploaded -->
-    <img src="https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1920&q=80" alt="<?= e($city['name']) ?>" class="position-absolute w-100 h-100 object-fit-cover" style="top:0; left:0; z-index:0; filter: brightness(0.5);">
-  <?php endif; ?>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+.hero-title { font-family: 'Outfit', sans-serif; letter-spacing: -1px; text-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+</style>
+
+<!-- Cinematic Hero Section -->
+<div class="position-relative" style="height: 55vh; min-height: 450px; overflow: hidden; margin-top: -1px;">
+  <img src="<?= $bannerImg ?>" alt="<?= e($city['name']) ?>" class="w-100 h-100 object-fit-cover" style="filter: brightness(0.5) contrast(1.1); transform: scale(1.1); transition: transform 12s cubic-bezier(0.25, 0.46, 0.45, 0.94);" id="heroImg">
+  <div class="position-absolute top-0 start-0 w-100 h-100" style="background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.9) 100%);"></div>
   
-  <div class="position-absolute w-100 h-100" style="top:0; left:0; background: linear-gradient(to top, var(--pr-secondary) 0%, transparent 100%); z-index:1;"></div>
-  
-  <div class="container-fluid px-3 px-md-5 position-relative z-2 h-100 d-flex flex-column justify-content-center pb-5 text-center text-white">
-    <nav aria-label="breadcrumb" class="mb-3 d-flex justify-content-center">
-      <ol class="breadcrumb mb-0" style="background: rgba(255,255,255,0.1); padding: 8px 16px; border-radius: 50px; backdrop-filter: blur(10px);">
-        <li class="breadcrumb-item"><a href="<?= PUBLIC_URL ?>" class="text-white text-decoration-none opacity-75">Home</a></li>
-        <li class="breadcrumb-item"><a href="<?= PUBLIC_URL ?>location" class="text-white text-decoration-none opacity-75">Locations</a></li>
-        <li class="breadcrumb-item"><a href="<?= PUBLIC_URL ?>location/<?= e($city['country_slug']) ?>" class="text-white text-decoration-none opacity-75"><?= e($city['country_name']) ?></a></li>
-        <li class="breadcrumb-item active text-white" aria-current="page"><?= e($city['name']) ?></li>
+  <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center text-center px-3" style="z-index: 2;">
+    <div class="badge mb-4 px-4 py-2" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); font-weight: 400; letter-spacing: 3px; text-transform: uppercase; border-radius: 50px; backdrop-filter: blur(8px);">
+      <i class="fas fa-city me-2" style="color: var(--pr-primary);"></i> Premium City Destinations
+    </div>
+    <h1 class="display-2 fw-800 text-white mb-3 hero-title">
+      Discover <span style="color: var(--pr-primary); position: relative; display: inline-block;">
+        <?= e($city['name']) ?>
+        <svg width="100%" height="15" viewBox="0 0 100 15" preserveAspectRatio="none" style="position:absolute; bottom:-5px; left:0; z-index:-1; opacity: 0.7;">
+            <path d="M0,10 Q50,0 100,10" stroke="var(--pr-primary)" stroke-width="4" fill="none"/>
+        </svg>
+      </span>
+    </h1>
+    <p class="lead text-white-50 mb-0" style="max-width: 700px; font-weight: 400; font-size: 1.15rem; line-height: 1.6;">
+      Explore premium neighborhoods and exclusive projects in <?= e($city['state_name']) ?>, <?= e($city['country_name']) ?>.
+    </p>
+  </div>
+</div>
+
+<!-- Breadcrumb over white -->
+<div class="bg-white border-bottom sticky-top" style="z-index: 10; top: 76px; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+  <div class="container-fluid px-3 px-md-5">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb mb-0 py-3" style="font-size: 0.9rem; font-weight: 500;">
+        <li class="breadcrumb-item"><a href="<?= PUBLIC_URL ?>" class="text-decoration-none text-muted"><i class="fas fa-home"></i></a></li>
+        <li class="breadcrumb-item"><a href="<?= PUBLIC_URL ?>location" class="text-decoration-none text-muted">Locations</a></li>
+        <li class="breadcrumb-item"><a href="<?= PUBLIC_URL ?>location/<?= e($city['country_slug']) ?>" class="text-decoration-none text-muted"><?= e($city['country_name']) ?></a></li>
+        <li class="breadcrumb-item active text-dark fw-bold"><?= e($city['name']) ?></li>
       </ol>
     </nav>
-    <h1 class="display-4 fw-bold mb-3">Discover <span style="color:var(--pr-primary)"><?= e($city['name']) ?></span></h1>
-    <p class="fs-5 opacity-75 mx-auto" style="max-width: 600px;">Explore premium neighborhoods and exclusive projects in <?= e($city['state_name']) ?>, <?= e($city['country_name']) ?>.</p>
   </div>
 </div>
 

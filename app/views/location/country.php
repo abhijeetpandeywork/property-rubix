@@ -64,7 +64,12 @@ if ($cSlug === 'india') {
 </div>
 
 <div class="container-fluid px-3 px-md-5 py-5" style="background-color: #f4f6f9; position: relative;">
-  
+
+  <!-- Premium Ad Banner shifted to top -->
+  <div style="max-width: 1400px; margin: 0 auto; position: relative; z-index: 5; margin-bottom: 30px;">
+    <?php require __DIR__ . '/../partials/_advertise_banner.php'; ?>
+  </div>
+
   <div class="text-center mb-5 pt-3">
     <span style="color: var(--pr-primary); font-weight: 800; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase;">Discover By Region</span>
     <h2 class="fw-800 mb-3 text-dark mt-2" style="font-size: 2.5rem; font-family: 'Outfit', sans-serif;">Select a Destination</h2>
@@ -111,11 +116,6 @@ if ($cSlug === 'india') {
         <a href="<?= PUBLIC_URL ?>" class="btn btn-primary px-4 py-2 rounded-pill mt-3 fw-bold">Return Home</a>
       </div>
     <?php endif; ?>
-  </div>
-
-  <!-- Premium Ad Banner shifted to bottom -->
-  <div style="max-width: 1400px; margin: 0 auto; position: relative; z-index: 5;">
-    <?php require __DIR__ . '/../partials/_advertise_banner.php'; ?>
   </div>
 
 </div>
