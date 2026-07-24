@@ -218,7 +218,7 @@
                 <div class="adv-feature-card">
                     <div class="adv-icon-box"><i class="fas fa-bullseye"></i></div>
                     <h3>Behavioral Re-targeting</h3>
-                    <p>We use advanced psychology and machine learning to re-target users who showed interest in similar properties, ensuring your advertising budget is spent on users with the highest intent.</p>
+                    <p>We use advanced psychology and machine learning to re-target users who showed interest in similar projects, ensuring your advertising budget is spent on users with the highest intent.</p>
                 </div>
             </div>
         </div>

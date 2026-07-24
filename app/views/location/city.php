@@ -21,7 +21,7 @@
       </ol>
     </nav>
     <h1 class="display-4 fw-bold mb-3">Discover <span style="color:var(--pr-primary)"><?= e($city['name']) ?></span></h1>
-    <p class="fs-5 opacity-75 mx-auto" style="max-width: 600px;">Explore premium neighborhoods and exclusive properties in <?= e($city['state_name']) ?>, <?= e($city['country_name']) ?>.</p>
+    <p class="fs-5 opacity-75 mx-auto" style="max-width: 600px;">Explore premium neighborhoods and exclusive projects in <?= e($city['state_name']) ?>, <?= e($city['country_name']) ?>.</p>
   </div>
 </div>
 
@@ -73,7 +73,7 @@
         <div class="col-12 text-center py-5">
           <div class="mb-4 text-muted opacity-50"><i class="fas fa-building fa-4x"></i></div>
           <h4 class="fw-bold text-dark">No neighborhoods listed yet.</h4>
-          <p class="text-muted">We are actively adding new exclusive properties in this city.</p>
+          <p class="text-muted">We are actively adding new exclusive projects in this city.</p>
         </div>
       <?php endif; ?>
     </div>

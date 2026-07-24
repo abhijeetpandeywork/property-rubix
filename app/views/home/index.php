@@ -46,8 +46,8 @@ if (empty($sliders)) {
       <div class="my-4 text-white fw-bold" style="font-size: 1.4rem; text-shadow: 0 2px 4px rgba(0,0,0,0.6);">OR</div>
       
       <div class="d-flex justify-content-center gap-3 flex-wrap">
-        <a href="<?= PUBLIC_URL ?>properties" class="btn btn-lg px-5 py-3 fw-bold shadow-lg" style="background: var(--pr-primary); color: white; border: 2px solid var(--pr-primary); border-radius: 50px; font-size: 1.15rem; transition: all 0.3s; backdrop-filter: blur(5px);">
-          Explore Properties <i class="fas fa-home ms-2"></i>
+        <a href="<?= PUBLIC_URL ?>projects" class="btn btn-lg px-5 py-3 fw-bold shadow-lg" style="background: var(--pr-primary); color: white; border: 2px solid var(--pr-primary); border-radius: 50px; font-size: 1.15rem; transition: all 0.3s; backdrop-filter: blur(5px);">
+          Explore Projects <i class="fas fa-building ms-2"></i>
         </a>
         <a href="<?= PUBLIC_URL ?>location" class="btn btn-lg px-5 py-3 fw-bold shadow-lg" style="background: rgba(255,255,255,0.1); color: white; border: 2px solid white; border-radius: 50px; font-size: 1.15rem; transition: all 0.3s; backdrop-filter: blur(5px);">
           Explore Locations <i class="fas fa-map-marked-alt ms-2"></i>

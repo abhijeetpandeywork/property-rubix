@@ -32,7 +32,6 @@ function adminLink(string $href, string $icon, string $label, string $curDir = '
     <!-- Content & Inventory -->
     <div class="adm-nav-section">Content & Inventory</div>
     <?= adminLink($adminBase . 'projects/', '🏗️', 'Projects', $curDir, 'projects') ?>
-    <?= adminLink($adminBase . 'properties/', '🏠', 'Properties', $curDir, 'properties') ?>
     <?= adminLink($adminBase . 'builders/', '👷', 'Builders', $curDir, 'builders') ?>
     <?= adminLink($adminBase . 'cities/', '🌆', 'Cities', $curDir, 'cities') ?>
     <?= adminLink($adminBase . 'localities/', '📍', 'Localities', $curDir, 'localities') ?>

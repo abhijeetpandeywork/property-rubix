@@ -190,14 +190,14 @@
     <nav aria-label="breadcrumb" class="mb-3 d-flex justify-content-center">
       <ol class="breadcrumb mb-0" style="font-size: 0.9rem; font-weight: 500;">
         <li class="breadcrumb-item"><a href="<?= PUBLIC_URL ?>" class="text-white-50 text-decoration-none">Home</a></li>
-        <li class="breadcrumb-item active text-white fw-bold">Explore Properties</li>
+        <li class="breadcrumb-item active text-white fw-bold">Explore Projects</li>
       </ol>
     </nav>
     <h1 class="display-4 fw-900 mb-2">
       <?= $filters['q'] ? 'Results for <span style="color:var(--pr-primary);">"' . e($filters['q']) . '"</span>' : 'Discover <span style="color:var(--pr-primary);">Premium</span> Real Estate' ?>
     </h1>
     <p class="lead text-white-50 mb-0" style="max-width: 600px; margin: 0 auto;">
-      Find your dream home or next investment opportunity among our curated luxury properties.
+      Find your dream home or next investment opportunity among our curated luxury projects.
     </p>
   </div>
 </div>
@@ -210,7 +210,7 @@
       <div class="adv-filter-sidebar">
         <form method="get">
           <h4 class="fw-800 mb-4 pb-3 border-bottom" style="font-size: 1.2rem; color: #111;">
-            <i class="fas fa-sliders-h me-2" style="color:var(--pr-primary);"></i> Filter Properties
+            <i class="fas fa-sliders-h me-2" style="color:var(--pr-primary);"></i> Filter Projects
           </h4>
 
           <!-- Keyword Search -->
@@ -291,7 +291,7 @@
       <!-- Control Bar -->
       <div class="control-bar d-flex align-items-center justify-content-between flex-wrap gap-3">
         <p class="mb-0 fw-600 text-dark">
-          Showing <span style="color:var(--pr-primary); font-size:1.1rem;"><?= number_format($total) ?></span> highly curated properties
+          Showing <span style="color:var(--pr-primary); font-size:1.1rem;"><?= number_format($total) ?></span> highly curated projects
         </p>
         <form method="get" class="d-flex align-items-center gap-3">
           <?php foreach ($filters as $k => $v): if (!$v || $k === 'sort') continue; ?>
@@ -326,8 +326,8 @@
         <div style="width: 80px; height: 80px; background: rgba(229,175,83,0.1); color: var(--pr-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
             <i class="fas fa-search fa-2x"></i>
         </div>
-        <h3 class="fw-bold text-dark mb-2">No Premium Properties Found</h3>
-        <p class="text-muted mb-4" style="max-width: 400px; margin: 0 auto;">We couldn't find any properties matching your exact criteria. Try adjusting your filters or expanding your search area.</p>
+        <h3 class="fw-bold text-dark mb-2">No Premium Projects Found</h3>
+        <p class="text-muted mb-4" style="max-width: 400px; margin: 0 auto;">We couldn't find any projects matching your exact criteria. Try adjusting your filters or expanding your search area.</p>
         <a href="<?= PUBLIC_URL ?>projects" class="btn btn-primary px-4 py-2 fw-bold" style="border-radius: 50px;">Reset All Filters</a>
       </div>
       <?php endif; ?>

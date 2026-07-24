@@ -24,7 +24,7 @@ if ($cSlug === 'india') {
       Explore <span style="color: var(--pr-primary);"><?= e($country['name']) ?></span>
     </h1>
     <p class="lead text-white-50 mb-0" style="max-width: 600px; font-weight: 300;">
-      Discover exclusive luxury properties, premium developments, and elite real estate opportunities across <?= e($country['name']) ?>.
+      Discover exclusive luxury projects, premium developments, and elite real estate opportunities across <?= e($country['name']) ?>.
     </p>
   </div>
 </div>

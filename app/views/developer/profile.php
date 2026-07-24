@@ -64,7 +64,7 @@
           <p style="margin-top: 0;"><strong><?= e($builder['name']) ?></strong> is a prominent real estate developer, with a rich legacy spanning over several decades. The company has earned a strong reputation for its innovative approach to residential, commercial, and mixed-use developments.</p>
         <?php endif; ?>
 
-        <p>The company's portfolio includes residential complexes, integrated townships, IT parks, and commercial properties across major cities. <?= e($builder['name']) ?> is committed to creating sustainable and modern living spaces, with a focus on design excellence, superior construction quality, and timely delivery.</p>
+        <p>The company's portfolio includes residential complexes, integrated townships, IT parks, and commercial projects across major cities. <?= e($builder['name']) ?> is committed to creating sustainable and modern living spaces, with a focus on design excellence, superior construction quality, and timely delivery.</p>
         <p>The company has a customer-centric approach, consistently striving to enhance the living experience through thoughtful designs, cutting-edge technology, and world-class amenities. With numerous awards and accolades to its name, <?= e($builder['name']) ?> continues to lead the industry by shaping vibrant communities that offer both luxury and affordability.</p>
       </div>
     </div>

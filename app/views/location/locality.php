@@ -64,7 +64,7 @@
       </div>
       <!-- Results -->
       <div class="col-lg-9">
-        <p class="text-muted mb-4"><strong><?= number_format($pager->total) ?></strong> properties in <?= e($locality) ?></p>
+        <p class="text-muted mb-4"><strong><?= number_format($pager->total) ?></strong> projects in <?= e($locality) ?></p>
         <?php if ($projects): ?>
         <div class="row g-4 mb-4">
           <?php foreach ($projects as $p): ?>
@@ -77,7 +77,7 @@
         <?php else: ?>
         <div class="text-center py-5">
           <i class="fas fa-city" style="font-size:3rem;color:var(--pr-border)"></i>
-          <h3 class="mt-3 text-muted">No properties found in <?= e($locality) ?> with selected filters</h3>
+          <h3 class="mt-3 text-muted">No projects found in <?= e($locality) ?> with selected filters</h3>
           <a href="?" class="btn btn-primary mt-3">Clear Filters</a>
         </div>
         <?php endif; ?>
