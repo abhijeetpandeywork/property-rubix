@@ -92,6 +92,7 @@ body {
 .hero-content {
     position: absolute; bottom: 0; left: 0; width: 100%; z-index: 2;
     padding-bottom: 80px; color: white; display: flex; flex-direction: column; align-items: center; text-align: center;
+    pointer-events: none;
 }
 .dual-logo-container {
     display: flex; align-items: center; gap: 20px; margin-bottom: 20px;
@@ -821,7 +822,7 @@ document.addEventListener("DOMContentLoaded", function() {
     // Hero Gallery Swiper
     if(typeof Swiper !== 'undefined') {
         new Swiper(".hero-swiper", {
-            loop: true, effect: "fade", autoplay: { delay: 4500, disableOnInteraction: false },
+            loop: true, autoplay: { delay: 4500, disableOnInteraction: false },
             navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" }
         });
     }
