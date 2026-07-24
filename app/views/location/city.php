@@ -48,8 +48,8 @@ $bannerImg = $city['banner_image'] ? upload($city['banner_image']) : 'https://im
 <div class="section py-5 position-relative" style="background:#f8f9fa;">
   <div class="container-fluid px-3 px-md-5">
     
-    <!-- Prominent, Elevated Search Bar -->
-    <div class="row justify-content-center mb-5" style="margin-top: -80px; position: relative; z-index: 10;">
+    <!-- Prominent Search Bar -->
+    <div class="row justify-content-center mb-5" style="position: relative; z-index: 10; padding-top: 15px;">
       <div class="col-lg-8 col-md-10">
         <div class="bg-white p-3 rounded-pill shadow-lg d-flex align-items-center" style="border: 1px solid rgba(0,0,0,0.05);">
           <i class="fas fa-search fs-4 text-muted ms-3 me-2"></i>
