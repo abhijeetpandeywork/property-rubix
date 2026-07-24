@@ -68,6 +68,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
             'sort_order'       => (int)($_POST['sort_order'] ?? 0),
             'meta_title'       => trim($_POST['meta_title']       ?? ''),
             'meta_description' => trim($_POST['meta_description'] ?? ''),
+            'contact_phone'    => trim($_POST['contact_phone']    ?? ''),
+            'whatsapp_number'  => trim($_POST['whatsapp_number']  ?? ''),
+            'virtual_tour_url' => trim($_POST['virtual_tour_url'] ?? ''),
+            'marquee_text'     => trim($_POST['marquee_text']     ?? ''),
+            'connectivity'     => $_POST['connectivity'] ?? '',
+            'highlights'       => $_POST['highlights'] ?? '',
         ];
 
         // Process Amenities text to JSON
@@ -93,6 +99,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
             $up = uploadImage($_FILES['thumbnail_image'], 'projects');
             if ($up['success']) $data['thumbnail_image'] = $up['path'];
             else $errors[] = 'Thumbnail: ' . $up['error'];
+        }
+
+        if (!empty($_POST['delete_project_logo'])) {
+            $data['project_logo'] = null;
+        }
+        if (!empty($_FILES['project_logo']['name'])) {
+            $up = uploadImage($_FILES['project_logo'], 'projects');
+            if ($up['success']) $data['project_logo'] = $up['path'];
+            else $errors[] = 'Project Logo: ' . $up['error'];
+        }
+
+        if (!empty($_POST['delete_rera_qr_code'])) {
+            $data['rera_qr_code'] = null;
+        }
+        if (!empty($_FILES['rera_qr_code']['name'])) {
+            $up = uploadImage($_FILES['rera_qr_code'], 'projects');
+            if ($up['success']) $data['rera_qr_code'] = $up['path'];
+            else $errors[] = 'RERA QR Code: ' . $up['error'];
         }
 
         if (!empty($_POST['delete_brochure_pdf'])) {
@@ -137,6 +161,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
         $newGallery = $processMultiUpload('gallery_images', 'projects/gallery');
         if ($newGallery || isset($_POST['delete_gallery_images'])) {
             $data['gallery_images'] = json_encode(array_merge($existingGallery, $newGallery));
+        }
+
+        // Handle interior images
+        $existingInterior = $id && !empty($row['interior_images']) ? json_decode($row['interior_images'], true) : [];
+        if (!is_array($existingInterior)) $existingInterior = [];
+
+        $deleteInterior = $_POST['delete_interior_images'] ?? [];
+        if (!empty($deleteInterior)) {
+            $existingInterior = array_values(array_filter($existingInterior, fn($img) => !in_array($img, $deleteInterior)));
+        }
+
+        $newInterior = $processMultiUpload('interior_images', 'projects/interior');
+        if ($newInterior || isset($_POST['delete_interior_images'])) {
+            $data['interior_images'] = json_encode(array_merge($existingInterior, $newInterior));
+        }
+
+        // Handle exterior images
+        $existingExterior = $id && !empty($row['exterior_images']) ? json_decode($row['exterior_images'], true) : [];
+        if (!is_array($existingExterior)) $existingExterior = [];
+
+        $deleteExterior = $_POST['delete_exterior_images'] ?? [];
+        if (!empty($deleteExterior)) {
+            $existingExterior = array_values(array_filter($existingExterior, fn($img) => !in_array($img, $deleteExterior)));
+        }
+
+        $newExterior = $processMultiUpload('exterior_images', 'projects/exterior');
+        if ($newExterior || isset($_POST['delete_exterior_images'])) {
+            $data['exterior_images'] = json_encode(array_merge($existingExterior, $newExterior));
         }
 
         // Handle floor plan images
@@ -367,16 +419,24 @@ require __DIR__ . '/../includes/header.php';
         </div>
       </div>
 
-      <!-- Description -->
+      <!-- Description & Additional Details -->
       <div class="adm-card">
-        <div class="adm-card-title">Description</div>
+        <div class="adm-card-title">Description & Details</div>
         <div class="mb-3">
           <label class="adm-form-label">Short Description</label>
           <textarea name="short_description" class="form-control" rows="2"><?= htmlspecialchars($row['short_description'] ?? '') ?></textarea>
         </div>
-        <div>
+        <div class="mb-3">
           <label class="adm-form-label">Full Description (Plain Text)</label>
-          <textarea name="description" class="form-control" rows="8"><?= htmlspecialchars($row['description'] ?? '') ?></textarea>
+          <textarea name="description" class="form-control" rows="6"><?= htmlspecialchars($row['description'] ?? '') ?></textarea>
+        </div>
+        <div class="mb-3">
+          <label class="adm-form-label">Connectivity (One per line or HTML)</label>
+          <textarea name="connectivity" class="form-control" rows="4"><?= htmlspecialchars($row['connectivity'] ?? '') ?></textarea>
+        </div>
+        <div>
+          <label class="adm-form-label">Project Highlights (One per line or HTML)</label>
+          <textarea name="highlights" class="form-control" rows="4"><?= htmlspecialchars($row['highlights'] ?? '') ?></textarea>
         </div>
       </div>
 
@@ -420,6 +480,18 @@ require __DIR__ . '/../includes/header.php';
           <input class="form-check-input" type="checkbox" name="rera_verified" id="rera_v" <?= !empty($row['rera_verified']) ? 'checked' : '' ?>>
           <label class="form-check-label" for="rera_v">RERA Verified</label>
         </div>
+        <div class="mb-3">
+          <label class="adm-form-label">RERA QR Code</label>
+          <?php if (!empty($row['rera_qr_code'])): ?>
+          <div class="mb-2">
+            <img src="<?= upload($row['rera_qr_code']) ?>" class="img-fluid rounded" style="height:60px;object-fit:cover">
+            <label style="font-size:12px;cursor:pointer;display:block;margin-top:4px;">
+              <input type="checkbox" name="delete_rera_qr_code" value="1"> Delete Image
+            </label>
+          </div>
+          <?php endif; ?>
+          <input type="file" name="rera_qr_code" class="form-control" accept="image/*">
+        </div>
         <div class="form-check mb-3">
           <input class="form-check-input" type="checkbox" name="is_featured" id="featured" <?= !empty($row['is_featured']) ? 'checked' : '' ?>>
           <label class="form-check-label" for="featured">Featured Project</label>
@@ -427,6 +499,19 @@ require __DIR__ . '/../includes/header.php';
         <div class="mb-3">
           <label class="adm-form-label">Sort Order</label>
           <input type="number" name="sort_order" class="form-control" value="<?= htmlspecialchars($row['sort_order'] ?? 0) ?>">
+        </div>
+        <hr>
+        <div class="mb-3">
+          <label class="adm-form-label">Marquee Text (News/Updates)</label>
+          <input type="text" name="marquee_text" class="form-control" value="<?= htmlspecialchars($row['marquee_text'] ?? '') ?>">
+        </div>
+        <div class="mb-3">
+          <label class="adm-form-label">Contact Phone</label>
+          <input type="text" name="contact_phone" class="form-control" value="<?= htmlspecialchars($row['contact_phone'] ?? '') ?>">
+        </div>
+        <div class="mb-3">
+          <label class="adm-form-label">WhatsApp Number</label>
+          <input type="text" name="whatsapp_number" class="form-control" value="<?= htmlspecialchars($row['whatsapp_number'] ?? '') ?>">
         </div>
         <hr>
         <div class="mb-3">
@@ -445,10 +530,26 @@ require __DIR__ . '/../includes/header.php';
           <label class="adm-form-label">Video URL</label>
           <input type="url" name="video_url" class="form-control" value="<?= htmlspecialchars($row['video_url'] ?? '') ?>">
         </div>
+        <div class="mb-3">
+          <label class="adm-form-label">Virtual Tour (URL/Embed)</label>
+          <input type="text" name="virtual_tour_url" class="form-control" value="<?= htmlspecialchars($row['virtual_tour_url'] ?? '') ?>">
+        </div>
       </div>
 
       <div class="adm-card">
         <div class="adm-card-title">Main Images</div>
+        <div class="mb-3">
+          <label class="adm-form-label">Project Logo</label>
+          <?php if (!empty($row['project_logo'])): ?>
+          <div class="mb-2">
+            <img src="<?= upload($row['project_logo']) ?>" class="img-fluid rounded" style="height:60px;object-fit:contain;background:#f8f9fa;">
+            <label style="font-size:12px;cursor:pointer;display:block;margin-top:4px;">
+              <input type="checkbox" name="delete_project_logo" value="1"> Delete Image
+            </label>
+          </div>
+          <?php endif; ?>
+          <input type="file" name="project_logo" class="form-control" accept="image/*">
+        </div>
         <div class="mb-3">
           <label class="adm-form-label">Banner Image</label>
           <?php if (!empty($row['banner_image'])): ?>
@@ -478,7 +579,39 @@ require __DIR__ . '/../includes/header.php';
       <div class="adm-card">
         <div class="adm-card-title">Gallery & Media</div>
         <div class="mb-3">
-          <label class="adm-form-label">Gallery Images (Multiple)</label>
+          <label class="adm-form-label">Interior Images (Multiple)</label>
+          <?php if (!empty($row['interior_images'])): $iArr = json_decode($row['interior_images'], true); if (is_array($iArr) && count($iArr)): ?>
+          <div class="d-flex flex-wrap gap-3 mb-2">
+            <?php foreach ($iArr as $gi): ?>
+            <div class="text-center">
+              <img src="<?= upload($gi) ?>" style="height:50px;width:50px;object-fit:cover;border-radius:4px;display:block;margin-bottom:4px;">
+              <label style="font-size:11px;cursor:pointer;">
+                 <input type="checkbox" name="delete_interior_images[]" value="<?= htmlspecialchars($gi) ?>"> Delete
+              </label>
+            </div>
+            <?php endforeach; ?>
+          </div>
+          <?php endif; endif; ?>
+          <input type="file" name="interior_images[]" class="form-control" accept="image/*" multiple>
+        </div>
+        <div class="mb-3">
+          <label class="adm-form-label">Exterior Images (Multiple)</label>
+          <?php if (!empty($row['exterior_images'])): $eArr = json_decode($row['exterior_images'], true); if (is_array($eArr) && count($eArr)): ?>
+          <div class="d-flex flex-wrap gap-3 mb-2">
+            <?php foreach ($eArr as $gi): ?>
+            <div class="text-center">
+              <img src="<?= upload($gi) ?>" style="height:50px;width:50px;object-fit:cover;border-radius:4px;display:block;margin-bottom:4px;">
+              <label style="font-size:11px;cursor:pointer;">
+                 <input type="checkbox" name="delete_exterior_images[]" value="<?= htmlspecialchars($gi) ?>"> Delete
+              </label>
+            </div>
+            <?php endforeach; ?>
+          </div>
+          <?php endif; endif; ?>
+          <input type="file" name="exterior_images[]" class="form-control" accept="image/*" multiple>
+        </div>
+        <div class="mb-3">
+          <label class="adm-form-label">Legacy Gallery Images (Optional)</label>
           <?php if (!empty($row['gallery_images'])): $gArr = json_decode($row['gallery_images'], true); if (is_array($gArr) && count($gArr)): ?>
           <div class="d-flex flex-wrap gap-3 mb-2">
             <?php foreach ($gArr as $gi): ?>
