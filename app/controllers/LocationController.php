@@ -4,12 +4,13 @@ class LocationController extends Controller {
     public function index(array $params = []): void {
         $pdo = db();
         // Count projects per country by joining states, cities, and projects
+        // Count projects per country by joining states, cities, and projects
         $countries = $pdo->query("
-            SELECT co.*, COUNT(p.id) AS project_count 
+            SELECT co.*, COUNT(DISTINCT p.id) AS project_count 
             FROM countries co
             LEFT JOIN states s ON s.country_id = co.id
             LEFT JOIN cities c ON c.state_id = s.id
-            LEFT JOIN projects p ON p.city_id = c.id AND p.status='published'
+            LEFT JOIN projects p ON p.city_id = c.id
             WHERE co.status='active' 
             GROUP BY co.id 
             ORDER BY co.sort_order
@@ -31,8 +32,12 @@ class LocationController extends Controller {
         if (!$country) { http_response_code(404); $this->view('errors/404', []); return; }
 
         $states = $pdo->prepare(
-            "SELECT s.*, COUNT(c.id) AS city_count FROM states s
+            "SELECT s.*, 
+                    COUNT(DISTINCT c.id) AS city_count,
+                    COUNT(DISTINCT p.id) AS project_count
+             FROM states s
              LEFT JOIN cities c ON c.state_id = s.id AND c.status='active'
+             LEFT JOIN projects p ON p.city_id = c.id
              WHERE s.country_id=?
              GROUP BY s.id ORDER BY s.name"
         );
@@ -59,7 +64,7 @@ class LocationController extends Controller {
         if (!$state) { http_response_code(404); $this->view('errors/404', []); return; }
 
         $cities = $pdo->prepare(
-            "SELECT c.*, COUNT(p.id) AS project_count FROM cities c
+            "SELECT c.*, COUNT(DISTINCT p.id) AS project_count FROM cities c
              LEFT JOIN projects p ON p.city_id = c.id
              WHERE c.state_id=? AND c.status='active'
              GROUP BY c.id ORDER BY c.sort_order, c.name"

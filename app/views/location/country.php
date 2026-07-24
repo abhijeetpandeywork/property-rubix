@@ -91,10 +91,19 @@ if ($cSlug === 'india') {
               <div class="state-icon d-flex align-items-center justify-content-center">
                 <i class="fas fa-map-marked-alt"></i>
               </div>
-              <?php if ($s['city_count'] > 0): ?>
-              <span class="badge bg-white text-dark shadow-sm px-3 py-2 fw-bold" style="font-size: 0.75rem; letter-spacing: 0.5px; border: 1px solid #eaeaea;">
-                <?= $s['city_count'] ?> <?= $s['city_count'] == 1 ? 'CITY' : 'CITIES' ?>
-              </span>
+              <?php if ($s['city_count'] > 0 || $s['project_count'] > 0): ?>
+              <div class="d-flex flex-column gap-1 align-items-end">
+                  <?php if ($s['project_count'] > 0): ?>
+                  <span class="badge bg-white text-dark shadow-sm px-3 py-1 fw-bold" style="font-size: 0.75rem; border: 1px solid #eaeaea;">
+                    <?= $s['project_count'] ?> <?= $s['project_count'] == 1 ? 'PROPERTY' : 'PROPERTIES' ?>
+                  </span>
+                  <?php endif; ?>
+                  <?php if ($s['city_count'] > 0): ?>
+                  <span class="badge bg-white text-dark shadow-sm px-3 py-1 fw-bold" style="font-size: 0.75rem; border: 1px solid #eaeaea;">
+                    <?= $s['city_count'] ?> <?= $s['city_count'] == 1 ? 'CITY' : 'CITIES' ?>
+                  </span>
+                  <?php endif; ?>
+              </div>
               <?php endif; ?>
             </div>
             

@@ -78,7 +78,8 @@ require __DIR__ . '/../includes/header.php';
         <tr>
           <td><?= $p['id'] ?></td>
           <td>
-            <pre style="margin:0; font-size:0.75rem; max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars(json_encode($p)) ?></pre>
+            <strong><?= htmlspecialchars($p['name']) ?></strong><br>
+            <span class="text-muted small">Slug: <?= htmlspecialchars($p['slug']) ?> | Status: <?= htmlspecialchars($p['status'] ?? 'active') ?></span>
           </td>
           <td>
             <div class="actions">
@@ -120,7 +121,14 @@ require __DIR__ . '/../includes/header.php';
             $val = htmlspecialchars($row[$c] ?? '');
             echo '<div class="col-md-6">';
             echo '<label class="adm-form-label">'.ucfirst(str_replace('_',' ',$c)).'</label>';
-            if (strpos($col['Type'], 'text') !== false) {
+            
+            if ($c === 'status') {
+                $statusVal = $row[$c] ?? 'active';
+                echo '<select name="'.$c.'" class="form-select">';
+                echo '<option value="active" '.($statusVal==='active'?'selected':'').'>Active</option>';
+                echo '<option value="inactive" '.($statusVal==='inactive'?'selected':'').'>Inactive</option>';
+                echo '</select>';
+            } elseif (strpos($col['Type'], 'text') !== false) {
                 echo '<textarea name="'.$c.'" class="form-control" rows="3">'.$val.'</textarea>';
             } else {
                 echo '<input type="text" name="'.$c.'" class="form-control" value="'.$val.'">';
