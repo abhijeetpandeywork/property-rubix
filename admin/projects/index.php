@@ -244,7 +244,9 @@ $list = crudList($pdo, 'projects', 20, 'projects.created_at DESC',
 );
 
 $builders = $pdo->query("SELECT id, name FROM builders ORDER BY name")->fetchAll();
-$cities   = $pdo->query("SELECT id, name FROM cities ORDER BY name")->fetchAll();
+$countries = $pdo->query("SELECT id, name FROM countries ORDER BY sort_order, name")->fetchAll();
+$states   = $pdo->query("SELECT id, country_id, name FROM states ORDER BY name")->fetchAll();
+$cities   = $pdo->query("SELECT id, state_id, name FROM cities ORDER BY name")->fetchAll();
 $localities = $pdo->query("SELECT id, city_id, name FROM localities WHERE status='active' ORDER BY name")->fetchAll();
 
 $pageTitle = 'Projects';
@@ -346,22 +348,32 @@ require __DIR__ . '/../includes/header.php';
               <?php endforeach; ?>
             </select>
           </div>
-          <div class="col-md-6">
-            <label class="adm-form-label">City</label>
-            <select name="city_id" id="citySelect" class="form-select">
-              <option value="">-- Select City --</option>
-              <?php foreach ($cities as $c): ?>
-              <option value="<?= $c['id'] ?>" <?= ($row['city_id'] ?? '') == $c['id'] ? 'selected' : '' ?>><?= htmlspecialchars($c['name']) ?></option>
+          <div class="col-md-3">
+            <label class="adm-form-label">Country</label>
+            <select id="countrySelect" class="form-select">
+              <option value="">-- Select Country --</option>
+              <?php foreach ($countries as $co): ?>
+              <option value="<?= $co['id'] ?>"><?= htmlspecialchars($co['name']) ?></option>
               <?php endforeach; ?>
             </select>
           </div>
-          <div class="col-md-6">
-            <label class="adm-form-label">Neighborhood / Locality</label>
-            <select name="locality_id" id="localitySelect" class="form-select">
-              <option value="">-- Select Neighborhood --</option>
-              <!-- Options populated by JS -->
+          <div class="col-md-3">
+            <label class="adm-form-label">State</label>
+            <select id="stateSelect" class="form-select">
+              <option value="">-- Select State --</option>
             </select>
-            <!-- Hidden input to also save string for backward compatibility -->
+          </div>
+          <div class="col-md-3">
+            <label class="adm-form-label">City</label>
+            <select name="city_id" id="citySelect" class="form-select">
+              <option value="">-- Select City --</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="adm-form-label">Locality</label>
+            <select name="locality_id" id="localitySelect" class="form-select">
+              <option value="">-- Select Locality --</option>
+            </select>
             <input type="hidden" name="location_area" id="locationAreaInput" value="<?= htmlspecialchars($row['location_area'] ?? '') ?>">
           </div>
           <div class="col-md-4">
@@ -702,41 +714,81 @@ require __DIR__ . '/../includes/header.php';
 
 <?php
 $extraScripts = '
-<!-- Initialize dynamic localities dropdown -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    const states = ' . json_encode($states) . ';
+    const cities = ' . json_encode($cities) . ';
     const localities = ' . json_encode($localities) . ';
+    
+    const countrySelect = document.getElementById("countrySelect");
+    const stateSelect = document.getElementById("stateSelect");
     const citySelect = document.getElementById("citySelect");
     const localitySelect = document.getElementById("localitySelect");
     const locationAreaInput = document.getElementById("locationAreaInput");
+    
+    const currentCityId = "' . ($row['city_id'] ?? '') . '";
     const currentLocalityId = "' . ($row['locality_id'] ?? '') . '";
     
+    let currentCountryId = "";
+    let currentStateId = "";
+    
+    if (currentCityId) {
+        const city = cities.find(c => c.id == currentCityId);
+        if (city) {
+            currentStateId = city.state_id;
+            const state = states.find(s => s.id == currentStateId);
+            if (state) currentCountryId = state.country_id;
+        }
+    }
+    
+    if (countrySelect && currentCountryId) countrySelect.value = currentCountryId;
+    
+    function updateStates() {
+        const cId = countrySelect.value;
+        stateSelect.innerHTML = \'<option value="">-- Select State --</option>\';
+        if (cId) {
+            states.filter(s => s.country_id == cId).forEach(s => {
+                const opt = new Option(s.name, s.id);
+                if (s.id == currentStateId) opt.selected = true;
+                stateSelect.appendChild(opt);
+            });
+        }
+        updateCities();
+    }
+    
+    function updateCities() {
+        const sId = stateSelect.value;
+        citySelect.innerHTML = \'<option value="">-- Select City --</option>\';
+        if (sId) {
+            cities.filter(c => c.state_id == sId).forEach(c => {
+                const opt = new Option(c.name, c.id);
+                if (c.id == currentCityId) opt.selected = true;
+                citySelect.appendChild(opt);
+            });
+        }
+        updateLocalities();
+    }
+    
     function updateLocalities() {
-        const cityId = citySelect.value;
-        localitySelect.innerHTML = \'<option value="">-- Select Neighborhood --</option>\';
-        
-        if (cityId) {
-            const filtered = localities.filter(l => l.city_id == cityId);
-            filtered.forEach(loc => {
-                const opt = document.createElement("option");
-                opt.value = loc.id;
-                opt.textContent = loc.name;
+        const cId = citySelect.value;
+        localitySelect.innerHTML = \'<option value="">-- Select Locality --</option>\';
+        if (cId) {
+            localities.filter(l => l.city_id == cId).forEach(loc => {
+                const opt = new Option(loc.name, loc.id);
                 opt.dataset.name = loc.name;
-                if (loc.id == currentLocalityId) {
-                    opt.selected = true;
-                }
+                if (loc.id == currentLocalityId) opt.selected = true;
                 localitySelect.appendChild(opt);
             });
         }
     }
     
-    // Initial load
-    if (citySelect) {
-        updateLocalities();
-        citySelect.addEventListener("change", updateLocalities);
+    if (countrySelect) {
+        countrySelect.addEventListener("change", () => { currentStateId = ""; updateStates(); });
+        stateSelect.addEventListener("change", () => { currentCityId = ""; updateCities(); });
+        citySelect.addEventListener("change", () => { currentLocalityId = ""; updateLocalities(); });
+        updateStates();
     }
     
-    // When locality is selected, also update the hidden string field
     if (localitySelect) {
         localitySelect.addEventListener("change", function() {
             const selectedOpt = this.options[this.selectedIndex];

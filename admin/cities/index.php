@@ -91,9 +91,7 @@ require __DIR__ . '/../includes/header.php';
         <?php foreach ($list['rows'] as $p): ?>
         <tr>
           <td><?= $p['id'] ?></td>
-          <td>
-            <pre style="margin:0; font-size:0.75rem; max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars(json_encode($p)) ?></pre>
-          </td>
+          <td><?= htmlspecialchars($p['name']) ?> <small class="text-muted">(<?= htmlspecialchars($p['slug']) ?>)</small></td>
           <td>
             <div class="actions">
               <a href="?action=edit&id=<?= $p['id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
@@ -141,6 +139,15 @@ require __DIR__ . '/../includes/header.php';
                     echo '<div class="mb-2"><img src="'.upload($row['banner_image']).'" class="img-fluid rounded" style="max-height: 80px; object-fit: contain;"></div>';
                 }
                 echo '<input type="file" name="'.$c.'" class="form-control" accept="image/*">';
+            } elseif ($c === 'state_id') {
+                $states = $pdo->query("SELECT id, name FROM states ORDER BY name")->fetchAll();
+                echo '<select name="'.$c.'" class="form-select">';
+                echo '<option value="">-- Select State --</option>';
+                foreach ($states as $s) {
+                    $sel = ($val == $s['id']) ? 'selected' : '';
+                    echo '<option value="'.$s['id'].'" '.$sel.'>'.htmlspecialchars($s['name']).'</option>';
+                }
+                echo '</select>';
             } elseif (strpos($col['Type'], 'text') !== false) {
                 echo '<textarea name="'.$c.'" class="form-control" rows="3">'.$val.'</textarea>';
             } else {

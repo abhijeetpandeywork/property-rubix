@@ -1,0 +1,1 @@
+﻿ALTER TABLE projects ADD COLUMN locality_id INT UNSIGNED DEFAULT NULL AFTER city_id;

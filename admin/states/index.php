@@ -1,14 +1,4 @@
 <?php
-require __DIR__ . '/../config/db.php';
-$pdo = db();
-
-$modules = [
-    'countries' => 'countries',
-    'states' => 'states'
-];
-
-$template = <<<PHP
-<?php
 require_once __DIR__ . '/../includes/auth_check.php';
 require_once __DIR__ . '/../includes/crud_helpers.php';
 
@@ -22,12 +12,12 @@ require_once __DIR__ . '/../includes/crud_helpers.php';
 // ── Delete
 if (\$action === 'delete' && \$id) {
     csrfCheck();
-    crudDelete(\$pdo, '{TABLE}', \$id, BASE_URL . 'admin/{MODULE}/');
+    crudDelete(\$pdo, 'states', \$id, BASE_URL . 'admin/states/');
 }
 
 // ── Load row for edit
 if (\$action === 'edit' && \$id) {
-    \$stmt = \$pdo->prepare("SELECT * FROM `{TABLE}` WHERE id=?");
+    \$stmt = \$pdo->prepare("SELECT * FROM `states` WHERE id=?");
     \$stmt->execute([\$id]);
     \$row = \$stmt->fetch() ?: [];
 }
@@ -47,24 +37,24 @@ if (\$_SERVER['REQUEST_METHOD'] === 'POST' && in_array(\$action, ['new','edit'])
     if (!\$errors) {
         if (\$id) {
             \$sets = implode(', ', array_map(fn(\$k) => "`\$k` = ?", array_keys(\$data)));
-            \$stmt = \$pdo->prepare("UPDATE `{TABLE}` SET \$sets WHERE id=?");
+            \$stmt = \$pdo->prepare("UPDATE `states` SET \$sets WHERE id=?");
             \$stmt->execute([...array_values(\$data), \$id]);
-            logAction('UPDATE', '{TABLE}', \$id);
+            logAction('UPDATE', 'states', \$id);
         } else {
             \$cols = implode(', ', array_map(fn(\$k) => "`\$k`", array_keys(\$data)));
             \$vals = implode(', ', array_fill(0, count(\$data), '?'));
-            \$stmt = \$pdo->prepare("INSERT INTO `{TABLE}` (\$cols) VALUES (\$vals)");
+            \$stmt = \$pdo->prepare("INSERT INTO `states` (\$cols) VALUES (\$vals)");
             \$stmt->execute(array_values(\$data));
             \$id = (int)\$pdo->lastInsertId();
-            logAction('CREATE', '{TABLE}', \$id);
+            logAction('CREATE', 'states', \$id);
         }
-        header('Location: ' . BASE_URL . 'admin/{MODULE}/?saved=1');
+        header('Location: ' . BASE_URL . 'admin/states/?saved=1');
         exit;
     }
 }
 
 // ── List
-\$list = crudList(\$pdo, '{TABLE}', 20, 'id DESC', '', '', \$search, ['id']);
+\$list = crudList(\$pdo, 'states', 20, 'id DESC', '', '', \$search, ['id']);
 
 \$pageTitle = '{TITLE}';
 require __DIR__ . '/../includes/header.php';
@@ -122,7 +112,7 @@ require __DIR__ . '/../includes/header.php';
     <div class="row g-3">
         <?php
         // Dynamically build form fields from table schema
-        \$stmt = \$pdo->query("DESCRIBE `{TABLE}`");
+        \$stmt = \$pdo->query("DESCRIBE `states`");
         \$columns = \$stmt->fetchAll();
         foreach (\$columns as \$col) {
             \$c = \$col['Field'];
@@ -148,18 +138,3 @@ require __DIR__ . '/../includes/header.php';
 <?php endif; ?>
 
 <?php require __DIR__ . '/../includes/footer.php'; ?>
-PHP;
-
-foreach ($modules as $module => $table) {
-    $dir = __DIR__ . '/' . $module;
-    if (!is_dir($dir)) {
-        mkdir($dir, 0755, true);
-    }
-    
-    $title = ucwords(str_replace('-', ' ', $module));
-    $content = str_replace(['{MODULE}', '{TABLE}', '{TITLE}'], [$module, $table, $title], $template);
-    
-    file_put_contents($dir . '/index.php', $content);
-    echo "Generated $module/index.php\n";
-}
-echo "Done.";
