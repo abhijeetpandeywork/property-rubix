@@ -7,7 +7,7 @@ $twUrl  = getSetting('social_twitter',   '#');
 $ytUrl  = getSetting('social_youtube',   '#');
 $igUrl  = getSetting('social_instagram', '#');
 ?>
-<aside class="site-drawer" id="siteDrawer" role="navigation" aria-label="Mobile navigation" aria-hidden="true" style="background-color: #fff; box-shadow: -5px 0 25px rgba(0,0,0,0.1);">
+<aside class="site-drawer glass-panel" id="siteDrawer" role="navigation" aria-label="Mobile navigation" aria-hidden="true" style="border-radius: 0; border-right: none; border-top: none; border-bottom: none;">
 
   <div class="drawer-header" style="padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: none;">
     <a href="<?= PUBLIC_URL ?>" class="drawer-logo text-decoration-none">

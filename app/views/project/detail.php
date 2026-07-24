@@ -223,14 +223,14 @@ body {
 /* --- Sticky Sidebar Form --- */
 .sticky-enquiry-wrapper { position: sticky; top: 100px; z-index: 10; }
 .glass-sidebar {
-    background: #fff; border: 1px solid rgba(0,0,0,0.05); border-radius: 24px; padding: 35px;
+    border: 1px solid rgba(0,0,0,0.05); border-radius: 24px; padding: 35px;
     box-shadow: 0 25px 60px rgba(0,0,0,0.05);
 }
 .price-display { font-size: 2.25rem; font-weight: 900; color: #0f172a; margin-bottom: 25px; font-family: 'Outfit', sans-serif; }
 </style>
 
 <!-- 2. Custom Project Header (Image 2) -->
-<header class="custom-proj-header">
+<header class="custom-proj-header glass-header">
     <div class="container-fluid px-3 px-md-5">
         <div class="cph-logo d-flex align-items-center gap-3">
             <?php if ($p['project_logo']): ?>
@@ -311,28 +311,28 @@ body {
         <!-- Bento Box Facts -->
         <div class="bento-grid">
             <?php if ($p['unit_types']): ?>
-            <div class="bento-box">
+            <div class="bento-box glass-panel">
                 <i class="fas fa-bed bento-icon"></i>
                 <div class="bento-label">Configurations</div>
                 <div class="bento-value"><?= e($p['unit_types']) ?></div>
             </div>
             <?php endif; ?>
             <?php if ($p['area_range']): ?>
-            <div class="bento-box">
+            <div class="bento-box glass-panel">
                 <i class="fas fa-expand-arrows-alt bento-icon"></i>
                 <div class="bento-label">Carpet Area</div>
                 <div class="bento-value"><?= e($p['area_range']) ?></div>
             </div>
             <?php endif; ?>
             <?php if ($p['total_area']): ?>
-            <div class="bento-box">
+            <div class="bento-box glass-panel">
                 <i class="fas fa-vector-square bento-icon"></i>
                 <div class="bento-label">Project Area</div>
                 <div class="bento-value"><?= e($p['total_area']) ?></div>
             </div>
             <?php endif; ?>
             <?php if ($p['possession_date']): ?>
-            <div class="bento-box">
+            <div class="bento-box glass-panel">
                 <i class="fas fa-calendar-check bento-icon"></i>
                 <div class="bento-label">Possession</div>
                 <div class="bento-value"><?= e($p['possession_date']) ?></div>
@@ -342,7 +342,7 @@ body {
 
         <!-- Plain Text Description -->
         <?php if ($p['description'] || $p['short_description']): ?>
-        <div class="lux-section">
+        <div class="lux-section glass-panel">
           <h2 class="lux-section-title"><i class="fas fa-info-circle"></i> About <?= e($p['name']) ?></h2>
           <div class="lux-description"><?= e($p['description'] ?: $p['short_description']) ?></div>
         </div>
@@ -350,7 +350,7 @@ body {
 
         <!-- Project Highlights -->
         <?php if ($p['highlights']): ?>
-        <div class="lux-section">
+        <div class="lux-section glass-panel">
           <h2 class="lux-section-title"><i class="fas fa-star"></i> Project Highlights</h2>
           <ul class="highlight-list">
               <?php 
@@ -381,7 +381,7 @@ body {
         if (!empty($connData)): 
             $tabIndex = 0;
         ?>
-        <div class="lux-section">
+        <div class="lux-section glass-panel">
           <div class="d-flex justify-content-between align-items-center mb-4">
               <h2 class="lux-section-title mb-0" style="font-size: 1.5rem;"><i class="fas fa-route"></i> Connectivity</h2>
               <button class="btn btn-sm text-white" style="background: #b08d55; font-weight: 600;"><i class="fas fa-download me-1"></i> Download Connectivity</button>
@@ -418,7 +418,7 @@ body {
 
         <!-- Premium Amenities Grid -->
         <?php if (!empty($projectAmenities)): ?>
-        <div class="lux-section">
+        <div class="lux-section glass-panel">
           <h2 class="lux-section-title"><i class="fas fa-gem"></i> Premium Lifestyle Amenities</h2>
           <div class="lux-amenities-grid">
             <?php foreach ($projectAmenities as $am): 
@@ -431,7 +431,7 @@ body {
                 if(strpos($amL, 'club')!==false) $icon='fa-glass-cheers';
                 if(strpos($amL, 'parking')!==false) $icon='fa-car';
             ?>
-            <div class="lux-amenity-card">
+            <div class="lux-amenity-card glass-panel">
               <div class="lux-amenity-icon-box"><i class="fas <?= $icon ?>"></i></div>
               <div class="fw-bold text-dark" style="font-size:1.1rem;"><?= e($am) ?></div>
             </div>
@@ -442,7 +442,7 @@ body {
 
         <!-- Visual Galleries (Tabs for Interior/Exterior/Legacy) -->
         <?php if (!empty($interiorImages) || !empty($exteriorImages) || !empty($galleryImages)): ?>
-        <div class="lux-section">
+        <div class="lux-section glass-panel">
           <h2 class="lux-section-title"><i class="fas fa-camera-retro"></i> Project Gallery</h2>
           
           <ul class="nav nav-tabs gallery-tabs mb-4" id="galleryTabs" role="tablist">
@@ -499,7 +499,7 @@ body {
 
         <!-- Custom 2x2 Virtual Tour Grid (Image 3 mapping) -->
         <?php if ($p['video_url'] || $p['virtual_tour_url'] || count($floorPlanImages) > 0): ?>
-        <div class="lux-section" style="background:#f4f4f4; border:none; padding:40px 30px;">
+        <div class="lux-section glass-panel" style="background:#f4f4f4; border:none; padding:40px 30px;">
           <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
               <h2 class="mb-0" style="font-size: 1.2rem; font-weight: 500; color: #111;">Virtual Tour</h2>
               <button class="btn btn-sm text-white" style="background: #4a3424; font-weight: 600;"><i class="fas fa-download me-1"></i> View Video</button>
@@ -573,7 +573,7 @@ body {
         <?php endif; ?>
 
         <!-- EMI Calculator (Custom JS UI) -->
-        <div class="lux-section">
+        <div class="lux-section glass-panel">
           <h2 class="lux-section-title"><i class="fas fa-calculator"></i> EMI Calculator</h2>
           <div class="row align-items-center">
               <div class="col-md-7">
@@ -611,7 +611,7 @@ body {
       <!-- ── RIGHT SIDEBAR (Sticky Glassmorphic) ── -->
       <div class="col-lg-4">
         <div class="sticky-enquiry-wrapper">
-          <div class="glass-sidebar text-center">
+          <div class="glass-sidebar glass-panel text-center">
             <h3 class="fw-800 mb-2">Interested?</h3>
             <p class="text-muted small mb-4">Request pricing details, a digital brochure, or schedule a priority site visit.</p>
 
@@ -696,7 +696,7 @@ body {
 <!-- Auto-Open Enquiry Modal -->
 <div class="modal fade" id="enquiryModal" tabindex="-1" aria-labelledby="enquiryModalLabel" aria-hidden="true" data-bs-backdrop="static">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="border-radius:24px; border:none; box-shadow:0 30px 60px rgba(0,0,0,0.2);">
+    <div class="modal-content glass-panel" style="border-radius:24px; border:none; box-shadow:0 30px 60px rgba(0,0,0,0.2);">
       <div class="modal-header border-0 pb-0 flex-column justify-content-center position-relative pt-4">
         <button type="button" class="btn-close position-absolute" data-bs-dismiss="modal" aria-label="Close" style="right:20px; top:20px;"></button>
         <?php if ($p['project_logo']): ?>

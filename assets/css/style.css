@@ -14,6 +14,11 @@
   --pr-text-muted:    #64748b;
   --pr-border:        #e2e8f0;
   --pr-bg:            #f8fafc;
+  --glass-bg:         rgba(255, 255, 255, 0.65);
+  --glass-bg-hover:   rgba(255, 255, 255, 0.85);
+  --glass-border:     1px solid rgba(255, 255, 255, 0.4);
+  --glass-shadow:     0 8px 32px 0 rgba(0, 0, 0, 0.05);
+  --glass-blur:       blur(20px);
   --pr-white:         #ffffff;
   --pr-card-shadow:   0 4px 24px rgba(0,0,0,0.08);
   --pr-header-h:      72px;
@@ -443,19 +448,22 @@ img { max-width: 100%; height: auto; }
 
 /* ── Uniform Property Card (.p-card) ───────────────────────────────────────── */
 .p-card {
-  background: white;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  transition: all 0.3s ease;
-  height: 100%;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--glass-shadow);
+    border: var(--glass-border);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 .p-card:hover {
-  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
-  transform: translateY(-5px);
+    transform: translateY(-5px);
+    background: var(--glass-bg-hover);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.08);
 }
 .p-card-img-wrapper {
   position: relative;
@@ -1097,3 +1105,55 @@ img { max-width: 100%; height: auto; }
 /* ── 404 / Error pages ───────────────────────────────────── */
 .error-page { min-height: 70vh; display: flex; align-items: center; justify-content: center; text-align: center; }
 .error-code { font-size: 8rem; font-weight: 800; color: var(--pr-primary); opacity: 0.15; line-height: 1; }
+
+/* ── Glassmorphism Overhaul ──────────────────────────────── */
+.mesh-bg {
+  background-color: #f6f8fb;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(234, 179, 8, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(15, 23, 42, 0.1) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(234, 179, 8, 0.1) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(15, 23, 42, 0.05) 0px, transparent 50%);
+  background-attachment: fixed;
+  background-size: 100% 100%;
+}
+
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: var(--pr-radius-lg);
+  transition: all 0.3s ease;
+}
+
+.glass-panel:hover {
+  background: var(--glass-bg-hover);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.08);
+}
+
+.glass-header {
+  background: rgba(255, 255, 255, 0.7) !important;
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-bottom: var(--glass-border) !important;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.45) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.6) !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03) !important;
+  transition: all 0.3s ease;
+}
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.7) !important;
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08) !important;
+}
+
+.modal-content.glass-panel {
+  background: rgba(255, 255, 255, 0.85);
+}

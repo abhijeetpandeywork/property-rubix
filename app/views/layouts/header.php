@@ -11,7 +11,7 @@ if (!function_exists('isActive')) {
 }
 $siteName = getSetting('site_name') ?: 'PropertyRubix';
 ?>
-<header class="site-header" id="siteHeader" style="background:#fff; box-shadow:0 2px 10px rgba(0,0,0,0.1); border-bottom: 1px solid #eaeaea;">
+<header class="site-header glass-header" id="siteHeader">
   <div class="header-inner container-fluid px-3 px-md-4 justify-content-between">
 
     <!-- Logo -->

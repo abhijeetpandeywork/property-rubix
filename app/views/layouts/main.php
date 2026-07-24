@@ -62,7 +62,7 @@ $canonicalUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https
 
 <?= isset($extraHead) ? $extraHead : '' ?>
 </head>
-<body class="<?= isset($bodyClass) ? e($bodyClass) : '' ?>">
+<body class="mesh-bg <?= isset($bodyClass) ? e($bodyClass) : '' ?>">
 
 <!-- ══ DRAWER OVERLAY ══════════════════════════════════════════════════════ -->
 <div class="drawer-overlay" id="drawerOverlay" aria-hidden="true"></div>
@@ -107,7 +107,7 @@ $canonicalUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https
 <!-- ══ SITE VISIT MODAL ════════════════════════════════════════════════════ -->
 <div class="modal fade" id="siteVisitModal" tabindex="-1" aria-labelledby="siteVisitModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="border: none; border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+    <div class="modal-content glass-panel" style="border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
       <div class="modal-header border-0 pb-0 justify-content-center position-relative">
         <h4 class="modal-title fw-bold text-center w-100" id="siteVisitModalLabel" style="color: var(--pr-primary);">Book Free Site Visit</h4>
         <button type="button" class="btn-close position-absolute" data-bs-dismiss="modal" style="right: 20px; top: 20px;"></button>

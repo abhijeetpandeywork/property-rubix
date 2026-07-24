@@ -74,11 +74,13 @@
 
 /* --- Luxury Property Cards --- */
 .lux-property-card {
-    background: #fff;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: var(--glass-shadow);
+    border: var(--glass-border);
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     height: 100%;
     display: flex;
@@ -86,8 +88,9 @@
 }
 .lux-property-card:hover {
     transform: translateY(-10px);
+    background: var(--glass-bg-hover);
     box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-    border-color: rgba(229,175,83,0.3);
+    border-color: rgba(229,175,83,0.5);
 }
 .lux-img-wrapper {
     position: relative;
