@@ -5,9 +5,9 @@
 
 /* ── CSS Variables ──────────────────────────────────────── */
 :root {
-  --pr-primary:       #eab308;
-  --pr-primary-dark:  #c2910c;
-  --pr-primary-light: #fef08a;
+  --pr-primary:       #EBAF4B;
+  --pr-primary-dark:  #d99c3a;
+  --pr-primary-light: #f7ca79;
   --pr-secondary:     #0f172a;
   --pr-accent:        #22c55e;
   --pr-text:          #0f172a;

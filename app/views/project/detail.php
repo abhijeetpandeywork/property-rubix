@@ -91,7 +91,7 @@ body {
 
 .hero-content {
     position: absolute; bottom: 0; left: 0; width: 100%; z-index: 2;
-    padding-bottom: 60px; color: white;
+    padding-bottom: 80px; color: white; display: flex; flex-direction: column; align-items: center; text-align: center;
 }
 .dual-logo-container {
     display: flex; align-items: center; gap: 20px; margin-bottom: 20px;
@@ -114,7 +114,7 @@ body {
     text-shadow: 0 10px 30px rgba(0,0,0,0.5); font-family: 'Outfit', sans-serif;
 }
 .luxury-location {
-    font-size: 1.25rem; font-weight: 500; opacity: 0.9; display: flex; align-items: center; gap: 10px;
+    font-size: 1.25rem; font-weight: 500; opacity: 0.9; display: flex; align-items: center; justify-content: center; gap: 10px;
 }
 
 /* --- Hero Animations & Glass Banner --- */
@@ -185,11 +185,11 @@ body {
 
 /* --- Connectivity Tabs --- */
 .conn-tabs .nav-link {
-    color: #5e452a; background: #fff; border: 1px solid #d4af37; border-radius: 4px;
+    color: #111; background: #fff; border: 1px solid var(--pr-primary); border-radius: 4px;
     padding: 10px 20px; font-size: 1rem; margin-right: 10px; font-weight: 600; white-space: nowrap;
 }
 .conn-tabs .nav-link.active {
-    color: #fff; background: #a67b45; border-color: #a67b45;
+    color: #fff; background: var(--pr-primary); border-color: var(--pr-primary);
 }
 .conn-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(2, 1fr); column-gap: 30px; }
 .conn-list li {
@@ -201,7 +201,7 @@ body {
 .conn-list li .conn-dist { font-size: 1.1rem; color: #64748b; margin-left: auto; }
 
 /* --- Virtual Tour Grid Styles --- */
-.vt-btn { background: #4a3424; color: #fff; border: none; padding: 8px 24px; border-radius: 4px; font-weight: 600; text-transform: uppercase; font-size: 0.9rem; margin-top: 15px; display: inline-block; transition: 0.3s; }
+.vt-btn { background: var(--pr-primary); color: #111; border: none; padding: 8px 24px; border-radius: 4px; font-weight: 600; text-transform: uppercase; font-size: 0.9rem; margin-top: 15px; display: inline-block; transition: 0.3s; }
 .vt-btn:hover { background: #35251a; color: #fff; }
 .vt-box { background: #fff; border-radius: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
 .vt-title { font-size: 1.1rem; color: #111; margin-bottom: 15px; font-weight: 500; }
@@ -286,7 +286,7 @@ body {
         </div>
         <div class="cph-actions d-none d-md-flex">
             <a href="tel:<?= e(str_replace(' ','',$phone)) ?>" class="cph-btn">
-                <i class="fas fa-phone-alt" style="color:#b08d55;"></i> <?= e($phone) ?>
+                <i class="fas fa-phone-alt" style="color:var(--pr-primary);"></i> <?= e($phone) ?>
             </a>
             <a href="https://wa.me/<?= e(str_replace(['+',' '],'',$wa)) ?>?text=<?= urlencode("Hi, I'm interested in {$p['name']}.") ?>" target="_blank" class="cph-btn">
                 <i class="fab fa-whatsapp" style="color:#25D366;"></i> WhatsApp
@@ -459,7 +459,7 @@ body {
         <div class="lux-section glass-panel">
           <div class="d-flex justify-content-between align-items-center mb-4">
               <h2 class="lux-section-title mb-0" style="font-size: 1.5rem;"><i class="fas fa-route"></i> Connectivity</h2>
-              <button type="button" class="btn btn-sm text-white" style="background: #b08d55; font-weight: 600;" data-bs-toggle="modal" data-bs-target="#enquiryModal"><i class="fas fa-download me-1"></i> Download Connectivity</button>
+              <button type="button" class="btn btn-sm text-white" style="background: var(--pr-primary); font-weight: 600;" data-bs-toggle="modal" data-bs-target="#enquiryModal"><i class="fas fa-download me-1"></i> Download Connectivity</button>
           </div>
           
           <ul class="nav nav-pills conn-tabs mb-4 flex-nowrap overflow-auto" id="connTabs" role="tablist" style="padding-bottom: 10px; border-bottom: 5px solid #888;">
@@ -577,7 +577,7 @@ body {
         <div class="lux-section glass-panel" style="background:#f4f4f4; border:none; padding:40px 30px;">
           <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
               <h2 class="mb-0" style="font-size: 1.2rem; font-weight: 500; color: #111;">Virtual Tour</h2>
-              <button type="button" class="btn btn-sm text-white" style="background: #4a3424; font-weight: 600;" data-bs-toggle="modal" data-bs-target="#enquiryModal"><i class="fas fa-download me-1"></i> Download Video</button>
+              <button type="button" class="btn btn-sm text-white" style="background: var(--pr-primary); font-weight: 600;" data-bs-toggle="modal" data-bs-target="#enquiryModal"><i class="fas fa-download me-1"></i> Download Video</button>
           </div>
           <div class="row g-4 mt-2">
               
@@ -716,7 +716,7 @@ body {
                 <?php if ($p['builder_logo']): ?>
                     <img src="<?= upload($p['builder_logo']) ?>" alt="<?= e($p['builder_name']) ?>" style="max-height:80px; max-width:200px; object-fit:contain; margin-bottom:15px; border-radius:8px;">
                 <?php else: ?>
-                    <h4 class="fw-bold mb-3" style="color:#b08d55; text-transform:uppercase; letter-spacing:2px;"><?= e($p['builder_name']) ?></h4>
+                    <h4 class="fw-bold mb-3" style="color:var(--pr-primary); text-transform:uppercase; letter-spacing:2px;"><?= e($p['builder_name']) ?></h4>
                 <?php endif; ?>
                 
                 <p class="mb-3 text-dark fw-bold" style="font-size:1.1rem;">This project is RERA registered.</p>
@@ -726,10 +726,10 @@ body {
                 <?php endif; ?>
                 
                 <p class="mb-1 text-muted" style="font-size:0.9rem;">RERA Website:</p>
-                <a href="https://www.up-rera.in/verify" target="_blank" class="fw-bold text-decoration-none" style="color:#b08d55; word-break:break-all; font-size:1rem;">https://www.up-rera.in/verify</a>
+                <a href="https://www.up-rera.in/verify" target="_blank" class="fw-bold text-decoration-none" style="color:var(--pr-primary); word-break:break-all; font-size:1rem;">https://www.up-rera.in/verify</a>
                 <?php if($p['rera_id']): ?><p class="mt-2 text-dark small fw-bold"><strong>Reg:</strong> <?= e($p['rera_id']) ?></p><?php endif; ?>
                 
-                <p class="mt-4 text-muted" style="font-size:0.75rem; line-height:1.5;">The content presented on this website is solely for informational purposes and does not constitute a service offer.... <a class="cursor-pointer" style="color:#b08d55;">read more</a></p>
+                <p class="mt-4 text-muted" style="font-size:0.75rem; line-height:1.5;">The content presented on this website is solely for informational purposes and does not constitute a service offer.... <a class="cursor-pointer" style="color:var(--pr-primary);">read more</a></p>
             </div>
             <?php endif; ?>
 
