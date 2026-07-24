@@ -40,7 +40,7 @@
         <div class="d-flex gap-5">
           <div>
             <div class="text-decoration-underline mb-1" style="font-size: 0.9rem; font-weight: 500;">Total Projects</div>
-            <div class="fw-bold"><?= (int)$builder['total_projects'] ?></div>
+            <div class="fw-bold"><?= count($projects) ?></div>
           </div>
           <div>
             <div class="text-decoration-underline mb-1" style="font-size: 0.9rem; font-weight: 500;">Total Years</div>
@@ -48,7 +48,7 @@
           </div>
           <div>
             <div class="text-decoration-underline mb-1" style="font-size: 0.9rem; font-weight: 500;">Ongoing Projects</div>
-            <div class="fw-bold">0</div>
+            <div class="fw-bold"><?= count(array_filter($projects, fn($p) => in_array($p['status'], ['under_construction', 'new_launch']))) ?></div>
           </div>
         </div>
 

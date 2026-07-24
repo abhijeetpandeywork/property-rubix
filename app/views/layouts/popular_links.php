@@ -21,12 +21,16 @@ foreach ($popularCities as $row) {
     $citiesByCountry[$row['country_name']][] = $row;
 }
 
-// Fetch active builders grouped by country
+// Fetch active builders grouped by the country of their listed projects
 $popularBuilders = $pdo->query(
-    "SELECT b.name AS builder_name, b.slug AS builder_slug, co.name AS country_name
+    "SELECT b.name AS builder_name, b.slug AS builder_slug, co.name AS country_name, COUNT(p.id) as proj_count
      FROM builders b
-     JOIN countries co ON co.id = b.country_id
+     JOIN projects p ON p.builder_id = b.id
+     JOIN cities c ON p.city_id = c.id
+     JOIN states s ON c.state_id = s.id
+     JOIN countries co ON s.country_id = co.id
      WHERE b.status='active'
+     GROUP BY b.id, co.id
      ORDER BY co.sort_order, b.name ASC"
 )->fetchAll(PDO::FETCH_ASSOC);
 
