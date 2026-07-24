@@ -55,7 +55,7 @@ $canonicalUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https
 <!-- Dynamic brand colors -->
 <style>
 :root {
-    --pr-primary:   <?= e($branding['primary_color']   ?? '#16a34a') ?>;
+    --pr-primary:   #f7cb46;
     --pr-secondary: <?= e($branding['secondary_color'] ?? '#0f172a') ?>;
 }
 </style>
