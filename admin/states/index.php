@@ -78,7 +78,8 @@ require __DIR__ . '/../includes/header.php';
         <tr>
           <td><?= $p['id'] ?></td>
           <td>
-            <pre style="margin:0; font-size:0.75rem; max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars(json_encode($p)) ?></pre>
+            <strong><?= htmlspecialchars($p['name']) ?></strong><br>
+            <span class="text-muted small">Slug: <?= htmlspecialchars($p['slug']) ?> | Country ID: <?= htmlspecialchars($p['country_id'] ?? '') ?></span>
           </td>
           <td>
             <div class="actions">
