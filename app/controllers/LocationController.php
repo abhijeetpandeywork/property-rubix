@@ -55,9 +55,12 @@ class LocationController extends Controller {
         }
 
         $this->view('location/select_country', [
-            'pageTitle' => 'Select Your Region',
-            'metaDesc'  => 'Select your region or continent to browse properties.',
-            'regions'   => $grouped
+            'pageTitle'     => 'Select Your Region',
+            'metaDesc'      => 'Select your region or continent to browse properties.',
+            'regions'       => $grouped,
+            'heroBannerUrl' => getSetting('select_country_banner') 
+                               ? upload(getSetting('select_country_banner'))
+                               : asset('img/world-map.png'),
         ]);
     }
 

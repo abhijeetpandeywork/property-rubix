@@ -36,6 +36,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
     
+    // Handle Select Country Banner Upload
+    if (!empty($_FILES['select_country_banner']['name'])) {
+        $up = uploadImage($_FILES['select_country_banner'], 'settings');
+        if ($up['success']) {
+            $existing = $pdo->prepare("SELECT id FROM settings WHERE key_name='select_country_banner'");
+            $existing->execute();
+            if ($existing->fetch()) {
+                $pdo->prepare("UPDATE settings SET value=? WHERE key_name='select_country_banner'")->execute([$up['path']]);
+            } else {
+                $pdo->prepare("INSERT INTO settings (key_name, value) VALUES ('select_country_banner', ?)")->execute([$up['path']]);
+            }
+        }
+    }
+
     // Handle Sliders Deletion
     $existingSliders = [];
     $stmt = $pdo->prepare("SELECT value FROM settings WHERE key_name='hero_sliders'");
@@ -115,6 +129,17 @@ require __DIR__ . '/../includes/header.php';
             <?php endif; ?>
             <input type="file" name="site_logo" class="form-control" accept="image/*">
             <div class="form-text">Upload a new logo to replace the current one in Header, Footer, and Drawer.</div>
+        </div>
+
+        <div class="mb-4">
+            <label class="adm-form-label">🗺️ Select Country Page – Hero Background Image</label>
+            <?php if (!empty($settings['select_country_banner'])): ?>
+                <div class="mb-2">
+                    <img src="<?= upload($settings['select_country_banner']) ?>" alt="Current Banner" style="max-height: 120px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                </div>
+            <?php endif; ?>
+            <input type="file" name="select_country_banner" class="form-control" accept="image/*">
+            <div class="form-text">Full-screen background image for the <strong>"Select Your Region"</strong> page. Recommended: 1920×1080px.</div>
         </div>
 
         <div>
