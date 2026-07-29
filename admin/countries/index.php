@@ -35,9 +35,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
     }
     
     if (isset($_FILES['bg_image']) && $_FILES['bg_image']['error'] === UPLOAD_ERR_OK) {
-        $path = uploadFile($_FILES['bg_image'], 'locations');
-        if ($path) {
-            $data['bg_image'] = $path;
+        $upload = uploadImage($_FILES['bg_image'], 'locations');
+        if ($upload['success'] && $upload['path']) {
+            $data['bg_image'] = $upload['path'];
+        } else {
+            $errors[] = $upload['error'] ?? 'Failed to upload background image.';
         }
     }
     
