@@ -9,8 +9,8 @@ $search = trim($_GET['q'] ?? '');
 $errors = [];
 $row    = [];
 
-// ── Delete
-if ($action === 'delete' && $id) {
+// ── Delete (POST only for security)
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'delete' && $id) {
     csrfCheck();
     crudDelete($pdo, 'countries', $id, BASE_URL . 'admin/countries/');
 }
@@ -85,9 +85,10 @@ require __DIR__ . '/../includes/header.php';
           <td>
             <div class="actions">
               <a href="?action=edit&id=<?= $p['id'] ?>" class="btn btn-sm btn-outline-primary">Edit</a>
-              <a href="?action=delete&id=<?= $p['id'] ?>&csrf_token=<?= csrfToken() ?>"
-                 class="btn btn-sm btn-outline-danger"
-                 data-confirm="Delete?">Del</a>
+              <form method="post" action="?action=delete&id=<?= $p['id'] ?>" style="display:inline;" onsubmit="return confirm('Delete this country?')">
+                <?= csrfField() ?>
+                <button type="submit" class="btn btn-sm btn-outline-danger">Del</button>
+              </form>
             </div>
           </td>
         </tr>
