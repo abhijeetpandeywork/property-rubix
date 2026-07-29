@@ -5,7 +5,7 @@
         flex-direction: column;
         background: #ffffff;
         /* World map background (to be uploaded by user as world-map.png) */
-        background-image: url('<?= asset('img/world-map.png') ?>');
+        background-image: url('<?= asset('img/world-map.png') ?>?v=<?= time() ?>');
         background-size: cover;
         background-position: center center;
         background-repeat: no-repeat;
