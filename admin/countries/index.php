@@ -126,7 +126,7 @@ require __DIR__ . '/../includes/header.php';
         $columns = $stmt->fetchAll();
         foreach ($columns as $col) {
             $c = $col['Field'];
-            if (in_array($c, ['id', 'created_at', 'updated_at'])) continue;
+            if (in_array($c, ['id', 'created_at', 'updated_at', 'bg_image'])) continue;
             $val = htmlspecialchars($row[$c] ?? '');
             echo '<div class="col-md-6">';
             echo '<label class="adm-form-label">'.ucfirst(str_replace('_',' ',$c)).'</label>';
@@ -146,11 +146,6 @@ require __DIR__ . '/../includes/header.php';
                     echo '<option value="'.$continent.'" '.$selected.'>'.$continent.'</option>';
                 }
                 echo '</select>';
-            } elseif ($c === 'bg_image') {
-                echo '<input type="file" name="'.$c.'" class="form-control" accept="image/*">';
-                if ($val) {
-                    echo '<div class="mt-2"><img src="'.upload($val).'" style="max-height:60px; border-radius:4px;"></div>';
-                }
             } elseif (strpos($col['Type'], 'text') !== false) {
                 echo '<textarea name="'.$c.'" class="form-control" rows="3">'.$val.'</textarea>';
             } else {
@@ -160,6 +155,23 @@ require __DIR__ . '/../includes/header.php';
         }
         ?>
     </div>
+    
+    <hr class="my-4">
+    <h5 class="mb-3">Country Page Hero Section</h5>
+    <div class="row">
+        <div class="col-md-12">
+            <label class="adm-form-label">Hero Background Image</label>
+            <input type="file" name="bg_image" class="form-control" accept="image/*">
+            <div class="form-text mt-2">Upload a stunning, high-resolution image to represent this country (Recommended: 1920x1080px).</div>
+            <?php if (!empty($row['bg_image'])): ?>
+                <div class="mt-3">
+                    <p class="mb-1 fw-bold small text-muted">Current Image:</p>
+                    <img src="<?= upload($row['bg_image']) ?>" style="max-height: 150px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+
     <div class="mt-4">
       <button type="submit" class="btn btn-primary fw-600"><i class="fas fa-save me-2"></i>Save</button>
     </div>
