@@ -747,7 +747,15 @@ body {
                 <?php endif; ?>
                 
                 <p class="mb-1 text-muted" style="font-size:0.9rem;">RERA Website:</p>
-                <a href="https://www.up-rera.in/verify" target="_blank" class="fw-bold text-decoration-none" style="color:var(--pr-primary); word-break:break-all; font-size:1rem;">https://www.up-rera.in/verify</a>
+                <?php
+                $reraLink = 'https://maharera.mahaonline.gov.in/';
+                if (stripos($p['state_name'], 'Uttar Pradesh') !== false || stripos($p['state_name'], 'UP') !== false) {
+                    $reraLink = 'https://www.up-rera.in/verify';
+                } elseif (stripos($p['state_name'], 'Haryana') !== false) {
+                    $reraLink = 'https://haryanarera.gov.in/';
+                }
+                ?>
+                <a href="<?= e($reraLink) ?>" target="_blank" class="fw-bold text-decoration-none" style="color:var(--pr-primary); word-break:break-all; font-size:1rem;"><?= e($reraLink) ?></a>
                 <?php if($p['rera_id']): ?><p class="mt-2 text-dark small fw-bold"><strong>Reg:</strong> <?= e($p['rera_id']) ?></p><?php endif; ?>
                 
                 <p class="mt-4 text-muted" style="font-size:0.75rem; line-height:1.5;">The content presented on this website is solely for informational purposes and does not constitute a service offer.... <a class="cursor-pointer" style="color:var(--pr-primary);">read more</a></p>

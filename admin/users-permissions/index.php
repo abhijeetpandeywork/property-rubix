@@ -84,7 +84,9 @@ require __DIR__ . '/../includes/header.php';
         <tr>
           <td><?= $p['id'] ?></td>
           <td>
-            <pre style="margin:0; font-size:0.75rem; max-width: 400px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"><?= htmlspecialchars(json_encode($p)) ?></pre>
+            <strong><?= htmlspecialchars($p['username'] ?? $p['name'] ?? $p['email'] ?? 'User #'.$p['id']) ?></strong>
+            <?php if (!empty($p['email'])): ?><br><span class="text-muted small"><?= htmlspecialchars($p['email']) ?></span><?php endif; ?>
+            <?php if (!empty($p['role'])): ?><br><span class="text-muted small">Role: <?= htmlspecialchars($p['role']) ?></span><?php endif; ?>
           </td>
           <td>
             <div class="actions">

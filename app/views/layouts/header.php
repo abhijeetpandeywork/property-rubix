@@ -52,18 +52,11 @@ $siteName = getSetting('site_name') ?: 'PropertyRubix';
       }
       ?>
       <!-- Country selector -->
-      <div class="dropdown country-selector d-flex align-items-center me-3">
-        <button class="btn btn-link text-decoration-none p-0 d-flex flex-column align-items-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="line-height:1.2; color: #000;">
+      <div class="country-selector d-flex align-items-center me-3">
+        <a href="<?= PUBLIC_URL ?>select-country" class="btn btn-link text-decoration-none p-0 d-flex flex-column align-items-center" style="line-height:1.2; color: #000;">
           <i class="fas fa-globe fs-4 mb-1"></i> 
           <span class="fw-bold" style="font-size:11px;"><?= $currentCountryName ?></span>
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end shadow-lg">
-          <li><a class="dropdown-item" href="<?= PUBLIC_URL ?>location/india">🇮🇳 India</a></li>
-          <li><a class="dropdown-item" href="<?= PUBLIC_URL ?>location/uae">🇦🇪 UAE</a></li>
-          <li><a class="dropdown-item" href="<?= PUBLIC_URL ?>location/usa">🇺🇸 USA</a></li>
-          <li><a class="dropdown-item" href="<?= PUBLIC_URL ?>location/canada">🇨🇦 Canada</a></li>
-          <li><a class="dropdown-item" href="<?= PUBLIC_URL ?>location/uk">🇬🇧 UK</a></li>
-        </ul>
+        </a>
       </div>
 
       <!-- Hamburger -->

@@ -23,6 +23,44 @@ class LocationController extends Controller {
         ]);
     }
 
+    public function selectCountry(array $params = []): void {
+        $pdo = db();
+        
+        // Fetch active countries grouped by continent
+        // Note: we use TRY/CATCH in case the continent column doesn't exist yet on live DB
+        // If it fails, fallback to grouping all under 'Global'
+        try {
+            $countries = $pdo->query("
+                SELECT id, name, slug, continent, flag_icon 
+                FROM countries 
+                WHERE status='active' 
+                ORDER BY continent ASC, sort_order ASC, name ASC
+            ")->fetchAll();
+        } catch (Exception $e) {
+            $countries = $pdo->query("
+                SELECT id, name, slug, 'Global' AS continent, flag_icon 
+                FROM countries 
+                WHERE status='active' 
+                ORDER BY sort_order ASC, name ASC
+            ")->fetchAll();
+        }
+
+        $grouped = [];
+        foreach ($countries as $c) {
+            $continent = !empty($c['continent']) ? $c['continent'] : 'Other';
+            if (!isset($grouped[$continent])) {
+                $grouped[$continent] = [];
+            }
+            $grouped[$continent][] = $c;
+        }
+
+        $this->view('location/select_country', [
+            'pageTitle' => 'Select Your Region',
+            'metaDesc'  => 'Select your region or continent to browse properties.',
+            'regions'   => $grouped
+        ]);
+    }
+
     public function country(array $params): void {
         $pdo     = db();
         $country = $pdo->prepare("SELECT * FROM countries WHERE slug=? AND status='active'");

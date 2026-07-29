@@ -128,6 +128,17 @@ require __DIR__ . '/../includes/header.php';
                 echo '<option value="active" '.($statusVal==='active'?'selected':'').'>Active</option>';
                 echo '<option value="inactive" '.($statusVal==='inactive'?'selected':'').'>Inactive</option>';
                 echo '</select>';
+            } elseif ($c === 'continent') {
+                $contVal = htmlspecialchars($row[$c] ?? '');
+                echo '<input type="text" name="'.$c.'" list="continentsList" class="form-control" value="'.$contVal.'" placeholder="e.g. Asia-Pacific">';
+                echo '<datalist id="continentsList">
+                        <option value="Asia-Pacific">
+                        <option value="North America">
+                        <option value="Europe">
+                        <option value="Middle East">
+                        <option value="Africa">
+                        <option value="South America">
+                      </datalist>';
             } elseif (strpos($col['Type'], 'text') !== false) {
                 echo '<textarea name="'.$c.'" class="form-control" rows="3">'.$val.'</textarea>';
             } else {

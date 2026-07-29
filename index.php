@@ -44,6 +44,7 @@ $router->get('/properties', 'PropertyController', 'listing');
 $router->get('/property/{slug}', 'PropertyController', 'detail');
 
 // Location drill-down
+$router->get('/select-country', 'LocationController', 'selectCountry');
 $router->get('/location', 'LocationController', 'index');
 $router->get('/location/{country}', 'LocationController', 'country');
 $router->get('/location/{country}/{state}', 'LocationController', 'state');
