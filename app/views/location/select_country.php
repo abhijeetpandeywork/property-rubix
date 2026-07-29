@@ -1,43 +1,52 @@
 <?php
 /**
  * Select Country / Region Page
- * Background: controlled from Admin → Settings → "Select Country Page Hero Background Image"
+ * Hero background: Admin → Settings → "Select Country Page – Hero Background Image"
  */
+$hasBanner = !empty($heroBannerUrl);
 ?>
 <style>
-.select-region-hero {
+/* ── Hero Wrapper ───────────────────────────────────────────────── */
+.scr-hero {
     position: relative;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    background: #f5f5f5; /* solid fallback — prevents any bleed-through */
+    isolation: isolate;  /* creates a new stacking context */
 }
-/* The background image layer */
-.select-region-hero__bg {
+
+<?php if ($hasBanner): ?>
+/* ── Background image layer (only when set) ─────────────────────── */
+.scr-hero::before {
+    content: '';
     position: absolute;
     inset: 0;
     background-image: url('<?= e($heroBannerUrl) ?>');
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
-    z-index: 0;
+    z-index: -2;
 }
-/* Light white overlay for readability */
-.select-region-hero__overlay {
+/* ── Light overlay for text readability ────────────────────────── */
+.scr-hero::after {
+    content: '';
     position: absolute;
     inset: 0;
-    background: rgba(255, 255, 255, 0.55);
-    backdrop-filter: blur(2px);
+    background: rgba(255, 255, 255, 0.50);
+    z-index: -1;
+}
+<?php endif; ?>
+
+/* ── Content ────────────────────────────────────────────────────── */
+.scr-hero__content {
+    flex-grow: 1;
+    padding-top: 120px;
+    padding-bottom: 60px;
+    position: relative;
     z-index: 1;
 }
-/* Content sits on top */
-.select-region-hero__content {
-    position: relative;
-    z-index: 2;
-    flex-grow: 1;
-    padding-top: 110px;
-    padding-bottom: 60px;
-}
+
 .region-title {
     font-family: 'Inter', sans-serif;
     font-weight: 400;
@@ -45,7 +54,7 @@
     line-height: 1.1;
     color: #111;
     margin-bottom: 2.5rem;
-    letter-spacing: -1px;
+    letter-spacing: -2px;
     text-transform: uppercase;
 }
 .region-title strong {
@@ -57,13 +66,13 @@
 }
 .continent-name {
     font-weight: 700;
-    font-size: 1.05rem;
+    font-size: 1rem;
     color: #111;
-    border-bottom: 2px solid rgba(0,0,0,0.08);
-    padding-bottom: 4px;
+    border-bottom: 2px solid rgba(0,0,0,0.10);
+    padding-bottom: 5px;
     margin-bottom: 0.6rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
 }
 .country-link {
     display: inline-block;
@@ -78,12 +87,34 @@
     color: var(--pr-primary, #eab308);
     transform: translateX(3px);
 }
+
+/* ── "No banner" notice for admins ─────────────────────────────── */
+.scr-no-banner-notice {
+    position: absolute;
+    top: 80px; right: 20px;
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 0.8rem;
+    color: #856404;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
 </style>
 
-<div class="select-region-hero">
-    <div class="select-region-hero__bg"></div>
-    <div class="select-region-hero__overlay"></div>
-    <div class="select-region-hero__content container px-4 px-md-5">
+<div class="scr-hero">
+
+    <?php if (!$hasBanner && isset($_SESSION['admin_id'])): ?>
+        <div class="scr-no-banner-notice">
+            <i class="fas fa-image"></i>
+            No banner set. <a href="<?= BASE_URL ?>admin/settings/" class="ms-1 fw-bold text-warning">Upload in Admin → Settings</a>
+        </div>
+    <?php endif; ?>
+
+    <div class="scr-hero__content container px-4 px-md-5">
         <div class="row">
             <div class="col-lg-8 col-xl-6">
                 <h1 class="region-title">

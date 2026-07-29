@@ -34,14 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
         }
     }
     
-    if (isset($_FILES['bg_image']) && $_FILES['bg_image']['error'] === UPLOAD_ERR_OK) {
-        $upload = uploadImage($_FILES['bg_image'], 'locations');
-        if ($upload['success'] && $upload['path']) {
-            $data['bg_image'] = $upload['path'];
-        } else {
-            $errors[] = $upload['error'] ?? 'Failed to upload background image.';
-        }
-    }
     
     if (!$errors) {
         if ($id) {
@@ -116,7 +108,7 @@ require __DIR__ . '/../includes/header.php';
 <div class="alert alert-danger"><ul class="mb-0"><?php foreach ($errors as $e): ?><li><?= htmlspecialchars($e) ?></li><?php endforeach; ?></ul></div>
 <?php endif; ?>
 
-<form method="post" class="adm-form" enctype="multipart/form-data" novalidate>
+<form method="post" class="adm-form" novalidate>
   <?= csrfField() ?>
   <div class="adm-card">
     <div class="row g-3">
@@ -154,24 +146,6 @@ require __DIR__ . '/../includes/header.php';
             echo '</div>';
         }
         ?>
-    </div>
-    
-    <hr class="my-4">
-    <h5 class="mb-3">Country Page Hero Section</h5>
-    <div class="row">
-        <div class="col-md-12">
-            <label class="adm-form-label">Hero Background Image</label>
-            <input type="file" name="bg_image" class="form-control" accept="image/*">
-            <div class="form-text mt-2">Upload a stunning, high-resolution image to represent this country (Recommended: 1920x1080px).</div>
-            <?php if (!empty($row['bg_image'])): ?>
-                <div class="mt-3">
-                    <p class="mb-1 fw-bold small text-muted">Current Image:</p>
-                    <img src="<?= upload($row['bg_image']) ?>" style="max-height: 150px; border-radius: 8px; border: 1px solid #ddd; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                </div>
-            <?php endif; ?>
-        </div>
-    </div>
-
     <div class="mt-4">
       <button type="submit" class="btn btn-primary fw-600"><i class="fas fa-save me-2"></i>Save</button>
     </div>
