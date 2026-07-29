@@ -1,15 +1,17 @@
 <?php
 /**
- * Select Country / Region Page — Premium Redesign
- * Psychology: Authority (globe visual) + Clarity (strong hierarchy) + Action (glowing CTA pills)
- * Background: Admin → Settings → "Select Country Page – Hero Background Image"
+ * Select Country / Region Page — Premium Design v3
+ * Psychology: Authority + Clarity + Action
+ * Text: High contrast white on dark bg, clearly legible
+ * Stats: Real DB data passed from LocationController
  */
 $hasBanner = !empty($heroBannerUrl);
+$stats     = $stats ?? [];
 ?>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-/* ── Reset bleed from other page elements ───── */
+/* ── Page shell — prevents any bleed-through ─ */
 .scr-page {
     position: relative;
     min-height: 100vh;
@@ -18,7 +20,7 @@ $hasBanner = !empty($heroBannerUrl);
     isolation: isolate;
     display: flex;
     flex-direction: column;
-    background: #0a0a0a;
+    background: #0d1117;
 }
 
 /* ── Background image ─────────────────────── */
@@ -32,42 +34,40 @@ $hasBanner = !empty($heroBannerUrl);
     background-position: center 30%;
     background-repeat: no-repeat;
     <?php else: ?>
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
     <?php endif; ?>
 }
 
-/* ── Subtle dark gradient overlay — keeps map visible but text readable ── */
+/* ── Dark gradient overlay — left side darker for text, right lighter to show map ── */
 .scr-overlay {
     position: absolute;
     inset: 0;
     z-index: -1;
     <?php if ($hasBanner): ?>
     background: linear-gradient(
-        105deg,
-        rgba(10,10,10,0.72) 0%,
-        rgba(10,10,10,0.40) 50%,
-        rgba(10,10,10,0.18) 100%
+        100deg,
+        rgba(8,8,12,0.88) 0%,
+        rgba(8,8,12,0.60) 40%,
+        rgba(8,8,12,0.25) 75%,
+        rgba(8,8,12,0.10) 100%
     );
-    <?php else: ?>
-    background: transparent;
     <?php endif; ?>
 }
 
-/* ── Main layout ──────────────────────────── */
+/* ── Inner layout ────────────────────────── */
 .scr-inner {
     position: relative;
     z-index: 1;
     flex: 1;
     display: flex;
     align-items: flex-start;
-    padding: 130px 5% 80px;
-    gap: 60px;
+    padding: 130px 6% 80px;
+    gap: 80px;
 }
 
-/* ── Left column — headline ─────────────── */
+/* ── LEFT: Headline column ───────────────── */
 .scr-left {
-    flex: 0 0 auto;
-    width: 320px;
+    flex: 0 0 300px;
     position: sticky;
     top: 130px;
 }
@@ -76,74 +76,77 @@ $hasBanner = !empty($heroBannerUrl);
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: rgba(247,203,70,0.12);
-    border: 1px solid rgba(247,203,70,0.35);
+    background: rgba(247,203,70,0.15);
+    border: 1px solid rgba(247,203,70,0.40);
     border-radius: 50px;
-    padding: 6px 16px;
-    font-size: 0.72rem;
+    padding: 7px 16px;
+    font-size: 0.70rem;
     font-weight: 700;
     letter-spacing: 2.5px;
     text-transform: uppercase;
     color: #f7cb46;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
 }
-.scr-eyebrow i { font-size: 0.85rem; }
 
 .scr-headline {
-    font-size: clamp(2.6rem, 4vw, 4rem);
+    font-size: clamp(2.8rem, 4.5vw, 4.2rem);
     font-weight: 300;
-    line-height: 1.05;
+    line-height: 1.0;
     color: #ffffff;
     letter-spacing: -2px;
-    margin-bottom: 0;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.6);
+    margin: 0;
 }
 .scr-headline strong {
     font-weight: 900;
     display: block;
     color: #ffffff;
-    background: linear-gradient(90deg, #ffffff 0%, #f7cb46 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    /* Bright & visible — not a faint gradient */
+    text-shadow: 0 0 40px rgba(247,203,70,0.3), 0 2px 20px rgba(0,0,0,0.8);
+}
+.scr-headline .accent {
+    color: #f7cb46;
 }
 
 .scr-subtext {
-    margin-top: 20px;
-    font-size: 0.88rem;
+    margin-top: 22px;
+    font-size: 0.9rem;
     font-weight: 400;
-    color: rgba(255,255,255,0.55);
-    line-height: 1.6;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.65;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+    max-width: 260px;
 }
 
 .scr-divider {
-    width: 50px;
+    width: 48px;
     height: 3px;
     background: linear-gradient(90deg, #f7cb46, transparent);
     border-radius: 2px;
     margin-top: 28px;
 }
 
-/* ── Right column — regions ─────────────── */
+/* ── RIGHT: Regions ─────────────────────── */
 .scr-right {
     flex: 1;
     min-width: 0;
-    padding-top: 8px;
+    padding-top: 6px;
 }
 
 .scr-continent {
-    margin-bottom: 36px;
+    margin-bottom: 38px;
     opacity: 0;
-    transform: translateY(24px);
-    animation: fadeUp 0.5s ease forwards;
+    transform: translateY(20px);
+    animation: scrFadeUp 0.5s ease forwards;
 }
-.scr-continent:nth-child(1) { animation-delay: 0.1s; }
-.scr-continent:nth-child(2) { animation-delay: 0.2s; }
-.scr-continent:nth-child(3) { animation-delay: 0.3s; }
-.scr-continent:nth-child(4) { animation-delay: 0.4s; }
-.scr-continent:nth-child(5) { animation-delay: 0.5s; }
-.scr-continent:nth-child(6) { animation-delay: 0.6s; }
+.scr-continent:nth-child(1) { animation-delay: 0.10s; }
+.scr-continent:nth-child(2) { animation-delay: 0.20s; }
+.scr-continent:nth-child(3) { animation-delay: 0.30s; }
+.scr-continent:nth-child(4) { animation-delay: 0.40s; }
+.scr-continent:nth-child(5) { animation-delay: 0.50s; }
+.scr-continent:nth-child(6) { animation-delay: 0.60s; }
 
-@keyframes fadeUp {
+@keyframes scrFadeUp {
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -151,117 +154,120 @@ $hasBanner = !empty($heroBannerUrl);
     display: flex;
     align-items: center;
     gap: 12px;
-    font-size: 0.72rem;
+    font-size: 0.68rem;
     font-weight: 800;
-    letter-spacing: 3px;
+    letter-spacing: 3.5px;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.40);
+    color: rgba(255,255,255,0.50);
     margin-bottom: 14px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
 }
 .scr-continent-label::after {
     content: '';
     flex: 1;
     height: 1px;
-    background: rgba(255,255,255,0.10);
+    background: rgba(255,255,255,0.12);
 }
 
-.scr-country-pills {
+.scr-pills {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
 }
 
-/* The core country pill */
+/* Country pill — glassmorphism, clearly readable */
 .scr-pill {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     padding: 11px 22px;
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(255,255,255,0.10);
+    border: 1px solid rgba(255,255,255,0.20);
     border-radius: 50px;
     text-decoration: none;
-    color: rgba(255,255,255,0.85);
-    font-size: 0.9rem;
-    font-weight: 500;
+    /* BRIGHT white text — very readable */
+    color: #ffffff;
+    font-size: 0.92rem;
+    font-weight: 600;
     letter-spacing: 0.2px;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.20);
     transition:
-        background 0.25s ease,
-        border-color 0.25s ease,
-        color 0.25s ease,
-        transform 0.25s ease,
-        box-shadow 0.25s ease;
+        background 0.22s ease,
+        border-color 0.22s ease,
+        transform 0.22s ease,
+        box-shadow 0.22s ease;
     position: relative;
     overflow: hidden;
 }
-
 .scr-pill::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(247,203,70,0.18) 0%, transparent 60%);
+    background: linear-gradient(135deg, rgba(247,203,70,0.20) 0%, transparent 65%);
     opacity: 0;
-    transition: opacity 0.25s ease;
+    transition: opacity 0.22s ease;
 }
-
 .scr-pill:hover {
-    background: rgba(247,203,70,0.15);
-    border-color: rgba(247,203,70,0.6);
+    background: rgba(247,203,70,0.18);
+    border-color: rgba(247,203,70,0.70);
     color: #ffffff;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(247,203,70,0.20);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(247,203,70,0.25), 0 4px 12px rgba(0,0,0,0.30);
     text-decoration: none;
 }
 .scr-pill:hover::before { opacity: 1; }
 
-.scr-pill-arrow {
-    font-size: 0.7rem;
-    opacity: 0;
-    transform: translateX(-4px);
-    transition: opacity 0.2s, transform 0.2s;
-    color: #f7cb46;
+.scr-pill-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #f7cb46;
+    flex-shrink: 0;
+    box-shadow: 0 0 6px rgba(247,203,70,0.8);
+    transition: box-shadow 0.22s ease;
 }
-.scr-pill:hover .scr-pill-arrow {
-    opacity: 1;
-    transform: translateX(0);
+.scr-pill:hover .scr-pill-dot {
+    box-shadow: 0 0 12px rgba(247,203,70,1);
 }
 
-/* ── Bottom stats strip ─────────────────── */
+/* ── Stats bar — real data ───────────────── */
 .scr-stats {
     position: relative;
     z-index: 1;
-    display: flex;
-    gap: 0;
-    border-top: 1px solid rgba(255,255,255,0.08);
-    background: rgba(0,0,0,0.30);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    padding: 0 5%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    border-top: 1px solid rgba(255,255,255,0.10);
+    background: rgba(8,8,12,0.65);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
 }
+
 .scr-stat {
-    flex: 1;
-    padding: 22px 24px;
-    border-right: 1px solid rgba(255,255,255,0.06);
+    padding: 24px 20px;
     text-align: center;
+    border-right: 1px solid rgba(255,255,255,0.08);
 }
 .scr-stat:last-child { border-right: none; }
+
 .scr-stat-num {
-    font-size: 1.5rem;
+    display: block;
+    font-size: 1.8rem;
     font-weight: 800;
     color: #f7cb46;
-    display: block;
     line-height: 1;
+    text-shadow: 0 0 20px rgba(247,203,70,0.4);
 }
 .scr-stat-label {
-    font-size: 0.72rem;
-    font-weight: 500;
-    color: rgba(255,255,255,0.45);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: 4px;
     display: block;
+    font-size: 0.70rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.50);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 5px;
 }
 
 /* ── Admin notice ───────────────────────── */
@@ -275,27 +281,24 @@ $hasBanner = !empty($heroBannerUrl);
     font-size: 0.8rem;
     color: #856404;
     z-index: 9999;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
 }
 
 /* ── Responsive ─────────────────────────── */
-@media (max-width: 900px) {
+@media (max-width: 860px) {
     .scr-inner {
         flex-direction: column;
+        gap: 30px;
         padding: 110px 6% 60px;
-        gap: 32px;
     }
-    .scr-left {
-        width: 100%;
-        position: static;
-    }
+    .scr-left { flex: none; width: 100%; position: static; }
     .scr-headline { font-size: 2.8rem; }
-    .scr-stats { flex-wrap: wrap; }
-    .scr-stat { flex: 1 1 50%; }
+    .scr-subtext { max-width: 100%; }
 }
 @media (max-width: 480px) {
     .scr-headline { font-size: 2.2rem; }
-    .scr-pill { font-size: 0.85rem; padding: 10px 18px; }
+    .scr-pill { font-size: 0.86rem; padding: 10px 18px; }
+    .scr-stat-num { font-size: 1.5rem; }
 }
 </style>
 
@@ -311,37 +314,40 @@ $hasBanner = !empty($heroBannerUrl);
     <div class="scr-overlay"></div>
 
     <div class="scr-inner">
-        <!-- Left: Headline -->
+
+        <!-- LEFT — Headline -->
         <div class="scr-left">
             <div class="scr-eyebrow">
                 <i class="fas fa-globe-americas"></i>
                 Global Properties
             </div>
+
             <h1 class="scr-headline">
                 Select<br>
-                <strong>Your<br>Region</strong>
+                <strong>Your<br><span class="accent">Region</span></strong>
             </h1>
+
             <p class="scr-subtext">
-                Explore premium real estate across continents. Find your ideal home, wherever in the world you want to be.
+                Explore premium real estate across continents. Find your perfect home, wherever in the world.
             </p>
             <div class="scr-divider"></div>
         </div>
 
-        <!-- Right: Continent blocks -->
+        <!-- RIGHT — Continent / country list -->
         <div class="scr-right">
             <?php if (empty($regions)): ?>
-                <p style="color:rgba(255,255,255,0.5);">No regions available at the moment.</p>
+                <p style="color:rgba(255,255,255,0.6)">No regions available at the moment.</p>
             <?php else: ?>
                 <?php foreach ($regions as $continent => $countries): ?>
                     <div class="scr-continent">
                         <div class="scr-continent-label">
                             <?= e($continent) ?>
                         </div>
-                        <div class="scr-country-pills">
+                        <div class="scr-pills">
                             <?php foreach ($countries as $c): ?>
                                 <a href="<?= PUBLIC_URL ?>location/<?= e($c['slug']) ?>" class="scr-pill">
+                                    <span class="scr-pill-dot"></span>
                                     <?= e($c['name']) ?>
-                                    <i class="fas fa-arrow-right scr-pill-arrow"></i>
                                 </a>
                             <?php endforeach; ?>
                         </div>
@@ -351,23 +357,15 @@ $hasBanner = !empty($heroBannerUrl);
         </div>
     </div>
 
-    <!-- Bottom stats bar -->
+    <!-- BOTTOM — Real stats bar -->
+    <?php if (!empty($stats)): ?>
     <div class="scr-stats">
-        <div class="scr-stat">
-            <span class="scr-stat-num">4</span>
-            <span class="scr-stat-label">Countries</span>
-        </div>
-        <div class="scr-stat">
-            <span class="scr-stat-num">500+</span>
-            <span class="scr-stat-label">Projects</span>
-        </div>
-        <div class="scr-stat">
-            <span class="scr-stat-num">10K+</span>
-            <span class="scr-stat-label">Happy Families</span>
-        </div>
-        <div class="scr-stat">
-            <span class="scr-stat-num">RERA</span>
-            <span class="scr-stat-label">Registered</span>
-        </div>
+        <?php foreach ($stats as $s): ?>
+            <div class="scr-stat">
+                <span class="scr-stat-num"><?= htmlspecialchars((string)$s['num']) ?></span>
+                <span class="scr-stat-label"><?= htmlspecialchars($s['label']) ?></span>
+            </div>
+        <?php endforeach; ?>
     </div>
+    <?php endif; ?>
 </div>

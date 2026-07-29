@@ -54,13 +54,31 @@ class LocationController extends Controller {
             $grouped[$continent][] = $c;
         }
 
+        // Real stats from DB
+        $countryCount  = count($countries);
+        $projectCount  = 0;
+        $propertyCount = 0;
+        $cityCount     = 0;
+        try {
+            $projectCount  = (int)$pdo->query("SELECT COUNT(*) FROM projects")->fetchColumn();
+            $cityCount     = (int)$pdo->query("SELECT COUNT(*) FROM cities")->fetchColumn();
+        } catch (Exception $e) {}
+
+        $happyFamilies = getSetting('happy_families_count') ?: '10,000';
+
         $this->view('location/select_country', [
-            'pageTitle'     => 'Select Your Region',
-            'metaDesc'      => 'Select your region or continent to browse properties.',
-            'regions'       => $grouped,
-            'heroBannerUrl' => getSetting('select_country_banner') 
-                               ? upload(getSetting('select_country_banner'))
-                               : asset('img/world-map.png'),
+            'pageTitle'      => 'Select Your Region',
+            'metaDesc'       => 'Select your region or continent to browse properties.',
+            'regions'        => $grouped,
+            'heroBannerUrl'  => getSetting('select_country_banner')
+                                ? upload(getSetting('select_country_banner'))
+                                : asset('img/world-map.png'),
+            'stats' => [
+                ['num' => $countryCount,    'label' => 'Countries'],
+                ['num' => $projectCount . '+', 'label' => 'Projects'],
+                ['num' => $happyFamilies . '+', 'label' => 'Happy Families'],
+                ['num' => $cityCount . '+',  'label' => 'Cities'],
+            ],
         ]);
     }
 
