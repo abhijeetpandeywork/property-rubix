@@ -1,29 +1,28 @@
 <?php
 /**
- * Select Country / Region Page — Premium Design v3
- * Psychology: Authority + Clarity + Action
- * Text: High contrast white on dark bg, clearly legible
- * Stats: Real DB data passed from LocationController
+ * Select Country / Region Page — Premium Card Design
+ * Matches the state/city card design from country.php / state.php
+ * Stats: Real DB data from LocationController
  */
 $hasBanner = !empty($heroBannerUrl);
 $stats     = $stats ?? [];
 ?>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;600;700;800&display=swap');
 
-/* ── Page shell — prevents any bleed-through ─ */
+/* ── Page wrapper — prevents bleed-through ── */
 .scr-page {
     position: relative;
     min-height: 100vh;
-    font-family: 'Inter', sans-serif;
-    overflow: hidden;
-    isolation: isolate;
     display: flex;
     flex-direction: column;
     background: #0d1117;
+    isolation: isolate;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
 }
 
-/* ── Background image ─────────────────────── */
+/* ── Background ──────────────────────────── */
 .scr-bg {
     position: absolute;
     inset: 0;
@@ -34,44 +33,30 @@ $stats     = $stats ?? [];
     background-position: center 30%;
     background-repeat: no-repeat;
     <?php else: ?>
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
+    background: linear-gradient(135deg,#0f172a 0%,#1e293b 60%,#0f172a 100%);
     <?php endif; ?>
 }
-
-/* ── Dark gradient overlay — left side darker for text, right lighter to show map ── */
 .scr-overlay {
     position: absolute;
     inset: 0;
     z-index: -1;
     <?php if ($hasBanner): ?>
     background: linear-gradient(
-        100deg,
-        rgba(8,8,12,0.88) 0%,
-        rgba(8,8,12,0.60) 40%,
-        rgba(8,8,12,0.25) 75%,
-        rgba(8,8,12,0.10) 100%
+        170deg,
+        rgba(8,8,14,0.94) 0%,
+        rgba(8,8,14,0.80) 45%,
+        rgba(8,8,14,0.55) 100%
     );
     <?php endif; ?>
 }
 
-/* ── Inner layout ────────────────────────── */
-.scr-inner {
+/* ── Hero title section ──────────────────── */
+.scr-hero-section {
     position: relative;
     z-index: 1;
-    flex: 1;
-    display: flex;
-    align-items: flex-start;
-    padding: 130px 6% 80px;
-    gap: 80px;
+    text-align: center;
+    padding: 130px 5% 60px;
 }
-
-/* ── LEFT: Headline column ───────────────── */
-.scr-left {
-    flex: 0 0 300px;
-    position: sticky;
-    top: 130px;
-}
-
 .scr-eyebrow {
     display: inline-flex;
     align-items: center;
@@ -79,182 +64,205 @@ $stats     = $stats ?? [];
     background: rgba(247,203,70,0.15);
     border: 1px solid rgba(247,203,70,0.40);
     border-radius: 50px;
-    padding: 7px 16px;
+    padding: 7px 18px;
     font-size: 0.70rem;
     font-weight: 700;
     letter-spacing: 2.5px;
     text-transform: uppercase;
     color: #f7cb46;
-    margin-bottom: 28px;
+    margin-bottom: 22px;
 }
-
-.scr-headline {
-    font-size: clamp(2.8rem, 4.5vw, 4.2rem);
-    font-weight: 300;
-    line-height: 1.0;
+.scr-main-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 800;
     color: #ffffff;
     letter-spacing: -2px;
-    text-shadow: 0 2px 20px rgba(0,0,0,0.6);
-    margin: 0;
+    line-height: 1.05;
+    margin-bottom: 16px;
+    text-shadow: 0 4px 30px rgba(0,0,0,0.4);
 }
-.scr-headline strong {
-    font-weight: 900;
-    display: block;
-    color: #ffffff;
-    /* Bright & visible — not a faint gradient */
-    text-shadow: 0 0 40px rgba(247,203,70,0.3), 0 2px 20px rgba(0,0,0,0.8);
-}
-.scr-headline .accent {
-    color: #f7cb46;
-}
-
-.scr-subtext {
-    margin-top: 22px;
-    font-size: 0.9rem;
-    font-weight: 400;
-    color: rgba(255,255,255,0.75);
+.scr-main-title .accent { color: #f7cb46; }
+.scr-desc {
+    color: rgba(255,255,255,0.65);
+    font-size: 1.05rem;
+    max-width: 520px;
+    margin: 0 auto;
     line-height: 1.65;
-    text-shadow: 0 1px 6px rgba(0,0,0,0.5);
-    max-width: 260px;
 }
 
-.scr-divider {
-    width: 48px;
-    height: 3px;
-    background: linear-gradient(90deg, #f7cb46, transparent);
-    border-radius: 2px;
-    margin-top: 28px;
+/* ── Continent section header ────────────── */
+.scr-section {
+    position: relative;
+    z-index: 1;
+    padding: 0 5% 50px;
 }
-
-/* ── RIGHT: Regions ─────────────────────── */
-.scr-right {
-    flex: 1;
-    min-width: 0;
-    padding-top: 6px;
-}
-
-.scr-continent {
-    margin-bottom: 38px;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: scrFadeUp 0.5s ease forwards;
-}
-.scr-continent:nth-child(1) { animation-delay: 0.10s; }
-.scr-continent:nth-child(2) { animation-delay: 0.20s; }
-.scr-continent:nth-child(3) { animation-delay: 0.30s; }
-.scr-continent:nth-child(4) { animation-delay: 0.40s; }
-.scr-continent:nth-child(5) { animation-delay: 0.50s; }
-.scr-continent:nth-child(6) { animation-delay: 0.60s; }
-
-@keyframes scrFadeUp {
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.scr-continent-label {
+.scr-continent-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    font-size: 0.68rem;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+.scr-continent-header-label {
+    font-size: 0.70rem;
     font-weight: 800;
     letter-spacing: 3.5px;
     text-transform: uppercase;
-    color: rgba(255,255,255,0.50);
-    margin-bottom: 14px;
-    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    color: rgba(255,255,255,0.45);
+    white-space: nowrap;
 }
-.scr-continent-label::after {
+.scr-continent-header::after {
     content: '';
     flex: 1;
     height: 1px;
-    background: rgba(255,255,255,0.12);
-}
-
-.scr-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-/* Country pill — glassmorphism, clearly readable */
-.scr-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 11px 22px;
     background: rgba(255,255,255,0.10);
-    border: 1px solid rgba(255,255,255,0.20);
-    border-radius: 50px;
+}
+
+/* ── Cards grid ─────────────────────────── */
+.scr-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 18px;
+}
+
+/* ── Country Card — exact style as state/city cards ── */
+.scr-card-link {
     text-decoration: none;
-    /* BRIGHT white text — very readable */
-    color: #ffffff;
-    font-size: 0.92rem;
-    font-weight: 600;
-    letter-spacing: 0.2px;
+    display: block;
+    height: 100%;
+}
+.scr-card {
+    border-radius: 16px;
+    padding: 28px 22px 22px;
+    background: rgba(255,255,255,0.92);
+    border: 1px solid rgba(255,255,255,0.85);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.18);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    text-shadow: 0 1px 6px rgba(0,0,0,0.6);
-    box-shadow: 0 2px 12px rgba(0,0,0,0.20);
-    transition:
-        background 0.22s ease,
-        border-color 0.22s ease,
-        transform 0.22s ease,
-        box-shadow 0.22s ease;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
-.scr-pill::before {
-    content: '';
+
+/* Animated top border on hover — same as state cards */
+.scr-card-border {
     position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(247,203,70,0.20) 0%, transparent 65%);
-    opacity: 0;
-    transition: opacity 0.22s ease;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #f7cb46, #d49830);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+    border-radius: 16px 16px 0 0;
 }
-.scr-pill:hover {
-    background: rgba(247,203,70,0.18);
-    border-color: rgba(247,203,70,0.70);
-    color: #ffffff;
-    transform: translateY(-3px);
-    box-shadow: 0 10px 28px rgba(247,203,70,0.25), 0 4px 12px rgba(0,0,0,0.30);
-    text-decoration: none;
+.scr-card-link:hover .scr-card-border { transform: scaleX(1); }
+.scr-card-link:hover .scr-card {
+    transform: translateY(-10px);
+    box-shadow: 0 24px 50px rgba(247,203,70,0.18), 0 8px 20px rgba(0,0,0,0.15);
+    border-color: rgba(247,203,70,0.40);
+    background: #ffffff;
 }
-.scr-pill:hover::before { opacity: 1; }
 
-.scr-pill-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #f7cb46;
+/* Card icon */
+.scr-card-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(247,203,70,0.10);
+    color: #f7cb46;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s ease;
+    margin-bottom: 4px;
     flex-shrink: 0;
-    box-shadow: 0 0 6px rgba(247,203,70,0.8);
-    transition: box-shadow 0.22s ease;
 }
-.scr-pill:hover .scr-pill-dot {
-    box-shadow: 0 0 12px rgba(247,203,70,1);
+.scr-card-link:hover .scr-card-icon {
+    background: linear-gradient(135deg, #f7cb46, #d49830);
+    color: #ffffff;
+    transform: rotate(10deg) scale(1.1);
+    box-shadow: 0 10px 22px rgba(247,203,70,0.35);
 }
 
-/* ── Stats bar — real data ───────────────── */
+/* Card badge */
+.scr-card-badge {
+    font-size: 0.68rem;
+    font-weight: 700;
+    background: #f8f9fa;
+    border: 1px solid #eaeaea;
+    border-radius: 50px;
+    padding: 3px 10px;
+    color: #555;
+    white-space: nowrap;
+}
+
+/* Card content */
+.scr-card-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: #111;
+    margin-bottom: 0;
+    margin-top: 18px;
+    transition: color 0.3s ease;
+    line-height: 1.2;
+}
+.scr-card-link:hover .scr-card-name { color: #c9920b; }
+
+.scr-card-cta {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #64748b;
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: color 0.3s ease;
+}
+.scr-card-cta i {
+    transition: transform 0.3s ease;
+    font-size: 0.72rem;
+}
+.scr-card-link:hover .scr-card-cta { color: #f7cb46; }
+.scr-card-link:hover .scr-card-cta i { transform: translateX(6px); }
+
+/* Staggered animation */
+.scr-card-link {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: crdFadeUp 0.45s ease forwards;
+}
+@keyframes crdFadeUp {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Stats bar ───────────────────────────── */
 .scr-stats {
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    border-top: 1px solid rgba(255,255,255,0.10);
+    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    border-top: 1px solid rgba(255,255,255,0.08);
     background: rgba(8,8,12,0.65);
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
+    margin-top: auto;
 }
-
 .scr-stat {
-    padding: 24px 20px;
+    padding: 22px 18px;
     text-align: center;
-    border-right: 1px solid rgba(255,255,255,0.08);
+    border-right: 1px solid rgba(255,255,255,0.06);
 }
 .scr-stat:last-child { border-right: none; }
-
 .scr-stat-num {
     display: block;
-    font-size: 1.8rem;
+    font-size: 1.7rem;
     font-weight: 800;
     color: #f7cb46;
     line-height: 1;
@@ -262,102 +270,102 @@ $stats     = $stats ?? [];
 }
 .scr-stat-label {
     display: block;
-    font-size: 0.70rem;
+    font-size: 0.68rem;
     font-weight: 600;
-    color: rgba(255,255,255,0.50);
+    color: rgba(255,255,255,0.45);
     text-transform: uppercase;
     letter-spacing: 1.5px;
     margin-top: 5px;
 }
 
-/* ── Admin notice ───────────────────────── */
-.scr-admin-notice {
-    position: fixed;
-    top: 90px; right: 20px;
-    background: #fff3cd;
-    border: 1px solid #ffc107;
-    border-radius: 8px;
-    padding: 10px 16px;
-    font-size: 0.8rem;
-    color: #856404;
-    z-index: 9999;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.12);
-}
-
 /* ── Responsive ─────────────────────────── */
-@media (max-width: 860px) {
-    .scr-inner {
-        flex-direction: column;
-        gap: 30px;
-        padding: 110px 6% 60px;
-    }
-    .scr-left { flex: none; width: 100%; position: static; }
-    .scr-headline { font-size: 2.8rem; }
-    .scr-subtext { max-width: 100%; }
+@media (max-width: 768px) {
+    .scr-hero-section { padding-top: 110px; }
+    .scr-cards-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; }
+    .scr-card { padding: 22px 16px 18px; }
 }
 @media (max-width: 480px) {
-    .scr-headline { font-size: 2.2rem; }
-    .scr-pill { font-size: 0.86rem; padding: 10px 18px; }
-    .scr-stat-num { font-size: 1.5rem; }
+    .scr-cards-grid { grid-template-columns: 1fr 1fr; }
+    .scr-main-title { font-size: 2.2rem; }
 }
 </style>
-
-<?php if (!$hasBanner && isset($_SESSION['admin_id'])): ?>
-<div class="scr-admin-notice">
-    <i class="fas fa-image me-1"></i> No banner set.
-    <a href="<?= BASE_URL ?>admin/settings/" class="fw-bold ms-1">Upload in Admin → Settings</a>
-</div>
-<?php endif; ?>
 
 <div class="scr-page">
     <div class="scr-bg"></div>
     <div class="scr-overlay"></div>
 
-    <div class="scr-inner">
-
-        <!-- LEFT — Headline -->
-        <div class="scr-left">
-            <div class="scr-eyebrow">
-                <i class="fas fa-globe-americas"></i>
-                Global Properties
-            </div>
-
-            <h1 class="scr-headline">
-                Select<br>
-                <strong>Your<br><span class="accent">Region</span></strong>
-            </h1>
-
-            <p class="scr-subtext">
-                Explore premium real estate across continents. Find your perfect home, wherever in the world.
-            </p>
-            <div class="scr-divider"></div>
+    <!-- Hero Title -->
+    <div class="scr-hero-section">
+        <div class="scr-eyebrow">
+            <i class="fas fa-globe-americas"></i>
+            Global Properties
         </div>
-
-        <!-- RIGHT — Continent / country list -->
-        <div class="scr-right">
-            <?php if (empty($regions)): ?>
-                <p style="color:rgba(255,255,255,0.6)">No regions available at the moment.</p>
-            <?php else: ?>
-                <?php foreach ($regions as $continent => $countries): ?>
-                    <div class="scr-continent">
-                        <div class="scr-continent-label">
-                            <?= e($continent) ?>
-                        </div>
-                        <div class="scr-pills">
-                            <?php foreach ($countries as $c): ?>
-                                <a href="<?= PUBLIC_URL ?>location/<?= e($c['slug']) ?>" class="scr-pill">
-                                    <span class="scr-pill-dot"></span>
-                                    <?= e($c['name']) ?>
-                                </a>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </div>
+        <h1 class="scr-main-title">
+            Select Your <span class="accent">Region</span>
+        </h1>
+        <p class="scr-desc">
+            Explore premium real estate across continents. Choose your country to discover curated projects and luxury developments.
+        </p>
     </div>
 
-    <!-- BOTTOM — Real stats bar -->
+    <!-- Continent Groups with Cards -->
+    <?php if (empty($regions)): ?>
+        <div class="scr-section text-center">
+            <p style="color:rgba(255,255,255,0.55)">No regions available at the moment.</p>
+        </div>
+    <?php else: ?>
+        <?php
+        $cardIndex = 0;
+        foreach ($regions as $continent => $countries):
+        ?>
+        <div class="scr-section">
+            <div class="scr-continent-header">
+                <span class="scr-continent-header-label"><?= e($continent) ?></span>
+            </div>
+            <div class="scr-cards-grid">
+                <?php foreach ($countries as $c):
+                    $cardIndex++;
+                    $delay = round(0.05 * $cardIndex, 2);
+                    $cityCount = $c['city_count'] ?? 0;
+                ?>
+                    <a href="<?= PUBLIC_URL ?>location/<?= e($c['slug']) ?>"
+                       class="scr-card-link"
+                       style="animation-delay: <?= $delay ?>s;">
+                        <div class="scr-card">
+                            <!-- Hover border -->
+                            <div class="scr-card-border"></div>
+
+                            <!-- Top row: icon + badge -->
+                            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:8px;">
+                                <div class="scr-card-icon">
+                                    <?php if (!empty($c['flag_icon'])): ?>
+                                        <i class="<?= e($c['flag_icon']) ?>"></i>
+                                    <?php else: ?>
+                                        <i class="fas fa-map-marked-alt"></i>
+                                    <?php endif; ?>
+                                </div>
+                                <?php if ($cityCount > 0): ?>
+                                    <span class="scr-card-badge"><?= $cityCount ?> <?= $cityCount == 1 ? 'CITY' : 'CITIES' ?></span>
+                                <?php endif; ?>
+                            </div>
+
+                            <!-- Name + CTA -->
+                            <div class="mt-auto">
+                                <h3 class="scr-card-name"><?= e($c['name']) ?></h3>
+                                <div class="scr-card-cta">
+                                    Explore Region
+                                    <i class="fas fa-arrow-right"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+
+    <!-- Real Stats Bar -->
     <?php if (!empty($stats)): ?>
     <div class="scr-stats">
         <?php foreach ($stats as $s): ?>

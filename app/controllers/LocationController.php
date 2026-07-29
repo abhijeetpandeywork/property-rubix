@@ -31,16 +31,17 @@ class LocationController extends Controller {
         // If it fails, fallback to grouping all under 'Global'
         try {
             $countries = $pdo->query("
-                SELECT id, name, slug, continent, flag_icon 
-                FROM countries 
-                WHERE status='active' 
-                ORDER BY continent ASC, sort_order ASC, name ASC
+                SELECT c.id, c.name, c.slug, c.continent, c.flag_icon,
+                       (SELECT COUNT(*) FROM cities ci WHERE ci.country_id = c.id) AS city_count
+                FROM countries c
+                WHERE c.status='active' 
+                ORDER BY c.continent ASC, c.sort_order ASC, c.name ASC
             ")->fetchAll();
         } catch (Exception $e) {
             $countries = $pdo->query("
-                SELECT id, name, slug, 'Global' AS continent, flag_icon 
-                FROM countries 
-                WHERE status='active' 
+                SELECT id, name, slug, 'Global' AS continent, flag_icon, 0 AS city_count
+                FROM countries
+                WHERE status='active'
                 ORDER BY sort_order ASC, name ASC
             ")->fetchAll();
         }
