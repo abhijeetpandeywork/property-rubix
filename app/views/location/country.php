@@ -2,12 +2,17 @@
 /** Country view showing states as premium cards */ 
 $cSlug = strtolower($country['slug']);
 $heroImage = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop'; // Default
-if ($cSlug === 'india') {
-    $heroImage = 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?q=80&w=2071&auto=format&fit=crop';
-} elseif ($cSlug === 'uae' || $cSlug === 'united-arab-emirates') {
-    $heroImage = 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=2070&auto=format&fit=crop';
-} elseif ($cSlug === 'usa' || $cSlug === 'united-states') {
-    $heroImage = 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=2070&auto=format&fit=crop';
+
+if (!empty($country['bg_image'])) {
+    $heroImage = upload($country['bg_image']);
+} else {
+    if ($cSlug === 'india') {
+        $heroImage = 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?q=80&w=2071&auto=format&fit=crop';
+    } elseif ($cSlug === 'uae' || $cSlug === 'united-arab-emirates') {
+        $heroImage = 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=2070&auto=format&fit=crop';
+    } elseif ($cSlug === 'usa' || $cSlug === 'united-states') {
+        $heroImage = 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?q=80&w=2070&auto=format&fit=crop';
+    }
 }
 ?>
 

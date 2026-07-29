@@ -34,6 +34,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
         }
     }
     
+    if (isset($_FILES['bg_image']) && $_FILES['bg_image']['error'] === UPLOAD_ERR_OK) {
+        $path = uploadFile($_FILES['bg_image'], 'locations');
+        if ($path) {
+            $data['bg_image'] = $path;
+        }
+    }
+    
     if (!$errors) {
         if ($id) {
             $sets = implode(', ', array_map(fn($k) => "`$k` = ?", array_keys($data)));
@@ -107,7 +114,7 @@ require __DIR__ . '/../includes/header.php';
 <div class="alert alert-danger"><ul class="mb-0"><?php foreach ($errors as $e): ?><li><?= htmlspecialchars($e) ?></li><?php endforeach; ?></ul></div>
 <?php endif; ?>
 
-<form method="post" class="adm-form" novalidate>
+<form method="post" class="adm-form" enctype="multipart/form-data" novalidate>
   <?= csrfField() ?>
   <div class="adm-card">
     <div class="row g-3">
@@ -137,6 +144,11 @@ require __DIR__ . '/../includes/header.php';
                     echo '<option value="'.$continent.'" '.$selected.'>'.$continent.'</option>';
                 }
                 echo '</select>';
+            } elseif ($c === 'bg_image') {
+                echo '<input type="file" name="'.$c.'" class="form-control" accept="image/*">';
+                if ($val) {
+                    echo '<div class="mt-2"><img src="'.upload($val).'" style="max-height:60px; border-radius:4px;"></div>';
+                }
             } elseif (strpos($col['Type'], 'text') !== false) {
                 echo '<textarea name="'.$c.'" class="form-control" rows="3">'.$val.'</textarea>';
             } else {
