@@ -128,12 +128,12 @@ $totalProjects = $totalProjects ?? 0;
               <div class="mt-auto">
                 <span class="badge rounded-pill fw-normal"
                       style="background:rgba(0,0,0,.05);color:#64748b;padding:6px 12px;font-size:.85rem;letter-spacing:.5px;">
-                  <?= number_format($totalProjects) ?> PROPERTIES
+                  <?= number_format((int)$loc['locality_project_count']) ?> PROPERTIES
                 </span>
               </div>
 
               <div class="explore-hint position-absolute bottom-0 w-100 text-center pb-3 opacity-0">
-                <span class="text-primary fw-bold" style="font-size:.9rem;">
+                <span style="color:var(--pr-primary);font-weight:700;font-size:.9rem;">
                   Explore Area <i class="fas fa-arrow-right ms-1"></i>
                 </span>
               </div>

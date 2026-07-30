@@ -157,16 +157,16 @@ class LocationController extends Controller {
         $totalStmt->execute([$city['id']]);
         $totalProjects = (int)$totalStmt->fetchColumn();
 
-        // Get localities for this city (show on locality cards)
+        // Get localities with their REAL per-locality project counts from admin data
         $localitiesStmt = $pdo->prepare(
             "SELECT l.id, l.name AS location_area, l.slug,
                     COUNT(p.id) AS locality_project_count
              FROM localities l
-             LEFT JOIN projects p ON p.locality_id = l.id AND p.city_id = ?
+             LEFT JOIN projects p ON p.locality_id = l.id
              WHERE l.city_id = ? AND l.status = 'active'
              GROUP BY l.id ORDER BY l.sort_order, l.name"
         );
-        $localitiesStmt->execute([$city['id'], $city['id']]);
+        $localitiesStmt->execute([$city['id']]);
         $localities = $localitiesStmt->fetchAll(PDO::FETCH_ASSOC);
 
         $this->view('location/city', [
@@ -207,9 +207,8 @@ class LocationController extends Controller {
         $status = $_GET['status'] ?? '';
         $budget = $_GET['budget'] ?? '';
 
-        // Show projects that match this locality OR are assigned to the city but no specific locality
-        // This ensures all city projects surface even if locality_id wasn't assigned in admin
-        $where = ['p.city_id = ?', '(p.locality_id = ? OR p.locality_id IS NULL)'];
+        // Show projects strictly assigned to this locality in admin panel
+        $where = ['p.city_id = ?', 'p.locality_id = ?'];
         $args  = [$city['id'], $localityId];
 
         if ($type)   { $where[] = 'p.type = ?';   $args[] = $type; }
