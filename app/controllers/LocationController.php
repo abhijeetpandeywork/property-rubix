@@ -170,28 +170,11 @@ class LocationController extends Controller {
         $localitiesStmt->execute([$city['id'], $city['id']]);
         $localities = $localitiesStmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Fetch all projects for this city to display below localities
-        $pager = new Pagination($totalProjects, 12);
-        
-        $projectsStmt = $pdo->prepare(
-            "SELECT p.*, b.name AS builder_name, l.name AS locality_name
-             FROM projects p
-             LEFT JOIN builders b ON b.id = p.builder_id
-             LEFT JOIN localities l ON l.id = p.locality_id
-             WHERE p.city_id = ?
-             ORDER BY p.is_featured DESC, p.sort_order ASC, p.id DESC
-             LIMIT ? OFFSET ?"
-        );
-        $projectsStmt->execute([$city['id'], $pager->perPage, $pager->offset]);
-        $projects = $projectsStmt->fetchAll();
-
         $this->view('location/city', [
-            'pageTitle'     => 'Neighborhoods & Projects in ' . $city['name'],
-            'metaDesc'      => 'Explore localities and projects in ' . $city['name'] . ', ' . $city['state_name'],
+            'pageTitle'     => 'Neighborhoods in ' . $city['name'],
+            'metaDesc'      => 'Explore localities in ' . $city['name'] . ', ' . $city['state_name'],
             'city'          => $city,
             'localities'    => $localities,
-            'projects'      => $projects,
-            'pager'         => $pager,
             'totalProjects' => $totalProjects,
         ]);
     }

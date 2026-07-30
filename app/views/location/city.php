@@ -149,34 +149,6 @@ $totalProjects = $totalProjects ?? 0;
         </div>
       <?php endif; ?>
     </div>
-    </div>
-
-    <!-- ALL PROJECTS IN THIS CITY -->
-    <div class="mt-5 pt-5 border-top">
-      <div class="d-flex justify-content-between align-items-center mb-4 pb-2">
-        <h2 class="fw-bold h3 mb-0 text-dark">
-          All Properties in <?= e($city['name']) ?>
-          <span class="text-muted ms-2 fw-normal" style="font-size:1.1rem;">(<?= number_format($totalProjects) ?>)</span>
-        </h2>
-      </div>
-
-      <?php if (!empty($projects)): ?>
-        <div class="row g-4 mb-5">
-          <?php foreach ($projects as $p): ?>
-            <div class="col-md-6 col-xl-3">
-              <?php require __DIR__ . '/../partials/_property_card.php'; ?>
-            </div>
-          <?php endforeach; ?>
-        </div>
-        <?= $pager->render() ?>
-      <?php else: ?>
-        <div class="empty-state-card text-center text-muted mt-2 p-5 bg-white rounded-4 border">
-          <div class="mb-3 text-muted opacity-50"><i class="fas fa-building fa-3x"></i></div>
-          <h4 class="fw-bold text-dark mb-2">No projects listed yet.</h4>
-          <p class="text-muted mb-0">We are actively adding exclusive projects in <?= e($city['name']) ?>.</p>
-        </div>
-      <?php endif; ?>
-    </div>
 
   </div>
 </div>
