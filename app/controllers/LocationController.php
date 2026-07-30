@@ -158,15 +158,16 @@ class LocationController extends Controller {
         $totalProjects = (int)$totalStmt->fetchColumn();
 
         // Get localities with their REAL per-locality project counts from admin data
+        // Match on locality_id OR legacy location_area string for backward compatibility
         $localitiesStmt = $pdo->prepare(
             "SELECT l.id, l.name AS location_area, l.slug,
                     COUNT(p.id) AS locality_project_count
              FROM localities l
-             LEFT JOIN projects p ON p.locality_id = l.id
+             LEFT JOIN projects p ON (p.locality_id = l.id OR p.location_area = l.name) AND p.city_id = ?
              WHERE l.city_id = ? AND l.status = 'active'
              GROUP BY l.id ORDER BY l.sort_order, l.name"
         );
-        $localitiesStmt->execute([$city['id']]);
+        $localitiesStmt->execute([$city['id'], $city['id']]);
         $localities = $localitiesStmt->fetchAll(PDO::FETCH_ASSOC);
 
         $this->view('location/city', [
@@ -207,9 +208,9 @@ class LocationController extends Controller {
         $status = $_GET['status'] ?? '';
         $budget = $_GET['budget'] ?? '';
 
-        // Show projects strictly assigned to this locality in admin panel
-        $where = ['p.city_id = ?', 'p.locality_id = ?'];
-        $args  = [$city['id'], $localityId];
+        // Show projects strictly assigned to this locality in admin panel (via ID or legacy string name)
+        $where = ['p.city_id = ?', '(p.locality_id = ? OR p.location_area = ?)'];
+        $args  = [$city['id'], $localityId, $matchedLocality];
 
         if ($type)   { $where[] = 'p.type = ?';   $args[] = $type; }
         if ($status) { $where[] = 'p.status = ?';  $args[] = $status; }
