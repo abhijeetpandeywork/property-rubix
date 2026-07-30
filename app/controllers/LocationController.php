@@ -152,22 +152,70 @@ class LocationController extends Controller {
         $city = $stmt->fetch();
         if (!$city) { http_response_code(404); $this->view('errors/404', []); return; }
 
+        // Get localities for this city (for filter tabs)
         $localitiesStmt = $pdo->prepare(
-            "SELECT l.id, l.name as location_area, l.slug, COUNT(p.id) as project_count 
+            "SELECT l.id, l.name AS location_area, l.slug, COUNT(p.id) AS project_count
              FROM localities l
              LEFT JOIN projects p ON p.locality_id = l.id
              WHERE l.city_id=? AND l.status='active'
-             GROUP BY l.id
-             ORDER BY l.sort_order, l.name"
+             GROUP BY l.id ORDER BY l.sort_order, l.name"
         );
         $localitiesStmt->execute([$city['id']]);
         $localities = $localitiesStmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // ── Filters ────────────────────────────────────────
+        $type       = $_GET['type']       ?? '';
+        $status     = $_GET['status']     ?? '';
+        $budget     = $_GET['budget']     ?? '';
+        $localityId = (int)($_GET['locality'] ?? 0);
+
+        // ── Fetch ALL projects in this city (not locked to locality) ──
+        $where = ['p.city_id = ?'];
+        $args  = [$city['id']];
+
+        if ($localityId) {
+            $where[] = 'p.locality_id = ?';
+            $args[]  = $localityId;
+        }
+        if ($type)   { $where[] = 'p.type = ?';   $args[] = $type; }
+        if ($status) { $where[] = 'p.status = ?';  $args[] = $status; }
+        if ($budget === 'under50l')  { $where[] = 'p.price_min < 5000000'; }
+        elseif ($budget === '50l-1cr') { $where[] = 'p.price_min BETWEEN 5000000 AND 10000000'; }
+        elseif ($budget === '1cr-3cr') { $where[] = 'p.price_min BETWEEN 10000000 AND 30000000'; }
+        elseif ($budget === 'above3cr') { $where[] = 'p.price_min > 30000000'; }
+
+        $whereStr = implode(' AND ', $where);
+        $total    = (int)$pdo->prepare("SELECT COUNT(*) FROM projects p WHERE $whereStr")
+                        ->execute($args) ? $pdo->prepare("SELECT COUNT(*) FROM projects p WHERE $whereStr") : null;
+        // Re-execute properly
+        $totalStmt = $pdo->prepare("SELECT COUNT(*) FROM projects p WHERE $whereStr");
+        $totalStmt->execute($args);
+        $totalCount = (int)$totalStmt->fetchColumn();
+
+        $pager = new Pagination($totalCount, 12);
+        $args2 = array_merge($args, [$pager->perPage, $pager->offset]);
+
+        $projectsStmt = $pdo->prepare(
+            "SELECT p.*, b.name AS builder_name,
+                    l.name AS locality_name
+             FROM projects p
+             LEFT JOIN builders b ON b.id = p.builder_id
+             LEFT JOIN localities l ON l.id = p.locality_id
+             WHERE $whereStr
+             ORDER BY p.is_featured DESC, p.sort_order ASC, p.id DESC
+             LIMIT ? OFFSET ?"
+        );
+        $projectsStmt->execute($args2);
+
         $this->view('location/city', [
-            'pageTitle'  => 'Localities in ' . $city['name'],
-            'metaDesc'   => 'Explore localities in ' . $city['name'] . ', ' . $city['state_name'],
-            'city'       => $city,
-            'localities' => $localities,
+            'pageTitle'    => 'Properties in ' . $city['name'],
+            'metaDesc'     => 'Browse real estate projects in ' . $city['name'] . ', ' . $city['state_name'],
+            'city'         => $city,
+            'localities'   => $localities,
+            'projects'     => $projectsStmt->fetchAll(),
+            'pager'        => $pager,
+            'totalCount'   => $totalCount,
+            'filters'      => compact('type', 'status', 'budget', 'localityId'),
         ]);
     }
 
