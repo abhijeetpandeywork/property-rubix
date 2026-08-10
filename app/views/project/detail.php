@@ -295,6 +295,65 @@ body {
     box-shadow: 0 25px 60px rgba(0,0,0,0.05);
 }
 .price-display { font-size: 2.25rem; font-weight: 900; color: #0f172a; margin-bottom: 25px; font-family: 'Outfit', sans-serif; }
+
+/* ─── Floor Plan Slot Cards ──────────────────────────── */
+.fp-slot-card {
+    border-radius: 14px; overflow: hidden; border: 1px solid #e2e8f0;
+    background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    display: flex; flex-direction: column;
+}
+.fp-slot-card:hover { transform: translateY(-4px); box-shadow: 0 12px 35px rgba(0,0,0,0.12); }
+.fp-slot-thumb {
+    display: block; position: relative; overflow: hidden;
+    aspect-ratio: 4/3; background: #f1f5f9;
+}
+.fp-slot-thumb img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 0.4s ease;
+}
+.fp-slot-card:hover .fp-slot-thumb img { transform: scale(1.04); }
+.fp-slot-zoom {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.35); color: #fff; font-size: 1.4rem;
+    opacity: 0; transition: opacity 0.25s ease;
+}
+.fp-slot-card:hover .fp-slot-zoom { opacity: 1; }
+.fp-slot-label {
+    padding: 10px 14px; font-size: 0.82rem; font-weight: 700;
+    text-align: center; background: #f8fafc; color: #1e293b;
+    border-top: 1px solid #e2e8f0; letter-spacing: 0.3px;
+}
+
+/* ─── Master Plan ────────────────────────────────────── */
+.fp-master-wrap {
+    border-radius: 18px; overflow: hidden; border: 2px solid var(--pr-primary);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1); position: relative;
+    background: #f8fafc;
+}
+.fp-master-badge {
+    background: var(--pr-primary); color: #fff;
+    padding: 10px 22px; font-weight: 700; font-size: 0.95rem;
+    letter-spacing: 0.5px;
+}
+.fp-master-link {
+    display: block; position: relative; overflow: hidden;
+    max-height: 520px;
+}
+.fp-master-img {
+    width: 100%; max-height: 520px; object-fit: contain;
+    background: #fff; display: block;
+    transition: transform 0.4s ease;
+}
+.fp-master-link:hover .fp-master-img { transform: scale(1.02); }
+.fp-master-overlay {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 10px;
+    background: rgba(0,0,0,0.35); color: #fff;
+    opacity: 0; transition: opacity 0.3s ease;
+}
+.fp-master-link:hover .fp-master-overlay { opacity: 1; }
+.fp-master-overlay span { font-size: 0.9rem; font-weight: 600; letter-spacing: 1px; }
 </style>
 
 <!-- 2. Custom Project Header (Image 2) -->
@@ -599,6 +658,53 @@ body {
             </div>
             <?php endif; ?>
           </div>
+        </div>
+        <?php endif; ?>
+
+        <?php
+        // ── Dedicated Floor Plan Slots ────────────────────────────────────
+        $fpSlots = [];
+        for ($s = 1; $s <= 6; $s++) {
+            $img = $p["fp_{$s}_image"] ?? null;
+            $lbl = trim($p["fp_{$s}_label"] ?? '');
+            if (!empty($img)) {
+                $fpSlots[] = ['image' => $img, 'label' => $lbl ?: "Floor Plan {$s}"];
+            }
+        }
+        $masterPlanImg   = $p['master_plan_image'] ?? null;
+        $masterPlanLabel = trim($p['master_plan_label'] ?? 'Master Plan') ?: 'Master Plan';
+        $hasFpSection    = !empty($fpSlots) || !empty($masterPlanImg);
+        ?>
+
+        <?php if ($hasFpSection): ?>
+        <div class="lux-section glass-panel" id="floor-plans">
+          <h2 class="lux-section-title"><i class="fas fa-layer-group"></i> Floor Plans</h2>
+
+          <?php if (!empty($fpSlots)): ?>
+          <div class="row g-4 mb-4">
+            <?php foreach ($fpSlots as $fp): ?>
+            <div class="col-6 col-md-4">
+              <div class="fp-slot-card h-100">
+                <a href="<?= upload($fp['image']) ?>" target="_blank" class="fp-slot-thumb" title="<?= e($fp['label']) ?>">
+                  <img src="<?= upload($fp['image']) ?>" alt="<?= e($fp['label']) ?>" loading="lazy">
+                  <div class="fp-slot-zoom"><i class="fas fa-search-plus"></i></div>
+                </a>
+                <div class="fp-slot-label"><?= e($fp['label']) ?></div>
+              </div>
+            </div>
+            <?php endforeach; ?>
+          </div>
+          <?php endif; ?>
+
+          <?php if (!empty($masterPlanImg)): ?>
+          <div class="fp-master-wrap">
+            <div class="fp-master-badge"><i class="fas fa-map me-2"></i><?= e($masterPlanLabel) ?></div>
+            <a href="<?= upload($masterPlanImg) ?>" target="_blank" class="fp-master-link">
+              <img src="<?= upload($masterPlanImg) ?>" alt="<?= e($masterPlanLabel) ?>" class="fp-master-img" loading="lazy">
+              <div class="fp-master-overlay"><i class="fas fa-search-plus fa-2x"></i><span>View Full Size</span></div>
+            </a>
+          </div>
+          <?php endif; ?>
         </div>
         <?php endif; ?>
 

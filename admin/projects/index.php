@@ -112,12 +112,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
                 'Entertainment' => trim($_POST['conn_ent'] ?? '')
             ]) : ($_POST['connectivity'] ?? ''),
             'highlights'       => $_POST['highlights'] ?? '',
+            // Floor Plan Labels (saved as text — images handled separately below)
+            'fp_1_label'  => trim($_POST['fp_1_label']  ?? ''),
+            'fp_2_label'  => trim($_POST['fp_2_label']  ?? ''),
+            'fp_3_label'  => trim($_POST['fp_3_label']  ?? ''),
+            'fp_4_label'  => trim($_POST['fp_4_label']  ?? ''),
+            'fp_5_label'  => trim($_POST['fp_5_label']  ?? ''),
+            'fp_6_label'  => trim($_POST['fp_6_label']  ?? ''),
+            'master_plan_label' => trim($_POST['master_plan_label'] ?? 'Master Plan') ?: 'Master Plan',
         ];
 
         // Process Amenities text to JSON
         if (isset($_POST['amenities'])) {
             $amenitiesArr = array_filter(array_map('trim', explode("\n", $_POST['amenities'])));
             $data['amenities'] = json_encode(array_values($amenitiesArr));
+        }
+
+        // Handle 6 individual floor plan image slots
+        for ($slot = 1; $slot <= 6; $slot++) {
+            $deleteKey = "delete_fp_{$slot}_image";
+            $fileKey   = "fp_{$slot}_image";
+            if (!empty($_POST[$deleteKey])) {
+                $data[$fileKey] = null;
+            } elseif (!empty($_FILES[$fileKey]['name'])) {
+                $up = uploadImage($_FILES[$fileKey], 'projects/floor_plans');
+                if ($up['success']) {
+                    $data[$fileKey] = $up['path'];
+                } else {
+                    $errors[] = "Floor Plan $slot: " . $up['error'];
+                }
+            }
+        }
+
+        // Handle master plan image
+        if (!empty($_POST['delete_master_plan_image'])) {
+            $data['master_plan_image'] = null;
+        } elseif (!empty($_FILES['master_plan_image']['name'])) {
+            $up = uploadImage($_FILES['master_plan_image'], 'projects/floor_plans');
+            if ($up['success']) {
+                $data['master_plan_image'] = $up['path'];
+            } else {
+                $errors[] = 'Master Plan: ' . $up['error'];
+            }
         }
 
         // Handle single and multiple banner image uploads
@@ -723,22 +759,69 @@ require __DIR__ . '/../includes/header.php';
           <?php endif; endif; ?>
           <input type="file" name="gallery_images[]" class="form-control" accept="image/*" multiple>
         </div>
-        <div class="mb-3">
-          <label class="adm-form-label">Floor Plan Images (Multiple)</label>
-          <?php if (!empty($row['floor_plan_images'])): $fArr = json_decode($row['floor_plan_images'], true); if (is_array($fArr) && count($fArr)): ?>
-          <div class="d-flex flex-wrap gap-3 mb-2">
-            <?php foreach ($fArr as $fi): ?>
-            <div class="text-center">
-              <img src="<?= upload($fi) ?>" style="height:50px;width:50px;object-fit:cover;border-radius:4px;display:block;margin-bottom:4px;">
-              <label style="font-size:11px;cursor:pointer;">
-                 <input type="checkbox" name="delete_floor_plan_images[]" value="<?= htmlspecialchars($fi) ?>"> Delete
+      </div>
+
+      <!-- ─── DEDICATED FLOOR PLAN SLOTS ─── -->
+      <div class="adm-card">
+        <div class="adm-card-title"><i class="fas fa-layer-group me-2 text-primary"></i>Floor Plans (Up to 6 Slots)</div>
+        <p class="text-muted small mb-3">Upload a floor plan image for each BHK type and write a custom label below it (e.g. "1 BHK Floor Plan", "2 BHK — 1250 sq.ft." etc.).</p>
+        <div class="row g-4">
+          <?php
+          $fpSlotLabels = ['fp_1','fp_2','fp_3','fp_4','fp_5','fp_6'];
+          $fpDefaultHints = ['1 BHK Floor Plan','2 BHK Floor Plan','3 BHK Floor Plan','4 BHK Floor Plan','5 BHK Floor Plan','Penthouse Floor Plan'];
+          foreach ($fpSlotLabels as $idx => $fpKey):
+              $slot = $idx + 1;
+              $imgCol  = "{$fpKey}_image";
+              $lblCol  = "{$fpKey}_label";
+              $curImg  = $row[$imgCol] ?? null;
+              $curLbl  = $row[$lblCol] ?? '';
+          ?>
+          <div class="col-md-6 col-lg-4">
+            <div class="p-3 border rounded-3 bg-light h-100">
+              <div class="fw-bold text-dark mb-2" style="font-size:0.9rem;">Floor Plan <?= $slot ?></div>
+              <?php if (!empty($curImg)): ?>
+              <div class="mb-2 text-center">
+                <img src="<?= upload($curImg) ?>" style="max-height:100px; max-width:100%; object-fit:contain; border-radius:6px; border:1px solid #ddd; background:#fff; padding:4px;">
+                <label style="font-size:11px; cursor:pointer; color:#dc2626; display:block; margin-top:4px;">
+                  <input type="checkbox" name="delete_<?= $imgCol ?>"> Delete Image
+                </label>
+              </div>
+              <?php endif; ?>
+              <input type="file" name="<?= $imgCol ?>" class="form-control form-control-sm mb-2" accept="image/*">
+              <input type="text" name="<?= $lblCol ?>" class="form-control form-control-sm" placeholder="<?= $fpDefaultHints[$idx] ?>" value="<?= htmlspecialchars($curLbl) ?>">
+              <small class="text-muted" style="font-size:10px;">Label shown below floor plan on website</small>
+            </div>
+          </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+
+      <!-- ─── MASTER PLAN ─── -->
+      <div class="adm-card">
+        <div class="adm-card-title"><i class="fas fa-map me-2 text-primary"></i>Master Plan</div>
+        <p class="text-muted small mb-3">Upload the master plan / site plan image and write a custom label (default: "Master Plan").</p>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <?php if (!empty($row['master_plan_image'])): ?>
+            <div class="mb-2 text-center">
+              <img src="<?= upload($row['master_plan_image']) ?>" style="max-height:140px; max-width:100%; object-fit:contain; border-radius:6px; border:1px solid #ddd; background:#fff; padding:4px;">
+              <label style="font-size:11px; cursor:pointer; color:#dc2626; display:block; margin-top:4px;">
+                <input type="checkbox" name="delete_master_plan_image"> Delete Master Plan Image
               </label>
             </div>
-            <?php endforeach; ?>
+            <?php endif; ?>
+            <input type="file" name="master_plan_image" class="form-control" accept="image/*">
           </div>
-          <?php endif; endif; ?>
-          <input type="file" name="floor_plan_images[]" class="form-control" accept="image/*" multiple>
+          <div class="col-md-6 d-flex flex-column justify-content-end">
+            <label class="adm-form-label">Master Plan Label</label>
+            <input type="text" name="master_plan_label" class="form-control" placeholder="Master Plan" value="<?= htmlspecialchars($row['master_plan_label'] ?? 'Master Plan') ?>">
+            <small class="text-muted">Text shown below master plan image on website</small>
+          </div>
         </div>
+      </div>
+
+      <div class="adm-card">
+        <div class="adm-card-title">Brochure</div>
         <div>
           <label class="adm-form-label">Brochure PDF</label>
           <?php if (!empty($row['brochure_pdf'])): ?>
