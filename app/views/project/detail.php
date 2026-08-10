@@ -668,6 +668,95 @@ body {
         </div>
         <?php endif; ?>
 
+        <!-- Location & Interactive Google Map -->
+        <?php 
+        $hasCoords = !empty($p['latitude']) && !empty($p['longitude']);
+        $hasMapUrl = !empty($p['map_url']);
+        $hasAddress = !empty($p['address']) || !empty($p['location_area']);
+        
+        if ($hasCoords || $hasMapUrl || $hasAddress):
+            $mapEmbedSrc = '';
+            $directMapUrl = '';
+            $rawIframe = '';
+            
+            if ($hasMapUrl && strpos($p['map_url'], '<iframe') !== false) {
+                // Raw iframe embed code provided in map_url
+                $rawIframe = $p['map_url'];
+            } else {
+                if ($hasCoords) {
+                    $lat = trim($p['latitude']);
+                    $lng = trim($p['longitude']);
+                    $mapEmbedSrc = "https://maps.google.com/maps?q={$lat},{$lng}&hl=en&z=15&output=embed";
+                    $directMapUrl = "https://www.google.com/maps/search/?api=1&query={$lat},{$lng}";
+                } elseif ($hasMapUrl) {
+                    $cleanUrl = trim($p['map_url']);
+                    if (strpos($cleanUrl, 'google.com/maps/embed') !== false) {
+                        $mapEmbedSrc = $cleanUrl;
+                        $directMapUrl = str_replace('/embed', '', $cleanUrl);
+                    } else {
+                        $mapEmbedSrc = "https://maps.google.com/maps?q=" . urlencode($cleanUrl) . "&hl=en&z=15&output=embed";
+                        $directMapUrl = $cleanUrl;
+                    }
+                } else {
+                    $queryLocation = trim(($p['address'] ? $p['address'] . ', ' : '') . ($p['location_area'] ? $p['location_area'] . ', ' : '') . ($p['city_name'] ?? ''));
+                    $mapEmbedSrc = "https://maps.google.com/maps?q=" . urlencode($queryLocation) . "&hl=en&z=14&output=embed";
+                    $directMapUrl = "https://www.google.com/maps/search/?api=1&query=" . urlencode($queryLocation);
+                }
+            }
+        ?>
+        <div class="lux-section glass-panel">
+          <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+              <h2 class="lux-section-title mb-0"><i class="fas fa-map-marked-alt text-primary"></i> Project Location & Map</h2>
+              <?php if (!empty($directMapUrl)): ?>
+              <a href="<?= e($directMapUrl) ?>" target="_blank" class="btn btn-sm text-white px-3 py-2 rounded-pill shadow-sm" style="background: var(--pr-primary); font-weight: 600;">
+                  <i class="fas fa-directions me-1"></i> Get Directions on Google Maps
+              </a>
+              <?php endif; ?>
+          </div>
+
+          <?php if (!empty($p['address']) || !empty($p['location_area'])): ?>
+          <div class="p-3 mb-4 rounded-3 bg-light border d-flex align-items-start gap-3">
+              <div class="rounded-circle p-2 bg-white border text-primary d-flex align-items-center justify-content-center" style="width:42px; height:42px; min-width:42px;">
+                  <i class="fas fa-map-pin fs-5" style="color:var(--pr-primary);"></i>
+              </div>
+              <div>
+                  <div class="fw-bold text-dark" style="font-size:1.05rem;">
+                      <?= e(!empty($p['address']) ? $p['address'] : $p['location_area']) ?>
+                  </div>
+                  <div class="text-muted small">
+                      <?= e($p['location_area'] ?? '') ?><?= (!empty($p['location_area']) && !empty($p['city_name'])) ? ', ' : '' ?><?= e($p['city_name'] ?? '') ?><?= !empty($p['state_name']) ? ', ' . e($p['state_name']) : '' ?>
+                  </div>
+                  <?php if ($hasCoords): ?>
+                  <div class="mt-2">
+                      <span class="badge bg-white text-secondary border small">
+                          <i class="fas fa-crosshairs me-1 text-primary"></i> Lat: <?= e($p['latitude']) ?>, Long: <?= e($p['longitude']) ?>
+                      </span>
+                  </div>
+                  <?php endif; ?>
+              </div>
+          </div>
+          <?php endif; ?>
+
+          <div class="map-embed-wrapper rounded-4 overflow-hidden shadow-sm border position-relative" style="height: 400px; background: #eaeaea;">
+              <?php if (!empty($rawIframe)): ?>
+                  <div class="w-100 h-100 ratio ratio-16x9">
+                      <?= $rawIframe ?>
+                  </div>
+              <?php elseif (!empty($mapEmbedSrc)): ?>
+                  <iframe 
+                      src="<?= e($mapEmbedSrc) ?>" 
+                      width="100%" 
+                      height="100%" 
+                      style="border:0; min-height:400px;" 
+                      allowfullscreen="" 
+                      loading="lazy" 
+                      referrerpolicy="no-referrer-when-downgrade">
+                  </iframe>
+              <?php endif; ?>
+          </div>
+        </div>
+        <?php endif; ?>
+
         <!-- EMI Calculator (Custom JS UI) -->
         <div class="lux-section glass-panel">
           <h2 class="lux-section-title"><i class="fas fa-calculator"></i> EMI Calculator</h2>
