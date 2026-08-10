@@ -39,6 +39,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
         if (!$slug) $slug = slugify($name);
         $slug = uniqueSlug('projects', $slug, $id ?: null);
 
+        // Helper function for multiple image uploads defined FIRST
+        $processMultiUpload = function($field, $subdir) {
+            $uploaded = [];
+            if (isset($_FILES[$field]) && is_array($_FILES[$field]['name'])) {
+                foreach ($_FILES[$field]['name'] as $i => $fname) {
+                    if (!empty($fname) && isset($_FILES[$field]['error'][$i]) && $_FILES[$field]['error'][$i] === UPLOAD_ERR_OK) {
+                        $fileData = [
+                            'name'     => $_FILES[$field]['name'][$i],
+                            'type'     => $_FILES[$field]['type'][$i],
+                            'tmp_name' => $_FILES[$field]['tmp_name'][$i],
+                            'error'    => $_FILES[$field]['error'][$i],
+                            'size'     => $_FILES[$field]['size'][$i],
+                        ];
+                        $up = uploadImage($fileData, $subdir);
+                        if ($up['success']) $uploaded[] = $up['path'];
+                    }
+                }
+            }
+            return $uploaded;
+        };
+
+        $priceMin = (isset($_POST['price_min']) && $_POST['price_min'] !== '' && is_numeric($_POST['price_min'])) ? (float)$_POST['price_min'] : null;
+        $priceMax = (isset($_POST['price_max']) && $_POST['price_max'] !== '' && is_numeric($_POST['price_max'])) ? (float)$_POST['price_max'] : null;
+        $totalUnits = (isset($_POST['total_units']) && trim($_POST['total_units']) !== '' && is_numeric($_POST['total_units'])) ? (int)$_POST['total_units'] : null;
+        $latitude = (isset($_POST['latitude']) && $_POST['latitude'] !== '' && is_numeric($_POST['latitude'])) ? (float)$_POST['latitude'] : null;
+        $longitude = (isset($_POST['longitude']) && $_POST['longitude'] !== '' && is_numeric($_POST['longitude'])) ? (float)$_POST['longitude'] : null;
+
         $data = [
             'builder_id'       => $buildId ?: null,
             'city_id'          => $cityId ?: null,
@@ -46,21 +73,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
             'slug'             => $slug,
             'type'             => $_POST['type']   ?? 'residential',
             'status'           => $_POST['status'] ?? 'upcoming',
-            'price_min'        => $_POST['price_min'] !== '' ? (float)$_POST['price_min'] : null,
-            'price_max'        => $_POST['price_max'] !== '' ? (float)$_POST['price_max'] : null,
+            'price_min'        => $priceMin,
+            'price_max'        => $priceMax,
             'price_display'    => trim($_POST['price_display'] ?? '') ?: null,
             'price_on_request' => isset($_POST['price_on_request']) ? 1 : 0,
             'unit_types'       => trim($_POST['unit_types']    ?? ''),
             'area_range'       => trim($_POST['area_range']    ?? ''),
             'total_area'       => trim($_POST['total_area']    ?? ''),
-            'total_units'      => trim($_POST['total_units']) !== '' ? (int)$_POST['total_units'] : null,
+            'total_units'      => $totalUnits,
             'rera_id'          => trim($_POST['rera_id']       ?? ''),
             'rera_verified'    => isset($_POST['rera_verified']) ? 1 : 0,
             'address'          => trim($_POST['address']       ?? ''),
             'locality_id'      => (int)($_POST['locality_id'] ?? 0) ?: null,
-            'location_area'    => trim($_POST['location_area'] ?? ''), // Keep string fallback for frontend backward compatibility
-            'latitude'         => $_POST['latitude']  !== '' ? (float)$_POST['latitude']  : null,
-            'longitude'        => $_POST['longitude'] !== '' ? (float)$_POST['longitude'] : null,
+            'location_area'    => trim($_POST['location_area'] ?? ''),
+            'latitude'         => $latitude,
+            'longitude'        => $longitude,
             'map_url'          => trim($_POST['map_url']       ?? ''),
             'short_description'=> trim($_POST['short_description'] ?? ''),
             'description'      => $_POST['description'] ?? '',
@@ -72,6 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
             'contact_phone'    => trim($_POST['contact_phone']    ?? ''),
             'whatsapp_number'  => trim($_POST['whatsapp_number']  ?? ''),
             'virtual_tour_url' => trim($_POST['virtual_tour_url'] ?? ''),
+            'video_url'        => trim($_POST['video_url']        ?? ''),
             'marquee_text'     => trim($_POST['marquee_text']     ?? ''),
             'connectivity'     => isset($_POST['conn_main']) ? json_encode([
                 'Connectivity' => trim($_POST['conn_main']),
@@ -150,27 +178,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
             else $errors[] = 'Brochure: ' . $up['error'];
         }
 
-        // Helper function for multiple image uploads
-        $processMultiUpload = function($field, $subdir) {
-            $uploaded = [];
-            if (isset($_FILES[$field]) && is_array($_FILES[$field]['name'])) {
-                foreach ($_FILES[$field]['name'] as $i => $name) {
-                    if ($_FILES[$field]['error'][$i] === UPLOAD_ERR_OK) {
-                        $fileData = [
-                            'name' => $_FILES[$field]['name'][$i],
-                            'type' => $_FILES[$field]['type'][$i],
-                            'tmp_name' => $_FILES[$field]['tmp_name'][$i],
-                            'error' => $_FILES[$field]['error'][$i],
-                            'size' => $_FILES[$field]['size'][$i],
-                        ];
-                        $up = uploadImage($fileData, $subdir);
-                        if ($up['success']) $uploaded[] = $up['path'];
-                    }
-                }
-            }
-            return $uploaded;
-        };
-
         // Handle gallery images
         $existingGallery = $id && !empty($row['gallery_images']) ? json_decode($row['gallery_images'], true) : [];
         if (!is_array($existingGallery)) $existingGallery = [];
@@ -226,26 +233,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
         if ($newFloorPlans || isset($_POST['delete_floor_plan_images'])) {
             $data['floor_plan_images'] = json_encode(array_merge($existingFloorPlans, $newFloorPlans));
         }
-    }
 
-    if (!$errors) {
-        if ($id) {
-            // UPDATE
-            $sets = implode(', ', array_map(fn($k) => "`$k` = ?", array_keys($data)));
-            $stmt = $pdo->prepare("UPDATE projects SET $sets WHERE id=?");
-            $stmt->execute([...array_values($data), $id]);
-            logAction('UPDATE', 'projects', $id);
-        } else {
-            // INSERT
-            $cols = implode(', ', array_map(fn($k) => "`$k`", array_keys($data)));
-            $vals = implode(', ', array_fill(0, count($data), '?'));
-            $stmt = $pdo->prepare("INSERT INTO projects ($cols) VALUES ($vals)");
-            $stmt->execute(array_values($data));
-            $id = (int)$pdo->lastInsertId();
-            logAction('CREATE', 'projects', $id);
+        if (!$errors) {
+            try {
+                if ($id) {
+                    // UPDATE
+                    $sets = implode(', ', array_map(fn($k) => "`$k` = ?", array_keys($data)));
+                    $stmt = $pdo->prepare("UPDATE projects SET $sets WHERE id=?");
+                    $stmt->execute([...array_values($data), $id]);
+                    logAction('UPDATE', 'projects', $id);
+                } else {
+                    // INSERT
+                    $cols = implode(', ', array_map(fn($k) => "`$k`", array_keys($data)));
+                    $vals = implode(', ', array_fill(0, count($data), '?'));
+                    $stmt = $pdo->prepare("INSERT INTO projects ($cols) VALUES ($vals)");
+                    $stmt->execute(array_values($data));
+                    $id = (int)$pdo->lastInsertId();
+                    logAction('CREATE', 'projects', $id);
+                }
+                header('Location: ' . BASE_URL . 'admin/projects/?saved=1');
+                exit;
+            } catch (PDOException $e) {
+                $errors[] = 'Database error: ' . $e->getMessage();
+            }
         }
-        header('Location: ' . BASE_URL . 'admin/projects/?saved=1');
-        exit;
     }
 }
 

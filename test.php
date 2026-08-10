@@ -1,7 +1,5 @@
 <?php
-require "config/db.php";
+// PropertyRubix Health Check
+require_once __DIR__ . '/config/db.php';
 $pdo = db();
-$stmt = $pdo->query("SHOW COLUMNS FROM projects");
-echo "<pre>";
-print_r($stmt->fetchAll(PDO::FETCH_ASSOC));
-echo "</pre>";
+echo "OK";
