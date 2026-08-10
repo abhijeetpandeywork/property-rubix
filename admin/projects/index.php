@@ -522,7 +522,7 @@ require __DIR__ . '/../includes/header.php';
         <div class="adm-card-title">Settings</div>
         <div class="mb-3">
           <label class="adm-form-label">RERA ID</label>
-          <input type="text" name="rera_id" class="form-control" value="<?= htmlspecialchars($row['rera_id'] ?? '') ?>">
+          <input type="text" name="rera_id" id="reraIdInput" class="form-control" value="<?= htmlspecialchars($row['rera_id'] ?? '') ?>" placeholder="e.g. RC/REP/HARERA/GGM/1059/791/2026/31">
         </div>
         <div class="form-check mb-3">
           <input class="form-check-input" type="checkbox" name="rera_verified" id="rera_v" <?= !empty($row['rera_verified']) ? 'checked' : '' ?>>
@@ -532,13 +532,20 @@ require __DIR__ . '/../includes/header.php';
           <label class="adm-form-label">RERA QR Code</label>
           <?php if (!empty($row['rera_qr_code'])): ?>
           <div class="mb-2">
-            <img src="<?= upload($row['rera_qr_code']) ?>" class="img-fluid rounded" style="height:60px;object-fit:cover">
+            <img src="<?= upload($row['rera_qr_code']) ?>" class="img-fluid rounded border" style="height:75px;object-fit:contain">
             <label style="font-size:12px;cursor:pointer;display:block;margin-top:4px;">
-              <input type="checkbox" name="delete_rera_qr_code" value="1"> Delete Image
+              <input type="checkbox" name="delete_rera_qr_code" value="1"> Delete Custom Image
             </label>
           </div>
           <?php endif; ?>
-          <input type="file" name="rera_qr_code" class="form-control" accept="image/*">
+          <div id="autoQrPreviewWrapper" class="mb-2" style="<?= empty($row['rera_qr_code']) && !empty($row['rera_id']) ? '' : 'display:none;' ?>">
+            <div class="p-2 border rounded bg-light d-inline-block text-center">
+              <img id="autoQrPreview" src="<?= !empty($row['rera_id']) ? 'https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=' . urlencode($row['rera_id']) : '' ?>" style="width:100px;height:100px;display:block;margin:0 auto 4px;">
+              <span class="badge bg-success" style="font-size:10px;">Auto-Generated QR</span>
+            </div>
+          </div>
+          <input type="file" name="rera_qr_code" id="reraQrFileInput" class="form-control" accept="image/*">
+          <small class="text-muted">Upload custom QR code image, or leave blank to automatically generate from RERA ID.</small>
         </div>
         <div class="form-check mb-3">
           <input class="form-check-input" type="checkbox" name="is_featured" id="featured" <?= !empty($row['is_featured']) ? 'checked' : '' ?>>
@@ -824,6 +831,36 @@ document.addEventListener("DOMContentLoaded", function() {
     
     if (localitySelect) {
         localitySelect.addEventListener("change", syncLocationArea);
+    }
+
+    // RERA Auto QR Preview
+    const reraIdInput = document.getElementById("reraIdInput");
+    const autoQrPreviewWrapper = document.getElementById("autoQrPreviewWrapper");
+    const autoQrPreview = document.getElementById("autoQrPreview");
+    const reraQrFileInput = document.getElementById("reraQrFileInput");
+
+    function updateReraQrPreview() {
+        const val = reraIdInput ? reraIdInput.value.trim() : "";
+        const hasCustomFile = reraQrFileInput && reraQrFileInput.files && reraQrFileInput.files.length > 0;
+        if (val && !hasCustomFile && autoQrPreviewWrapper && autoQrPreview) {
+            autoQrPreview.src = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + encodeURIComponent(val);
+            autoQrPreviewWrapper.style.display = "block";
+        } else if (!val && autoQrPreviewWrapper) {
+            autoQrPreviewWrapper.style.display = "none";
+        }
+    }
+
+    if (reraIdInput) {
+        reraIdInput.addEventListener("input", updateReraQrPreview);
+    }
+    if (reraQrFileInput) {
+        reraQrFileInput.addEventListener("change", function() {
+            if (this.files && this.files.length > 0 && autoQrPreviewWrapper) {
+                autoQrPreviewWrapper.style.display = "none";
+            } else {
+                updateReraQrPreview();
+            }
+        });
     }
 
     // Initialize dropdowns on page load

@@ -731,32 +731,64 @@ body {
               <?php endif; ?>
             </div>
             
-            <!-- RERA Block Centered (Image 3) -->
-            <?php if ($p['builder_name'] || $p['rera_id'] || $p['rera_qr_code']): ?>
-            <div class="text-center mt-5 pt-4 border-top" style="background:#fdfcf9; border-radius:16px; padding:20px; border:1px solid #f0eade;">
-                <?php if ($p['builder_logo']): ?>
-                    <img src="<?= upload($p['builder_logo']) ?>" alt="<?= e($p['builder_name']) ?>" style="max-height:80px; max-width:200px; object-fit:contain; margin-bottom:15px; border-radius:8px;">
-                <?php else: ?>
+            <!-- RERA Block Centered -->
+            <?php if (!empty($p['builder_name']) || !empty($p['rera_id']) || !empty($p['rera_qr_code'])): ?>
+            <div class="text-center mt-5 pt-4 border-top" style="background:#fdfcf9; border-radius:16px; padding:25px 20px; border:1px solid #f0eade;">
+                <?php if (!empty($p['builder_logo'])): ?>
+                    <img src="<?= upload($p['builder_logo']) ?>" alt="<?= e($p['builder_name']) ?>" style="max-height:80px; max-width:220px; object-fit:contain; margin-bottom:15px; border-radius:8px;">
+                <?php elseif (!empty($p['builder_name'])): ?>
                     <h4 class="fw-bold mb-3" style="color:var(--pr-primary); text-transform:uppercase; letter-spacing:2px;"><?= e($p['builder_name']) ?></h4>
                 <?php endif; ?>
                 
-                <p class="mb-3 text-dark fw-bold" style="font-size:1.1rem;">This project is RERA registered.</p>
+                <p class="mb-3 text-dark fw-bold" style="font-size:1.15rem;">This project is RERA registered.</p>
                 
-                <?php if($p['rera_qr_code']): ?>
-                <img src="<?= upload($p['rera_qr_code']) ?>" alt="RERA QR" style="width:180px; height:180px; object-fit:cover; border:3px solid #000; border-radius:12px; margin-bottom:15px; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+                <?php
+                $reraLink = 'https://maharera.mahaonline.gov.in/';
+                $stateName = $p['state_name'] ?? '';
+                if (stripos($stateName, 'Haryana') !== false) {
+                    $reraLink = 'https://haryanarera.gov.in/';
+                } elseif (stripos($stateName, 'Uttar Pradesh') !== false || stripos($stateName, 'UP') !== false) {
+                    $reraLink = 'https://www.up-rera.in/verify';
+                } elseif (stripos($stateName, 'Karnataka') !== false) {
+                    $reraLink = 'https://rera.karnataka.gov.in/';
+                } elseif (stripos($stateName, 'Delhi') !== false) {
+                    $reraLink = 'https://rera.delhi.gov.in/';
+                } elseif (stripos($stateName, 'Gujarat') !== false) {
+                    $reraLink = 'https://gujrera.gujarat.gov.in/';
+                } elseif (stripos($stateName, 'Rajasthan') !== false) {
+                    $reraLink = 'https://rera.rajasthan.gov.in/';
+                } elseif (stripos($stateName, 'Tamil Nadu') !== false) {
+                    $reraLink = 'https://www.rera.tn.gov.in/';
+                } elseif (stripos($stateName, 'Telangana') !== false) {
+                    $reraLink = 'https://rerait.telangana.gov.in/';
+                }
+
+                // Determine QR Code: custom uploaded image OR dynamically auto-generated from RERA ID + portal
+                $qrCodeUrl = '';
+                if (!empty($p['rera_qr_code'])) {
+                    $qrCodeUrl = upload($p['rera_qr_code']);
+                } elseif (!empty($p['rera_id'])) {
+                    $qrData = $reraLink . ' (RERA Reg: ' . $p['rera_id'] . ')';
+                    $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' . urlencode($qrData) . '&margin=6';
+                }
+                ?>
+                
+                <?php if ($qrCodeUrl): ?>
+                <div class="mb-3 d-inline-block p-2 bg-white rounded-3 shadow-sm border">
+                    <img src="<?= e($qrCodeUrl) ?>" alt="RERA QR Code" style="width:160px; height:160px; object-fit:contain; display:block;">
+                </div>
                 <?php endif; ?>
                 
                 <p class="mb-1 text-muted" style="font-size:0.9rem;">RERA Website:</p>
-                <?php
-                $reraLink = 'https://maharera.mahaonline.gov.in/';
-                if (stripos($p['state_name'], 'Uttar Pradesh') !== false || stripos($p['state_name'], 'UP') !== false) {
-                    $reraLink = 'https://www.up-rera.in/verify';
-                } elseif (stripos($p['state_name'], 'Haryana') !== false) {
-                    $reraLink = 'https://haryanarera.gov.in/';
-                }
-                ?>
-                <a href="<?= e($reraLink) ?>" target="_blank" class="fw-bold text-decoration-none" style="color:var(--pr-primary); word-break:break-all; font-size:1rem;"><?= e($reraLink) ?></a>
-                <?php if($p['rera_id']): ?><p class="mt-2 text-dark small fw-bold"><strong>Reg:</strong> <?= e($p['rera_id']) ?></p><?php endif; ?>
+                <div class="mb-2">
+                    <a href="<?= e($reraLink) ?>" target="_blank" class="fw-bold text-decoration-none d-inline-block px-3 py-1 rounded" style="color:var(--pr-primary); word-break:break-all; font-size:1rem; background:rgba(229,175,83,0.12); border:1px solid rgba(229,175,83,0.35);"><?= e($reraLink) ?></a>
+                </div>
+                
+                <?php if (!empty($p['rera_id'])): ?>
+                <p class="mt-2 mb-0 text-dark fw-bold" style="font-size:1.05rem;">
+                    <strong>Reg:</strong> <?= e($p['rera_id']) ?>
+                </p>
+                <?php endif; ?>
                 
                 <p class="mt-4 text-muted" style="font-size:0.75rem; line-height:1.5;">The content presented on this website is solely for informational purposes and does not constitute a service offer.... <a class="cursor-pointer" style="color:var(--pr-primary);">read more</a></p>
             </div>
