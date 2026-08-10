@@ -25,7 +25,7 @@ function csrfField(): string {
  */
 function csrfVerify(): bool {
     if (session_status() === PHP_SESSION_NONE) session_start();
-    $submitted = $_POST['csrf_token'] ?? '';
+    $submitted = $_POST['csrf_token'] ?? $_GET['csrf_token'] ?? '';
     $expected  = $_SESSION['csrf_token'] ?? '';
 
     if (!$submitted || !$expected) return false;
