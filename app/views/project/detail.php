@@ -602,73 +602,76 @@ body {
         </div>
         <?php endif; ?>
 
-        <!-- Custom 2x2 Virtual Tour Grid (Image 3 mapping) -->
-        <?php if ($p['video_url'] || $p['virtual_tour_url'] || count($floorPlanImages) > 0): ?>
-        <div class="lux-section glass-panel" style="background:#f4f4f4; border:none; padding:40px 30px;">
-          <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
-              <h2 class="mb-0" style="font-size: 1.2rem; font-weight: 500; color: #111;">Virtual Tour</h2>
-              <button type="button" class="btn btn-sm text-white" style="background: var(--pr-primary); font-weight: 600;" data-bs-toggle="modal" data-bs-target="#enquiryModal"><i class="fas fa-download me-1"></i> Download Video</button>
+        <!-- Custom Virtual Tour & Video Walkthrough Grid -->
+        <?php if (!empty($p['video_url']) || !empty($p['virtual_tour_url']) || count($floorPlanImages) > 0): 
+            $embedVideoUrl = !empty($p['video_url']) ? View::videoEmbedUrl($p['video_url']) : '';
+            $embedTourUrl  = !empty($p['virtual_tour_url']) ? View::videoEmbedUrl($p['virtual_tour_url']) : '';
+        ?>
+        <div class="lux-section glass-panel" style="background:#fdfdfd; border:1px solid #f1f5f9; padding:40px 30px;">
+          <div class="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3 flex-wrap gap-2">
+              <h2 class="lux-section-title mb-0" style="font-size: 1.5rem;"><i class="fas fa-play-circle text-primary"></i> Project Video Tour & Walkthrough</h2>
+              <?php if (!empty($p['video_url'])): ?>
+              <a href="<?= e(str_starts_with($p['video_url'], 'http') ? $p['video_url'] : $embedVideoUrl) ?>" target="_blank" class="btn btn-sm btn-outline-danger px-3 py-2 rounded-pill fw-600">
+                  <i class="fab fa-youtube me-1"></i> Watch on YouTube
+              </a>
+              <?php endif; ?>
           </div>
-          <div class="row g-4 mt-2">
+          <div class="row g-4 mt-1">
               
-              <!-- Sample Tour -->
-              <?php if($p['video_url']): ?>
-              <div class="col-md-6">
-                  <div class="vt-box">
-                      <div class="vt-title">Sample Tour</div>
-                      <div class="vt-img-wrap">
-                          <iframe src="<?= e($p['video_url']) ?>"></iframe>
+              <!-- Video / Sample Tour -->
+              <?php if ($embedVideoUrl): ?>
+              <div class="<?= (!empty($embedTourUrl) || count($floorPlanImages) > 0) ? 'col-lg-6' : 'col-12' ?>">
+                  <div class="vt-box p-3 bg-white rounded-3 border shadow-sm">
+                      <div class="vt-title fw-bold text-dark mb-3"><i class="fas fa-video text-primary me-2"></i> Project Video Tour</div>
+                      <div class="vt-img-wrap rounded-3 overflow-hidden shadow-sm" style="aspect-ratio: 16/9; background:#000;">
+                          <iframe src="<?= e($embedVideoUrl) ?>" title="<?= e($p['name']) ?> Video Tour" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width:100%; height:100%; border:0;"></iframe>
                       </div>
-                      <button type="button" class="vt-btn" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request for video</button>
+                      <button type="button" class="vt-btn w-100 mt-3" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request High-Res Video</button>
                   </div>
               </div>
               <?php endif; ?>
 
-              <!-- Drone Tour -->
-              <?php if($p['virtual_tour_url']): ?>
-              <div class="col-md-6">
-                  <div class="vt-box">
-                      <div class="vt-title">Drone Tour</div>
-                      <div class="vt-img-wrap">
-                          <?php if(strpos($p['virtual_tour_url'], '<iframe') !== false): ?>
-                              <?= $p['virtual_tour_url'] ?>
-                          <?php else: ?>
-                              <iframe src="<?= e($p['virtual_tour_url']) ?>"></iframe>
-                          <?php endif; ?>
+              <!-- Drone / Virtual Tour -->
+              <?php if ($embedTourUrl): ?>
+              <div class="<?= (!empty($embedVideoUrl) || count($floorPlanImages) > 0) ? 'col-lg-6' : 'col-12' ?>">
+                  <div class="vt-box p-3 bg-white rounded-3 border shadow-sm">
+                      <div class="vt-title fw-bold text-dark mb-3"><i class="fas fa-vr-cardboard text-primary me-2"></i> 360° Virtual / Drone Tour</div>
+                      <div class="vt-img-wrap rounded-3 overflow-hidden shadow-sm" style="aspect-ratio: 16/9; background:#000;">
+                          <iframe src="<?= e($embedTourUrl) ?>" title="<?= e($p['name']) ?> Virtual Tour" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width:100%; height:100%; border:0;"></iframe>
                       </div>
-                      <button type="button" class="vt-btn" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request for video</button>
+                      <button type="button" class="vt-btn w-100 mt-3" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request Full Virtual Tour</button>
                   </div>
               </div>
               <?php endif; ?>
               
               <!-- Plot Tour -->
-              <?php if(isset($floorPlanImages[0])): ?>
-              <div class="col-md-6 mt-4">
-                  <div class="vt-box">
-                      <div class="vt-title">Plot Tour</div>
-                      <div class="vt-img-wrap">
+              <?php if (isset($floorPlanImages[0])): ?>
+              <div class="col-md-6">
+                  <div class="vt-box p-3 bg-white rounded-3 border shadow-sm">
+                      <div class="vt-title fw-bold text-dark mb-3"><i class="fas fa-map text-primary me-2"></i> Plot / Master Plan</div>
+                      <div class="vt-img-wrap rounded-3 overflow-hidden shadow-sm" style="aspect-ratio: 16/9;">
                           <a href="<?= upload($floorPlanImages[0]) ?>" target="_blank" class="fp-item-override">
-                              <img src="<?= upload($floorPlanImages[0]) ?>" alt="Plot Tour">
+                              <img src="<?= upload($floorPlanImages[0]) ?>" alt="Plot Tour" style="width:100%; height:100%; object-fit:cover;">
                               <i class="fas fa-search-plus vt-mag-icon"></i>
                           </a>
                       </div>
-                      <button type="button" class="vt-btn" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request for plan</button>
+                      <button type="button" class="vt-btn w-100 mt-3" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request Floor Plan Details</button>
                   </div>
               </div>
               <?php endif; ?>
               
               <!-- Master Layout -->
-              <?php if(isset($floorPlanImages[1])): ?>
-              <div class="col-md-6 mt-4">
-                  <div class="vt-box">
-                      <div class="vt-title">Master Layout</div>
-                      <div class="vt-img-wrap">
+              <?php if (isset($floorPlanImages[1])): ?>
+              <div class="col-md-6">
+                  <div class="vt-box p-3 bg-white rounded-3 border shadow-sm">
+                      <div class="vt-title fw-bold text-dark mb-3"><i class="fas fa-layer-group text-primary me-2"></i> Master Layout</div>
+                      <div class="vt-img-wrap rounded-3 overflow-hidden shadow-sm" style="aspect-ratio: 16/9;">
                           <a href="<?= upload($floorPlanImages[1]) ?>" target="_blank" class="fp-item-override">
-                              <img src="<?= upload($floorPlanImages[1]) ?>" alt="Master Layout">
+                              <img src="<?= upload($floorPlanImages[1]) ?>" alt="Master Layout" style="width:100%; height:100%; object-fit:cover;">
                               <i class="fas fa-search-plus vt-mag-icon"></i>
                           </a>
                       </div>
-                      <button type="button" class="vt-btn" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request for plan</button>
+                      <button type="button" class="vt-btn w-100 mt-3" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request Master Plan PDF</button>
                   </div>
               </div>
               <?php endif; ?>

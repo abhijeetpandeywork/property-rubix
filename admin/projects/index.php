@@ -611,8 +611,9 @@ require __DIR__ . '/../includes/header.php';
           <input type="url" name="map_url" class="form-control" placeholder="https://maps.google.com/..." value="<?= htmlspecialchars($row['map_url'] ?? '') ?>">
         </div>
         <div class="mb-3">
-          <label class="adm-form-label">Video URL</label>
-          <input type="url" name="video_url" class="form-control" value="<?= htmlspecialchars($row['video_url'] ?? '') ?>">
+          <label class="adm-form-label">Video URL / YouTube Link</label>
+          <input type="text" name="video_url" class="form-control" placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/... or embed code" value="<?= htmlspecialchars($row['video_url'] ?? '') ?>">
+          <small class="text-muted">Paste any YouTube link, short link (youtu.be), Vimeo URL, or iframe embed code.</small>
         </div>
         <div class="mb-3">
           <label class="adm-form-label">Virtual Tour (URL/Embed)</label>

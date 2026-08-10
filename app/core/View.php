@@ -62,4 +62,29 @@ class View {
         if ($diff < 31536000)return floor($diff / 2592000) . ' months ago';
         return floor($diff / 31536000) . ' years ago';
     }
+
+    /**
+     * Convert any YouTube, Vimeo, or video URL/iframe into a valid embed URL.
+     */
+    public static function videoEmbedUrl(?string $url): string {
+        if (!$url) return '';
+        $url = trim($url);
+
+        // If raw iframe embed code provided, extract src
+        if (preg_match('/<iframe[^>]+src=["\']([^"\']+)["\']/i', $url, $m)) {
+            $url = $m[1];
+        }
+
+        // YouTube: standard watch URL, short youtu.be, embed URL, or shorts URL
+        if (preg_match('/(?:youtube\.com\/(?:watch\?.*v=|embed\/|v\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/i', $url, $m)) {
+            return 'https://www.youtube.com/embed/' . $m[1] . '?rel=0&modestbranding=1';
+        }
+
+        // Vimeo: standard or player URL
+        if (preg_match('/vimeo\.com\/(?:video\/)?([0-9]+)/i', $url, $m)) {
+            return 'https://player.vimeo.com/video/' . $m[1];
+        }
+
+        return $url;
+    }
 }
