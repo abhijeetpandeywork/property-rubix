@@ -906,17 +906,38 @@ body {
     <div class="container-fluid px-3 px-md-5">
         <h2 class="fw-bold mb-4" style="font-family:'Outfit';">Similar Projects in <?= e($p['city_name']) ?></h2>
         <div class="row g-4">
-            <?php foreach ($related as $rProj): ?>
+            <?php foreach ($related as $rProj): 
+                $rImg = '';
+                if (!empty($rProj['thumbnail_image'])) {
+                    $rImg = upload($rProj['thumbnail_image']);
+                } elseif (!empty($rProj['banner_image'])) {
+                    $rImg = upload($rProj['banner_image']);
+                } elseif (!empty($rProj['banner_images'])) {
+                    $bArr = json_decode($rProj['banner_images'], true);
+                    if (!empty($bArr[0])) $rImg = upload($bArr[0]);
+                } elseif (!empty($rProj['exterior_images'])) {
+                    $eArr = json_decode($rProj['exterior_images'], true);
+                    if (!empty($eArr[0])) $rImg = upload($eArr[0]);
+                } elseif (!empty($rProj['gallery_images'])) {
+                    $gArr = json_decode($rProj['gallery_images'], true);
+                    if (!empty($gArr[0])) $rImg = upload($gArr[0]);
+                }
+                if (empty($rImg)) {
+                    $rImg = 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600&q=80';
+                }
+            ?>
             <div class="col-md-6 col-lg-4">
-                <div class="card h-100 border-0 shadow-sm" style="border-radius:12px; overflow:hidden; transition:0.3s;" onmouseover="this.style.transform='translateY(-5px)';" onmouseout="this.style.transform='translateY(0)';">
-                    <img src="<?= $rProj['thumbnail_image'] ? upload($rProj['thumbnail_image']) : 'https://placehold.co/600x400' ?>" class="card-img-top" alt="<?= e($rProj['name']) ?>" style="height:200px; object-fit:cover;">
-                    <div class="card-body p-4">
-                        <div class="text-muted small mb-2"><i class="fas fa-map-marker-alt text-primary"></i> <?= e($rProj['location_area']) ?></div>
-                        <h5 class="card-title fw-bold mb-2"><?= e($rProj['name']) ?></h5>
-                        <p class="card-text text-muted mb-3" style="font-size:0.9rem;"><?= e($rProj['builder_name']) ?></p>
+                <div class="card h-100 border-0 shadow-sm" style="border-radius:16px; overflow:hidden; transition:all 0.3s ease; border:1px solid #f1f5f9;" onmouseover="this.style.transform='translateY(-6px)'; this.style.boxShadow='0 20px 30px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='';">
+                    <a href="<?= PUBLIC_URL ?>project/<?= e($rProj['slug']) ?>" style="display:block; overflow:hidden;">
+                        <img src="<?= e($rImg) ?>" class="card-img-top" alt="<?= e($rProj['name']) ?>" style="height:220px; width:100%; object-fit:cover; transition:transform 0.5s ease;" onmouseover="this.style.transform='scale(1.05)';" onmouseout="this.style.transform='scale(1)';">
+                    </a>
+                    <div class="card-body p-4 d-flex flex-column">
+                        <div class="text-muted small mb-2"><i class="fas fa-map-marker-alt" style="color:var(--pr-primary);"></i> <?= e($rProj['location_area'] ?: $p['city_name']) ?></div>
+                        <h5 class="card-title fw-bold mb-1"><a href="<?= PUBLIC_URL ?>project/<?= e($rProj['slug']) ?>" class="text-dark text-decoration-none"><?= e($rProj['name']) ?></a></h5>
+                        <p class="card-text text-muted mb-3" style="font-size:0.88rem;"><?= e($rProj['builder_name'] ?? '') ?></p>
                         <div class="d-flex justify-content-between align-items-center mt-auto border-top pt-3">
-                            <div class="fw-bold fs-5 text-dark"><?= View::priceRange($rProj['price_min'], $rProj['price_max'], (bool)$rProj['price_on_request']) ?></div>
-                            <a href="<?= PUBLIC_URL ?>project/<?= e($rProj['slug']) ?>" class="btn btn-outline-dark btn-sm rounded-pill px-3">View Details</a>
+                            <div class="fw-bold fs-5 text-dark"><?= View::priceRange($rProj['price_min'], $rProj['price_max'], (bool)$rProj['price_on_request'], $rProj['price_display'] ?? '') ?></div>
+                            <a href="<?= PUBLIC_URL ?>project/<?= e($rProj['slug']) ?>" class="btn btn-sm rounded-pill px-3 text-white fw-600" style="background:var(--pr-primary);">View Details</a>
                         </div>
                     </div>
                 </div>
