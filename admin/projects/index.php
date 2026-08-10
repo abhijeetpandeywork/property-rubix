@@ -726,30 +726,33 @@ document.addEventListener("DOMContentLoaded", function() {
     const localitySelect = document.getElementById("localitySelect");
     const locationAreaInput = document.getElementById("locationAreaInput");
     
-    const currentCityId = "' . ($row['city_id'] ?? '') . '";
-    const currentLocalityId = "' . ($row['locality_id'] ?? '') . '";
+    let currentCityId = "' . ((int)($row['city_id'] ?? 0) ?: '') . '";
+    let currentLocalityId = "' . ((int)($row['locality_id'] ?? 0) ?: '') . '";
     
     let currentCountryId = "";
     let currentStateId = "";
     
     if (currentCityId) {
-        const city = cities.find(c => c.id == currentCityId);
+        const city = cities.find(c => String(c.id) === String(currentCityId));
         if (city) {
-            currentStateId = city.state_id;
-            const state = states.find(s => s.id == currentStateId);
-            if (state) currentCountryId = state.country_id;
+            currentStateId = String(city.state_id);
+            const state = states.find(s => String(s.id) === String(currentStateId));
+            if (state) currentCountryId = String(state.country_id);
         }
     }
     
-    if (countrySelect && currentCountryId) countrySelect.value = currentCountryId;
+    if (countrySelect && currentCountryId) {
+        countrySelect.value = currentCountryId;
+    }
     
     function updateStates() {
-        const cId = countrySelect.value;
+        if (!stateSelect) return;
+        const cId = countrySelect ? countrySelect.value : "";
         stateSelect.innerHTML = \'<option value="">-- Select State --</option>\';
         if (cId) {
-            states.filter(s => s.country_id == cId).forEach(s => {
+            states.filter(s => String(s.country_id) === String(cId)).forEach(s => {
                 const opt = new Option(s.name, s.id);
-                if (s.id == currentStateId) opt.selected = true;
+                if (String(s.id) === String(currentStateId)) opt.selected = true;
                 stateSelect.appendChild(opt);
             });
         }
@@ -757,12 +760,13 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     
     function updateCities() {
-        const sId = stateSelect.value;
+        if (!citySelect) return;
+        const sId = stateSelect ? stateSelect.value : "";
         citySelect.innerHTML = \'<option value="">-- Select City --</option>\';
         if (sId) {
-            cities.filter(c => c.state_id == sId).forEach(c => {
+            cities.filter(c => String(c.state_id) === String(sId)).forEach(c => {
                 const opt = new Option(c.name, c.id);
-                if (c.id == currentCityId) opt.selected = true;
+                if (String(c.id) === String(currentCityId)) opt.selected = true;
                 citySelect.appendChild(opt);
             });
         }
@@ -770,31 +774,60 @@ document.addEventListener("DOMContentLoaded", function() {
     }
     
     function updateLocalities() {
-        const cId = citySelect.value;
+        if (!localitySelect) return;
+        const cId = citySelect ? citySelect.value : "";
         localitySelect.innerHTML = \'<option value="">-- Select Locality --</option>\';
         if (cId) {
-            localities.filter(l => l.city_id == cId).forEach(loc => {
+            localities.filter(l => String(l.city_id) === String(cId)).forEach(loc => {
                 const opt = new Option(loc.name, loc.id);
                 opt.dataset.name = loc.name;
-                if (loc.id == currentLocalityId) opt.selected = true;
+                if (String(loc.id) === String(currentLocalityId)) opt.selected = true;
                 localitySelect.appendChild(opt);
             });
+        }
+        syncLocationArea();
+    }
+
+    function syncLocationArea() {
+        if (!localitySelect || !locationAreaInput) return;
+        const selectedOpt = localitySelect.options[localitySelect.selectedIndex];
+        if (selectedOpt && selectedOpt.value && selectedOpt.dataset.name) {
+            locationAreaInput.value = selectedOpt.dataset.name;
         }
     }
     
     if (countrySelect) {
-        countrySelect.addEventListener("change", () => { currentStateId = ""; updateStates(); });
-        stateSelect.addEventListener("change", () => { currentCityId = ""; updateCities(); });
-        citySelect.addEventListener("change", () => { currentLocalityId = ""; updateLocalities(); });
-        updateStates();
+        countrySelect.addEventListener("change", function() {
+            currentStateId = "";
+            currentCityId = "";
+            currentLocalityId = "";
+            updateStates();
+        });
+    }
+
+    if (stateSelect) {
+        stateSelect.addEventListener("change", function() {
+            currentStateId = this.value;
+            currentCityId = "";
+            currentLocalityId = "";
+            updateCities();
+        });
+    }
+
+    if (citySelect) {
+        citySelect.addEventListener("change", function() {
+            currentCityId = this.value;
+            currentLocalityId = "";
+            updateLocalities();
+        });
     }
     
     if (localitySelect) {
-        localitySelect.addEventListener("change", function() {
-            const selectedOpt = this.options[this.selectedIndex];
-            locationAreaInput.value = selectedOpt.value ? selectedOpt.dataset.name : "";
-        });
+        localitySelect.addEventListener("change", syncLocationArea);
     }
+
+    // Initialize dropdowns on page load
+    updateStates();
 });
 </script>'; 
 require __DIR__ . '/../includes/footer.php'; 
