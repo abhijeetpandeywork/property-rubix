@@ -8,6 +8,10 @@ $phone = $p['contact_phone'] ?: getSetting('phone_primary', '+91 98765 43210');
 $wa    = $p['whatsapp_number'] ?: getSetting('whatsapp_number', '919876543210');
 
 // Parse JSON arrays
+$bannerImages = !empty($p['banner_images']) ? json_decode($p['banner_images'], true) ?: [] : [];
+if (empty($bannerImages) && !empty($p['banner_image'])) {
+    $bannerImages = [$p['banner_image']];
+}
 $galleryImages = !empty($p['gallery_images']) ? json_decode($p['gallery_images'], true) ?: [] : [];
 if (empty($galleryImages)) {
     if ($p['banner_image']) $galleryImages[] = $p['banner_image'];
@@ -68,24 +72,25 @@ body {
 }
 @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
 
-/* --- Cinematic Hero --- */
+/* --- Cinematic Hero in HD --- */
 .luxury-hero-gallery {
     position: relative;
     width: 100%;
-    height: 90vh;
-    min-height: 600px;
-    background: #000;
+    height: 85vh;
+    min-height: 560px;
+    background: #0f172a;
     overflow: hidden;
 }
 .hero-swiper { width: 100%; height: 100%; }
 .hero-swiper .swiper-slide img {
-    width: 100%; height: 100%; object-fit: cover; opacity: 1; transition: transform 10s ease;
+    width: 100%; height: 100%; object-fit: cover; opacity: 1; image-rendering: -webkit-optimize-contrast;
+    transition: transform 10s cubic-bezier(0.25, 1, 0.5, 1);
 }
-.hero-swiper .swiper-slide-active img { transform: scale(1.05); }
+.hero-swiper .swiper-slide-active img { transform: scale(1.03); }
 
 .luxury-hero-gallery::after {
     content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 40%, rgba(0,0,0,0.9) 100%);
+    background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.05) 45%, rgba(0,0,0,0.78) 100%);
     z-index: 1; pointer-events: none;
 }
 
@@ -330,7 +335,11 @@ body {
 <div class="luxury-hero-gallery">
   <div class="swiper hero-swiper">
     <div class="swiper-wrapper">
-      <?php if (!empty($exteriorImages)): ?>
+      <?php if (!empty($bannerImages)): ?>
+          <?php foreach ($bannerImages as $img): ?>
+          <div class="swiper-slide"><img src="<?= upload($img) ?>" alt="<?= e($p['name']) ?>" loading="eager"></div>
+          <?php endforeach; ?>
+      <?php elseif (!empty($exteriorImages)): ?>
           <?php foreach ($exteriorImages as $img): ?>
           <div class="swiper-slide"><img src="<?= upload($img) ?>" alt="<?= e($p['name']) ?>"></div>
           <?php endforeach; ?>
@@ -364,10 +373,10 @@ body {
 
       <!-- Glassmorphic Core Stats Banner -->
       <div class="hero-stats-banner animate-fade-up delay-3">
-          <?php if (!empty($p['price_min'])): ?>
+          <?php if (!empty($p['price_display']) || !empty($p['price_min'])): ?>
           <div class="hero-stat-item">
               <div class="hero-stat-label">Starting Price</div>
-              <div class="hero-stat-val"><?= View::priceRange($p['price_min'], $p['price_max'], (bool)$p['price_on_request']) ?> <?= $p['price_on_request'] ? '' : '*' ?></div>
+              <div class="hero-stat-val"><?= View::priceRange($p['price_min'], $p['price_max'], (bool)$p['price_on_request'], $p['price_display'] ?? '') ?></div>
           </div>
           <?php endif; ?>
           
@@ -801,7 +810,7 @@ body {
             <p class="text-muted small mb-4">Request pricing details, a digital brochure, or schedule a priority site visit.</p>
 
             <div class="price-display">
-                <?= View::priceRange($p['price_min'], $p['price_max'], (bool)$p['price_on_request']) ?>
+                <?= View::priceRange($p['price_min'], $p['price_max'], (bool)$p['price_on_request'], $p['price_display'] ?? '') ?>
             </div>
 
             <button type="button" class="btn w-100 py-3 mb-3 fw-bold shadow-lg text-white" style="border-radius:12px; font-size:1.1rem; background: var(--pr-primary); border:none;" data-bs-toggle="modal" data-bs-target="#enquiryModal">

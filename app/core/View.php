@@ -5,9 +5,12 @@
 class View {
 
     /**
-     * Format price range for display.
+     * Format price range for display (supports custom text like ₹3.5 Cr, $1.2M, etc.).
      */
-    public static function priceRange(?float $min, ?float $max, bool $onRequest = false): string {
+    public static function priceRange(?float $min, ?float $max, bool $onRequest = false, ?string $display = null): string {
+        if (!empty($display) && trim($display) !== '') {
+            return htmlspecialchars(trim($display));
+        }
         if ($onRequest) return '<span class="text-primary fw-600">Price on Request</span>';
         if (!$min && !$max) return '<span class="text-muted">Price on Request</span>';
 

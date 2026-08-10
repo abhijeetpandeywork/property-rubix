@@ -6,8 +6,8 @@
 $img = !empty($p['thumbnail_image']) ? upload($p['thumbnail_image']) : (!empty($p['banner_image']) ? upload($p['banner_image']) : 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&q=70');
 
 $statusLabel = str_replace('_', ' ', ucfirst($p['status']));
-$priceStr = View::priceRange($p['price_min'], $p['price_max'], (bool)$p['price_on_request']);
-if ($priceStr !== 'Price on Request' && !str_contains($priceStr, '-')) {
+$priceStr = View::priceRange($p['price_min'], $p['price_max'], (bool)$p['price_on_request'], $p['price_display'] ?? null);
+if (empty($p['price_display']) && $priceStr !== 'Price on Request' && !str_contains($priceStr, '–') && !str_contains($priceStr, '-')) {
     $priceStr .= ' Onwards';
 }
 

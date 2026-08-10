@@ -48,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
             'status'           => $_POST['status'] ?? 'upcoming',
             'price_min'        => $_POST['price_min'] !== '' ? (float)$_POST['price_min'] : null,
             'price_max'        => $_POST['price_max'] !== '' ? (float)$_POST['price_max'] : null,
+            'price_display'    => trim($_POST['price_display'] ?? '') ?: null,
             'price_on_request' => isset($_POST['price_on_request']) ? 1 : 0,
             'unit_types'       => trim($_POST['unit_types']    ?? ''),
             'area_range'       => trim($_POST['area_range']    ?? ''),
@@ -91,14 +92,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
             $data['amenities'] = json_encode(array_values($amenitiesArr));
         }
 
-        // Handle single image uploads
-        if (!empty($_POST['delete_banner_image'])) {
-            $data['banner_image'] = null;
+        // Handle single and multiple banner image uploads
+        $existingBanners = $id && !empty($row['banner_images']) ? json_decode($row['banner_images'], true) : [];
+        if (!is_array($existingBanners)) $existingBanners = [];
+        if (empty($existingBanners) && !empty($row['banner_image'])) {
+            $existingBanners = [$row['banner_image']];
         }
-        if (!empty($_FILES['banner_image']['name'])) {
-            $up = uploadImage($_FILES['banner_image'], 'projects');
-            if ($up['success']) $data['banner_image'] = $up['path'];
-            else $errors[] = 'Banner: ' . $up['error'];
+
+        $deleteBanners = $_POST['delete_banner_images'] ?? [];
+        if (!empty($deleteBanners)) {
+            $existingBanners = array_values(array_filter($existingBanners, fn($img) => !in_array($img, $deleteBanners)));
+        }
+
+        $newBanners = $processMultiUpload('banner_images', 'projects/banners');
+        if ($newBanners || isset($_POST['delete_banner_images'])) {
+            $allBanners = array_merge($existingBanners, $newBanners);
+            $data['banner_images'] = json_encode($allBanners);
+            $data['banner_image']  = !empty($allBanners[0]) ? $allBanners[0] : null;
+        } elseif (!empty($existingBanners)) {
+            $data['banner_images'] = json_encode($existingBanners);
+            $data['banner_image']  = $existingBanners[0];
         }
 
         if (!empty($_POST['delete_thumbnail_image'])) {
@@ -405,21 +418,32 @@ require __DIR__ . '/../includes/header.php';
 
       <!-- Pricing -->
       <div class="adm-card">
-        <div class="adm-card-title">Pricing</div>
+        <div class="adm-card-title">Pricing & Units</div>
         <div class="row g-3">
-          <div class="col-md-4">
-            <label class="adm-form-label">Min Price (₹)</label>
-            <input type="number" name="price_min" class="form-control" value="<?= htmlspecialchars($row['price_min'] ?? '') ?>">
+          <div class="col-12">
+            <label class="adm-form-label fw-bold text-primary">Custom Price Display Text (Recommended)</label>
+            <input type="text" name="price_display" class="form-control" value="<?= htmlspecialchars($row['price_display'] ?? '') ?>" placeholder="e.g. ₹3.5 Cr – ₹5.2 Cr, ₹85 Lakh Onwards, $1.2M – $2.5M, 2.5M AED, Price on Request">
+            <small class="text-muted">Type any currency, units (Cr, Lakh, $, AED) or custom text. If entered, this exact text will display on the website.</small>
           </div>
           <div class="col-md-4">
-            <label class="adm-form-label">Max Price (₹)</label>
-            <input type="number" name="price_max" class="form-control" value="<?= htmlspecialchars($row['price_max'] ?? '') ?>">
+            <label class="adm-form-label">Min Price (Numeric ₹ for sorting/filters)</label>
+            <input type="number" name="price_min" class="form-control" value="<?= htmlspecialchars($row['price_min'] ?? '') ?>" placeholder="e.g. 35000000">
+          </div>
+          <div class="col-md-4">
+            <label class="adm-form-label">Max Price (Numeric ₹ for sorting/filters)</label>
+            <input type="number" name="price_max" class="form-control" value="<?= htmlspecialchars($row['price_max'] ?? '') ?>" placeholder="e.g. 52000000">
+          </div>
+          <div class="col-md-4">
+            <div class="form-check mt-4 pt-2">
+              <input class="form-check-input" type="checkbox" name="price_on_request" id="por" <?= !empty($row['price_on_request']) ? 'checked' : '' ?>>
+              <label class="form-check-label fw-600" for="por">Price on Request</label>
+            </div>
           </div>
           <div class="col-md-4">
             <label class="adm-form-label">Unit Types</label>
             <input type="text" name="unit_types" class="form-control" value="<?= htmlspecialchars($row['unit_types'] ?? '') ?>" placeholder="2BHK, 3BHK">
           </div>
-          <div class="col-md-6">
+          <div class="col-md-4">
             <label class="adm-form-label">Area Range</label>
             <input type="text" name="area_range" class="form-control" value="<?= htmlspecialchars($row['area_range'] ?? '') ?>" placeholder="850–2200 sq.ft.">
           </div>
@@ -430,12 +454,6 @@ require __DIR__ . '/../includes/header.php';
           <div class="col-md-4">
             <label class="adm-form-label">Total Units</label>
             <input type="number" name="total_units" class="form-control" value="<?= htmlspecialchars($row['total_units'] ?? '') ?>" placeholder="e.g. 500">
-          </div>
-          <div class="col-md-4">
-            <div class="form-check mt-4">
-              <input class="form-check-input" type="checkbox" name="price_on_request" id="por" <?= !empty($row['price_on_request']) ? 'checked' : '' ?>>
-              <label class="form-check-label" for="por">Price on Request</label>
-            </div>
           </div>
         </div>
       </div>
@@ -606,16 +624,28 @@ require __DIR__ . '/../includes/header.php';
           <input type="file" name="project_logo" class="form-control" accept="image/*">
         </div>
         <div class="mb-3">
-          <label class="adm-form-label">Banner Image</label>
-          <?php if (!empty($row['banner_image'])): ?>
-          <div class="mb-2">
-            <img src="<?= upload($row['banner_image']) ?>" class="img-fluid rounded" style="height:80px;object-fit:cover">
-            <label style="font-size:12px;cursor:pointer;display:block;margin-top:4px;">
-              <input type="checkbox" name="delete_banner_image" value="1"> Delete Image
-            </label>
+          <label class="adm-form-label fw-bold text-primary">Hero Banner Images (Multiple HD)</label>
+          <?php 
+          $bArr = !empty($row['banner_images']) ? json_decode($row['banner_images'], true) : [];
+          if (!is_array($bArr)) $bArr = [];
+          if (empty($bArr) && !empty($row['banner_image'])) {
+              $bArr = [$row['banner_image']];
+          }
+          if (!empty($bArr)):
+          ?>
+          <div class="d-flex flex-wrap gap-2 mb-2 p-2 bg-light rounded border">
+            <?php foreach ($bArr as $bi): ?>
+            <div class="text-center p-1 bg-white rounded border shadow-sm">
+              <img src="<?= upload($bi) ?>" style="height:65px;width:105px;object-fit:cover;border-radius:4px;display:block;margin-bottom:4px;">
+              <label style="font-size:11px;cursor:pointer;color:#dc2626;" class="d-block mb-0">
+                 <input type="checkbox" name="delete_banner_images[]" value="<?= htmlspecialchars($bi) ?>"> Delete
+              </label>
+            </div>
+            <?php endforeach; ?>
           </div>
           <?php endif; ?>
-          <input type="file" name="banner_image" class="form-control" accept="image/*">
+          <input type="file" name="banner_images[]" class="form-control" accept="image/*" multiple>
+          <small class="text-muted">Upload one or multiple high-definition (HD 1920x1080) hero banner images. These display in the project details hero banner.</small>
         </div>
         <div class="mb-3">
           <label class="adm-form-label">Thumbnail</label>
