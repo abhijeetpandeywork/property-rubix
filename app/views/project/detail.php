@@ -354,6 +354,66 @@ body {
 }
 .fp-master-link:hover .fp-master-overlay { opacity: 1; }
 .fp-master-overlay span { font-size: 0.9rem; font-weight: 600; letter-spacing: 1px; }
+
+/* --- Lightbox Modal Styles --- */
+.pr-lightbox-modal {
+    position: fixed; inset: 0; z-index: 99999;
+    background: rgba(10, 15, 29, 0.95);
+    backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    display: none; opacity: 0; transition: opacity 0.3s ease;
+    align-items: center; justify-content: center; flex-direction: column;
+    user-select: none;
+}
+.pr-lightbox-modal.active { display: flex; opacity: 1; }
+.pr-lightbox-toolbar {
+    position: absolute; top: 0; left: 0; right: 0; padding: 20px 30px;
+    display: flex; align-items: center; justify-content: space-between;
+    color: #fff; z-index: 100001; background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, transparent 100%);
+}
+.pr-lightbox-counter { font-size: 0.95rem; font-weight: 600; color: rgba(255,255,255,0.75); letter-spacing: 1px; }
+.pr-lightbox-actions { display: flex; align-items: center; gap: 15px; }
+.pr-lightbox-btn {
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
+    color: #fff; width: 44px; height: 44px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem; cursor: pointer; transition: all 0.25s ease;
+    text-decoration: none;
+}
+.pr-lightbox-btn:hover { background: var(--pr-primary, #b08d55); color: #fff; border-color: var(--pr-primary, #b08d55); transform: scale(1.08); }
+.pr-lightbox-body {
+    position: relative; max-width: 92vw; max-height: 82vh;
+    display: flex; align-items: center; justify-content: center;
+}
+.pr-lightbox-img {
+    max-width: 92vw; max-height: 80vh; object-fit: contain;
+    border-radius: 8px; box-shadow: 0 25px 60px rgba(0,0,0,0.5);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+}
+.pr-lightbox-nav {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
+    color: #fff; width: 54px; height: 54px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem; cursor: pointer; transition: all 0.25s ease;
+    z-index: 100001;
+}
+.pr-lightbox-nav:hover { background: var(--pr-primary, #b08d55); border-color: var(--pr-primary, #b08d55); transform: translateY(-50%) scale(1.1); }
+.pr-lightbox-prev { left: 30px; }
+.pr-lightbox-next { right: 30px; }
+.pr-lightbox-caption {
+    position: absolute; bottom: 25px; left: 50%; transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(10px);
+    padding: 10px 24px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.2);
+    color: #fff; font-size: 0.95rem; font-weight: 600; text-align: center;
+    max-width: 80%; text-shadow: 0 1px 3px rgba(0,0,0,0.5); z-index: 100001;
+}
+.cursor-pointer { cursor: pointer !important; }
+@media (max-width: 768px) {
+    .pr-lightbox-prev { left: 10px; width: 44px; height: 44px; font-size: 1.2rem; }
+    .pr-lightbox-next { right: 10px; width: 44px; height: 44px; font-size: 1.2rem; }
+    .pr-lightbox-toolbar { padding: 15px; }
+    .pr-lightbox-caption { bottom: 15px; font-size: 0.85rem; padding: 8px 18px; }
+}
 </style>
 
 <!-- 2. Custom Project Header (Image 2) -->
@@ -396,15 +456,15 @@ body {
     <div class="swiper-wrapper">
       <?php if (!empty($bannerImages)): ?>
           <?php foreach ($bannerImages as $img): ?>
-          <div class="swiper-slide"><img src="<?= upload($img) ?>" alt="<?= e($p['name']) ?>" loading="eager"></div>
+          <div class="swiper-slide cursor-pointer" data-lightbox="gallery" data-src="<?= upload($img) ?>" data-title="<?= e($p['name']) ?> - Banner View"><img src="<?= upload($img) ?>" alt="<?= e($p['name']) ?>" loading="eager"></div>
           <?php endforeach; ?>
       <?php elseif (!empty($exteriorImages)): ?>
           <?php foreach ($exteriorImages as $img): ?>
-          <div class="swiper-slide"><img src="<?= upload($img) ?>" alt="<?= e($p['name']) ?>"></div>
+          <div class="swiper-slide cursor-pointer" data-lightbox="gallery" data-src="<?= upload($img) ?>" data-title="<?= e($p['name']) ?> - Exterior View"><img src="<?= upload($img) ?>" alt="<?= e($p['name']) ?>"></div>
           <?php endforeach; ?>
       <?php elseif (!empty($galleryImages)): ?>
           <?php foreach ($galleryImages as $img): ?>
-          <div class="swiper-slide"><img src="<?= upload($img) ?>" alt="<?= e($p['name']) ?>"></div>
+          <div class="swiper-slide cursor-pointer" data-lightbox="gallery" data-src="<?= upload($img) ?>" data-title="<?= e($p['name']) ?> - Gallery View"><img src="<?= upload($img) ?>" alt="<?= e($p['name']) ?>"></div>
           <?php endforeach; ?>
       <?php else: ?>
           <div class="swiper-slide"><img src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=2075&auto=format&fit=crop" alt="Default Hero"></div>
@@ -632,7 +692,7 @@ body {
             <div class="tab-pane fade show active" id="tab-ext" role="tabpanel">
                 <div class="fp-grid">
                     <?php foreach ($exteriorImages as $img): ?>
-                    <div class="fp-item"><a href="<?= upload($img) ?>" target="_blank"><img src="<?= upload($img) ?>" alt="Exterior"><div class="fp-overlay"><i class="fas fa-search-plus fa-2x text-white"></i></div></a></div>
+                    <div class="fp-item"><a href="<?= upload($img) ?>" data-lightbox="gallery" data-title="Exterior View - <?= e($p['name']) ?>"><img src="<?= upload($img) ?>" alt="Exterior"><div class="fp-overlay"><i class="fas fa-search-plus fa-2x text-white"></i></div></a></div>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -642,7 +702,7 @@ body {
             <div class="tab-pane fade <?= empty($exteriorImages) ? 'show active' : '' ?>" id="tab-int" role="tabpanel">
                 <div class="fp-grid">
                     <?php foreach ($interiorImages as $img): ?>
-                    <div class="fp-item"><a href="<?= upload($img) ?>" target="_blank"><img src="<?= upload($img) ?>" alt="Interior"><div class="fp-overlay"><i class="fas fa-search-plus fa-2x text-white"></i></div></a></div>
+                    <div class="fp-item"><a href="<?= upload($img) ?>" data-lightbox="gallery" data-title="Interior View - <?= e($p['name']) ?>"><img src="<?= upload($img) ?>" alt="Interior"><div class="fp-overlay"><i class="fas fa-search-plus fa-2x text-white"></i></div></a></div>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -652,7 +712,7 @@ body {
             <div class="tab-pane fade show active" id="tab-gal" role="tabpanel">
                 <div class="fp-grid">
                     <?php foreach ($galleryImages as $img): ?>
-                    <div class="fp-item"><a href="<?= upload($img) ?>" target="_blank"><img src="<?= upload($img) ?>" alt="Gallery"><div class="fp-overlay"><i class="fas fa-search-plus fa-2x text-white"></i></div></a></div>
+                    <div class="fp-item"><a href="<?= upload($img) ?>" data-lightbox="gallery" data-title="Project Gallery - <?= e($p['name']) ?>"><img src="<?= upload($img) ?>" alt="Gallery"><div class="fp-overlay"><i class="fas fa-search-plus fa-2x text-white"></i></div></a></div>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -679,7 +739,7 @@ body {
                   <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden bg-white hover-shadow transition" style="border: 1px solid #eaeaea !important;">
                     <?php if ($img): ?>
                       <div class="position-relative overflow-hidden bg-light text-center border-bottom" style="height: 220px;">
-                        <a href="<?= $img ?>" target="_blank" title="<?= e($title ?: $config ?: 'Floor Plan') ?>">
+                        <a href="<?= $img ?>" data-lightbox="gallery" data-title="<?= e($title ?: ($config ? $config . ' Floor Plan' : 'Floor Plan')) ?><?= $area ? ' (' . e($area) . ')' : '' ?>">
                           <img src="<?= $img ?>" alt="<?= e($title ?: $config ?: 'Floor Plan') ?>" class="w-100 h-100" style="object-fit: contain; padding: 12px;" loading="lazy">
                           <div class="position-absolute top-0 end-0 m-2 bg-dark bg-opacity-75 text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width:36px; height:36px;">
                             <i class="fas fa-search-plus"></i>
@@ -708,7 +768,7 @@ body {
 
                       <div class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center gap-2">
                         <?php if ($img): ?>
-                          <a href="<?= $img ?>" target="_blank" class="btn btn-sm btn-outline-secondary flex-grow-1"><i class="fas fa-eye me-1"></i>Enlarge</a>
+                          <a href="<?= $img ?>" data-lightbox="gallery" data-title="<?= e($title ?: ($config ? $config . ' Floor Plan' : 'Floor Plan')) ?><?= $area ? ' (' . e($area) . ')' : '' ?>" class="btn btn-sm btn-outline-secondary flex-grow-1"><i class="fas fa-eye me-1"></i>Enlarge Plan</a>
                         <?php endif; ?>
 
                         <?php if ($modalTarget): ?>
@@ -824,7 +884,7 @@ body {
             <?php endif; ?>
 
             <?php if (!empty($masterPlanImg)): ?>
-              <a href="<?= upload($masterPlanImg) ?>" target="_blank" class="fp-master-link d-block position-relative rounded overflow-hidden text-center border">
+              <a href="<?= upload($masterPlanImg) ?>" data-lightbox="gallery" data-title="<?= e($masterPlanLabel) ?> - <?= e($p['name']) ?>" class="fp-master-link d-block position-relative rounded overflow-hidden text-center border">
                 <img src="<?= upload($masterPlanImg) ?>" alt="<?= e($masterPlanLabel) ?>" class="fp-master-img img-fluid" style="max-height:500px; width:100%; object-fit:contain; background:#fafafa; padding:10px;" loading="lazy">
                 <div class="fp-master-overlay"><i class="fas fa-search-plus fa-2x mb-2 text-white"></i><span class="d-block text-white fw-bold">View Full Master Plan</span></div>
               </a>
@@ -882,7 +942,7 @@ body {
                   <div class="vt-box p-3 bg-white rounded-3 border shadow-sm">
                       <div class="vt-title fw-bold text-dark mb-3"><i class="fas fa-map text-primary me-2"></i> Plot / Master Plan</div>
                       <div class="vt-img-wrap rounded-3 overflow-hidden shadow-sm" style="aspect-ratio: 16/9;">
-                          <a href="<?= upload($floorPlanImages[0]) ?>" target="_blank" class="fp-item-override">
+                          <a href="<?= upload($floorPlanImages[0]) ?>" data-lightbox="gallery" data-title="Plot / Master Plan - <?= e($p['name']) ?>" class="fp-item-override">
                               <img src="<?= upload($floorPlanImages[0]) ?>" alt="Plot Tour" style="width:100%; height:100%; object-fit:cover;">
                               <i class="fas fa-search-plus vt-mag-icon"></i>
                           </a>
@@ -898,7 +958,7 @@ body {
                   <div class="vt-box p-3 bg-white rounded-3 border shadow-sm">
                       <div class="vt-title fw-bold text-dark mb-3"><i class="fas fa-layer-group text-primary me-2"></i> Master Layout</div>
                       <div class="vt-img-wrap rounded-3 overflow-hidden shadow-sm" style="aspect-ratio: 16/9;">
-                          <a href="<?= upload($floorPlanImages[1]) ?>" target="_blank" class="fp-item-override">
+                          <a href="<?= upload($floorPlanImages[1]) ?>" data-lightbox="gallery" data-title="Master Layout - <?= e($p['name']) ?>" class="fp-item-override">
                               <img src="<?= upload($floorPlanImages[1]) ?>" alt="Master Layout" style="width:100%; height:100%; object-fit:cover;">
                               <i class="fas fa-search-plus vt-mag-icon"></i>
                           </a>
@@ -1107,7 +1167,7 @@ body {
                 ?>
                 
                 <?php if ($qrCodeUrl): ?>
-                <div class="mb-3 d-inline-block p-2 bg-white rounded-3 shadow-sm border">
+                <div class="mb-3 d-inline-block p-2 bg-white rounded-3 shadow-sm border cursor-pointer" data-lightbox="gallery" data-src="<?= e($qrCodeUrl) ?>" data-title="RERA QR Code - <?= e($p['name']) ?>">
                     <img src="<?= e($qrCodeUrl) ?>" alt="RERA QR Code" style="width:160px; height:160px; object-fit:contain; display:block;">
                 </div>
                 <?php endif; ?>
@@ -1301,6 +1361,125 @@ document.getElementById("projectEnquiryForm")?.addEventListener("submit", async 
   }
   finally { btn.disabled = false; btn.innerHTML = 'Submit Enquiry'; }
 });
+
+// Interactive Lightbox Controller
+(function() {
+    let lightboxItems = [];
+    let currentIndex = 0;
+
+    const modal = document.createElement('div');
+    modal.className = 'pr-lightbox-modal';
+    modal.id = 'prLightboxModal';
+    modal.innerHTML = `
+        <div class="pr-lightbox-toolbar">
+            <div class="pr-lightbox-counter" id="prLightboxCounter">1 / 1</div>
+            <div class="pr-lightbox-actions">
+                <a href="#" id="prLightboxDownload" target="_blank" download class="pr-lightbox-btn" title="Download Image"><i class="fas fa-download"></i></a>
+                <button type="button" class="pr-lightbox-btn" id="prLightboxClose" title="Close (Esc)"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <button type="button" class="pr-lightbox-nav pr-lightbox-prev" id="prLightboxPrev" title="Previous (Left Arrow)"><i class="fas fa-chevron-left"></i></button>
+        <div class="pr-lightbox-body">
+            <img src="" alt="" class="pr-lightbox-img" id="prLightboxImg">
+        </div>
+        <button type="button" class="pr-lightbox-nav pr-lightbox-next" id="prLightboxNext" title="Next (Right Arrow)"><i class="fas fa-chevron-right"></i></button>
+        <div class="pr-lightbox-caption" id="prLightboxCaption"></div>
+    `;
+    document.body.appendChild(modal);
+
+    const imgEl = modal.querySelector('#prLightboxImg');
+    const counterEl = modal.querySelector('#prLightboxCounter');
+    const captionEl = modal.querySelector('#prLightboxCaption');
+    const downloadEl = modal.querySelector('#prLightboxDownload');
+
+    function openLightbox(index) {
+        if (lightboxItems.length === 0) return;
+        currentIndex = (index + lightboxItems.length) % lightboxItems.length;
+        updateLightbox();
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function updateLightbox() {
+        const item = lightboxItems[currentIndex];
+        if (!item) return;
+
+        imgEl.style.opacity = '0';
+        imgEl.style.transform = 'scale(0.95)';
+
+        setTimeout(() => {
+            imgEl.src = item.src;
+            imgEl.alt = item.title || 'Image View';
+            counterEl.textContent = `${currentIndex + 1} / ${lightboxItems.length}`;
+            captionEl.textContent = item.title || '';
+            captionEl.style.display = item.title ? 'block' : 'none';
+            downloadEl.href = item.src;
+
+            imgEl.onload = () => {
+                imgEl.style.opacity = '1';
+                imgEl.style.transform = 'scale(1)';
+            };
+            imgEl.style.opacity = '1';
+            imgEl.style.transform = 'scale(1)';
+        }, 120);
+    }
+
+    function initLightboxTriggers() {
+        lightboxItems = [];
+        const triggers = Array.from(document.querySelectorAll('[data-lightbox="gallery"]'));
+
+        triggers.forEach((el) => {
+            const src = el.getAttribute('data-src') || el.getAttribute('href') || el.querySelector('img')?.src;
+            const title = el.getAttribute('data-title') || el.getAttribute('title') || el.querySelector('img')?.alt || '';
+
+            if (src && !src.startsWith('#') && !src.includes('javascript:')) {
+                const itemIndex = lightboxItems.length;
+                lightboxItems.push({ src, title });
+
+                el.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    openLightbox(itemIndex);
+                });
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initLightboxTriggers();
+
+        document.getElementById('prLightboxClose')?.addEventListener('click', closeLightbox);
+        document.getElementById('prLightboxPrev')?.addEventListener('click', () => openLightbox(currentIndex - 1));
+        document.getElementById('prLightboxNext')?.addEventListener('click', () => openLightbox(currentIndex + 1));
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal || e.target.classList.contains('pr-lightbox-body')) {
+                closeLightbox();
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (!modal.classList.contains('active')) return;
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') openLightbox(currentIndex - 1);
+            if (e.key === 'ArrowRight') openLightbox(currentIndex + 1);
+        });
+
+        // Touch Swipe on mobile
+        let touchStartX = 0;
+        modal.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].screenX; }, {passive: true});
+        modal.addEventListener('touchend', (e) => {
+            const touchEndX = e.changedTouches[0].screenX;
+            if (touchStartX - touchEndX > 50) openLightbox(currentIndex + 1);
+            if (touchEndX - touchStartX > 50) openLightbox(currentIndex - 1);
+        }, {passive: true});
+    });
+})();
 </script>
 <?php
 $extraScripts = ob_get_clean();
