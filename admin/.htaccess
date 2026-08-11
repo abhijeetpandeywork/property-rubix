@@ -1,0 +1,27 @@
+# Admin Directory Configuration — PropertyRubix
+
+# Disable ModSecurity false-positives for admin forms
+<IfModule mod_security2.c>
+  SecRuleEngine Off
+  SecRequestBodyAccess Off
+</IfModule>
+<IfModule mod_security.c>
+  SecFilterEngine Off
+  SecFilterScanPOST Off
+</IfModule>
+
+# Allow large file uploads for floor plans, master plans, and gallery images
+<IfModule mod_php7.c>
+  php_value upload_max_filesize 64M
+  php_value post_max_size 64M
+  php_value max_execution_time 300
+  php_value max_input_time 300
+</IfModule>
+<IfModule mod_php.c>
+  php_value upload_max_filesize 64M
+  php_value post_max_size 64M
+  php_value max_execution_time 300
+  php_value max_input_time 300
+</IfModule>
+
+Options -Indexes

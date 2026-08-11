@@ -47,7 +47,7 @@ jobs:
             DB_NAME=${{ secrets.DB_NAME }}
             DB_USER=${{ secrets.DB_USER }}
             DB_PASS=${{ secrets.DB_PASS }}
-            BASE_URL=http://property.digitalrubix.site/
+            BASE_URL=https://property.digitalrubix.site/
             APP_ENV=production
             EOF
             

@@ -444,7 +444,7 @@ require __DIR__ . '/../includes/header.php';
 <div class="alert alert-danger"><ul class="mb-0"><?php foreach ($errors as $e): ?><li><?= htmlspecialchars($e) ?></li><?php endforeach; ?></ul></div>
 <?php endif; ?>
 
-<form method="post" enctype="multipart/form-data" class="adm-form" novalidate>
+<form method="post" action="?action=<?= htmlspecialchars($action) ?><?= $id ? '&id=' . $id : '' ?>" enctype="multipart/form-data" class="adm-form" novalidate>
   <?= csrfField() ?>
   <div class="row g-4">
     <div class="col-lg-8">
