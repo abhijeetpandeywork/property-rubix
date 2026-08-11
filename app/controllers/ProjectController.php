@@ -28,7 +28,11 @@ class ProjectController extends Controller {
             }
         }
 
-        if ($q)      { $where[] = '(p.name LIKE ? OR p.address LIKE ? OR b.name LIKE ? OR p.unit_types LIKE ?)'; $args = array_merge($args, ["%$q%","%$q%","%$q%","%$q%"]); }
+        if ($q) {
+            // Search across project name, address, builder, unit types, city, state, locality
+            $where[] = '(p.name LIKE ? OR p.address LIKE ? OR b.name LIKE ? OR p.unit_types LIKE ? OR c.name LIKE ? OR s.name LIKE ? OR l.name LIKE ?)';
+            $args = array_merge($args, ["%$q%","%$q%","%$q%","%$q%","%$q%","%$q%","%$q%"]);
+        }
         if ($type)   { $where[] = 'p.type = ?';     $args[] = $type; }
         if ($status) { $where[] = 'p.status = ?';   $args[] = $status; }
         if ($cityId) { $where[] = 'p.city_id = ?';  $args[] = $cityId; }
@@ -58,7 +62,12 @@ class ProjectController extends Controller {
         $whereStr = implode(' AND ', $where);
 
         $totalStmt = $pdo->prepare(
-            "SELECT COUNT(*) FROM projects p LEFT JOIN builders b ON b.id=p.builder_id WHERE $whereStr"
+            "SELECT COUNT(*) FROM projects p
+             LEFT JOIN builders b    ON b.id = p.builder_id
+             LEFT JOIN cities c      ON c.id = p.city_id
+             LEFT JOIN states s      ON s.id = c.state_id
+             LEFT JOIN localities l  ON l.id = p.locality_id
+             WHERE $whereStr"
         );
         $totalStmt->execute($args);
         $total = (int)$totalStmt->fetchColumn();
@@ -69,10 +78,11 @@ class ProjectController extends Controller {
         $projects = $pdo->prepare(
             "SELECT p.*, b.name AS builder_name, c.name AS city_name, s.name AS state_name, co.name AS country_name
              FROM projects p
-             LEFT JOIN builders b  ON b.id = p.builder_id
-             LEFT JOIN cities c    ON c.id = p.city_id
-             LEFT JOIN states s    ON s.id = c.state_id
-             LEFT JOIN countries co ON co.id = s.country_id
+             LEFT JOIN builders b    ON b.id = p.builder_id
+             LEFT JOIN cities c      ON c.id = p.city_id
+             LEFT JOIN states s      ON s.id = c.state_id
+             LEFT JOIN countries co  ON co.id = s.country_id
+             LEFT JOIN localities l  ON l.id = p.locality_id
              WHERE $whereStr ORDER BY $orderBy LIMIT ? OFFSET ?"
         );
         $projects->execute($args2);
