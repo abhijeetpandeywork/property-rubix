@@ -42,26 +42,6 @@ if (empty($sliders)) {
             <!-- Content injected by JS -->
         </div>
       </div>
-
-      <!-- BHK Quick Filter Pills -->
-      <div class="mt-4 d-flex flex-wrap justify-content-center gap-2" style="max-width:700px; margin:0 auto;">
-        <span class="text-white-50 fw-500 me-1 d-flex align-items-center" style="font-size:0.88rem;"><i class="fas fa-bed me-1"></i> Quick Filter:</span>
-        <?php
-        $bhkPills = [
-            'studio' => '🛋️ Studio',
-            '1'      => '🏠 1 BHK',
-            '2'      => '🏡 2 BHK',
-            '3'      => '🏘️ 3 BHK',
-            '4'      => '🏰 4 BHK',
-            '5'      => '🏯 5 BHK',
-        ];
-        foreach ($bhkPills as $val => $label):
-        ?>
-        <a href="<?= PUBLIC_URL ?>projects?bhk=<?= urlencode($val) ?>"
-           class="bhk-pill"
-           title="Browse <?= $label ?> Projects"><?= $label ?></a>
-        <?php endforeach; ?>
-      </div>
       
       <div class="my-4 text-white fw-bold" style="font-size: 1.4rem; text-shadow: 0 2px 4px rgba(0,0,0,0.6);">OR</div>
       
