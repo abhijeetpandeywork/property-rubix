@@ -768,7 +768,7 @@ body {
 
                       <div class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center gap-2">
                         <?php if ($img): ?>
-                          <a href="<?= $img ?>" data-lightbox="gallery" data-title="<?= e($title ?: ($config ? $config . ' Floor Plan' : 'Floor Plan')) ?><?= $area ? ' (' . e($area) . ')' : '' ?>" class="btn btn-sm btn-outline-secondary flex-grow-1"><i class="fas fa-eye me-1"></i>Enlarge Plan</a>
+                          <a href="<?= $img ?>" data-lightbox="gallery" data-title="<?= e($title ?: ($config ? $config . ' Floor Plan' : 'Floor Plan')) ?><?= $area ? ' (' . e($area) . ')' : '' ?>" class="btn btn-sm btn-outline-secondary flex-grow-1"><i class="fas fa-eye me-1"></i>Preview</a>
                         <?php endif; ?>
 
                         <?php if ($modalTarget): ?>
@@ -870,25 +870,47 @@ body {
             </div>
           <?php endif; ?>
 
-          <?php if (!empty($masterPlanImg) || !empty($masterPlanPdf) || !empty($masterPlanDesc)): ?>
-          <div class="fp-master-wrap mt-5 p-4 bg-white rounded-3 border shadow-sm">
-            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-              <div class="fp-master-badge mb-0" style="font-size:1.1rem; font-weight:700;"><i class="fas fa-map me-2 text-primary"></i><?= e($masterPlanLabel) ?></div>
-              <?php if (!empty($masterPlanPdf)): ?>
-                <a href="<?= upload($masterPlanPdf) ?>" target="_blank" class="btn btn-sm btn-danger rounded-pill px-3 fw-bold"><i class="fas fa-file-pdf me-1"></i> Download Master Plan Layout PDF</a>
+          <?php
+          $masterPlans = !empty($p['master_plans_json']) ? json_decode($p['master_plans_json'], true) : [];
+          if (!is_array($masterPlans)) $masterPlans = [];
+          if (empty($masterPlans) && (!empty($masterPlanImg) || !empty($masterPlanPdf) || !empty($masterPlanDesc))) {
+              $masterPlans[] = [
+                  'label'       => $masterPlanLabel ?: 'Master Plan',
+                  'description' => $masterPlanDesc,
+                  'image'       => $masterPlanImg,
+                  'pdf'         => $masterPlanPdf,
+              ];
+          }
+          ?>
+
+          <?php if (!empty($masterPlans)): ?>
+          <div class="mt-5 d-flex flex-column gap-4">
+            <?php foreach ($masterPlans as $mpIdx => $mpItem): 
+                $mpImg  = !empty($mpItem['image']) ? upload($mpItem['image']) : '';
+                $mpPdf  = !empty($mpItem['pdf']) ? upload($mpItem['pdf']) : '';
+                $mpLbl  = trim($mpItem['label'] ?? '') ?: 'Master Plan';
+                $mpDesc = trim($mpItem['description'] ?? '');
+            ?>
+            <div class="fp-master-wrap p-4 bg-white rounded-3 border shadow-sm">
+              <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+                <div class="fp-master-badge mb-0" style="font-size:1.1rem; font-weight:700;"><i class="fas fa-map me-2 text-primary"></i><?= e($mpLbl) ?></div>
+                <?php if (!empty($mpPdf)): ?>
+                  <a href="<?= e($mpPdf) ?>" target="_blank" class="btn btn-sm btn-danger rounded-pill px-3 fw-bold"><i class="fas fa-file-pdf me-1"></i> Download <?= e($mpLbl) ?> Layout PDF</a>
+                <?php endif; ?>
+              </div>
+
+              <?php if (!empty($mpDesc)): ?>
+                <p class="text-muted small mb-3"><?= nl2br(e($mpDesc)) ?></p>
+              <?php endif; ?>
+
+              <?php if (!empty($mpImg)): ?>
+                <a href="<?= e($mpImg) ?>" data-lightbox="gallery" data-title="<?= e($mpLbl) ?> - <?= e($p['name']) ?>" class="fp-master-link d-block position-relative rounded overflow-hidden text-center border">
+                  <img src="<?= e($mpImg) ?>" alt="<?= e($mpLbl) ?>" class="fp-master-img img-fluid" style="max-height:500px; width:100%; object-fit:contain; background:#fafafa; padding:10px;" loading="lazy">
+                  <div class="fp-master-overlay"><i class="fas fa-search-plus fa-2x mb-2 text-white"></i><span class="d-block text-white fw-bold">View Full <?= e($mpLbl) ?></span></div>
+                </a>
               <?php endif; ?>
             </div>
-
-            <?php if (!empty($masterPlanDesc)): ?>
-              <p class="text-muted small mb-3"><?= nl2br(e($masterPlanDesc)) ?></p>
-            <?php endif; ?>
-
-            <?php if (!empty($masterPlanImg)): ?>
-              <a href="<?= upload($masterPlanImg) ?>" data-lightbox="gallery" data-title="<?= e($masterPlanLabel) ?> - <?= e($p['name']) ?>" class="fp-master-link d-block position-relative rounded overflow-hidden text-center border">
-                <img src="<?= upload($masterPlanImg) ?>" alt="<?= e($masterPlanLabel) ?>" class="fp-master-img img-fluid" style="max-height:500px; width:100%; object-fit:contain; background:#fafafa; padding:10px;" loading="lazy">
-                <div class="fp-master-overlay"><i class="fas fa-search-plus fa-2x mb-2 text-white"></i><span class="d-block text-white fw-bold">View Full Master Plan</span></div>
-              </a>
-            <?php endif; ?>
+            <?php endforeach; ?>
           </div>
           <?php endif; ?>
         </div>
@@ -918,7 +940,6 @@ body {
                       <div class="vt-img-wrap rounded-3 overflow-hidden shadow-sm" style="aspect-ratio: 16/9; background:#000;">
                           <iframe src="<?= e($embedVideoUrl) ?>" title="<?= e($p['name']) ?> Video Tour" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="width:100%; height:100%; border:0;"></iframe>
                       </div>
-                      <button type="button" class="vt-btn w-100 mt-3" data-bs-toggle="modal" data-bs-target="#enquiryModal">Request High-Res Video</button>
                   </div>
               </div>
               <?php endif; ?>
@@ -1183,7 +1204,13 @@ body {
                 </p>
                 <?php endif; ?>
                 
-                <p class="mt-4 text-muted" style="font-size:0.75rem; line-height:1.5;">The content presented on this website is solely for informational purposes and does not constitute a service offer.... <a class="cursor-pointer" style="color:var(--pr-primary);">read more</a></p>
+                <p class="mt-4 text-muted" style="font-size:0.75rem; line-height:1.5;">
+                    The content presented on this website is solely for informational purposes and does not constitute a service offer.
+                    <span id="reraDisclaimerMore" style="display:none;">
+                        All project information, dimensions, specifications, and images shown are subject to change without notice. PropertyRubix is an independent real estate discovery platform. Prospective buyers are advised to verify all details directly with the builder or authorized RERA registration authority before taking any purchasing decision.
+                    </span>
+                    <a id="reraDisclaimerToggle" class="cursor-pointer fw-bold ms-1" style="color:var(--pr-primary);" onclick="var m=document.getElementById('reraDisclaimerMore'); if(m.style.display==='none'){m.style.display='inline'; this.textContent='read less';}else{m.style.display='none'; this.textContent='read more';}">read more</a>
+                </p>
             </div>
             <?php endif; ?>
 

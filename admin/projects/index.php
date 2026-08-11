@@ -18,7 +18,8 @@ if ($action === 'delete' && $id) {
 }
 
 // ── Load row for edit
-$floorPlansList = [];
+$floorPlansList  = [];
+$masterPlansList = [];
 if ($action === 'edit' && $id) {
     $stmt = $pdo->prepare("SELECT * FROM projects WHERE id=?");
     $stmt->execute([$id]);
@@ -27,6 +28,18 @@ if ($action === 'edit' && $id) {
     $fpStmt = $pdo->prepare("SELECT * FROM project_floor_plans WHERE project_id=? ORDER BY sort_order ASC, id ASC");
     $fpStmt->execute([$id]);
     $floorPlansList = $fpStmt->fetchAll(PDO::FETCH_ASSOC);
+
+    if (!empty($row['master_plans_json'])) {
+        $masterPlansList = json_decode($row['master_plans_json'], true) ?: [];
+    }
+    if (empty($masterPlansList) && (!empty($row['master_plan_image']) || !empty($row['master_plan_pdf']) || !empty($row['master_plan_description']))) {
+        $masterPlansList[] = [
+            'label'       => $row['master_plan_label'] ?: 'Master Plan',
+            'description' => $row['master_plan_description'] ?? '',
+            'image'       => $row['master_plan_image'] ?? '',
+            'pdf'         => $row['master_plan_pdf'] ?? '',
+        ];
+    }
 }
 
 // ── Save (new or edit)
@@ -127,27 +140,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
             $data['amenities'] = json_encode(array_values($amenitiesArr));
         }
 
-        // Handle master plan image
-        if (!empty($_POST['delete_master_plan_image'])) {
-            $data['master_plan_image'] = null;
-        } elseif (!empty($_FILES['master_plan_image']['name'])) {
-            $up = uploadImage($_FILES['master_plan_image'], 'projects/floor_plans');
-            if ($up['success']) {
-                $data['master_plan_image'] = $up['path'];
-            } else {
-                $errors[] = 'Master Plan: ' . $up['error'];
-            }
-        }
+        // Handle dynamic master plans
+        if (isset($_POST['master_plans_submitted'])) {
+            $submittedMp = $_POST['master_plans'] ?? [];
+            $finalMasterPlans = [];
 
-        // Handle master plan PDF
-        if (!empty($_POST['delete_master_plan_pdf'])) {
-            $data['master_plan_pdf'] = null;
-        } elseif (!empty($_FILES['master_plan_pdf']['name'])) {
-            $up = uploadPdf($_FILES['master_plan_pdf'], 'projects/master_plan');
-            if ($up['success']) {
-                $data['master_plan_pdf'] = $up['path'];
+            if (is_array($submittedMp)) {
+                foreach ($submittedMp as $mpIdx => $mpItem) {
+                    $lbl  = trim($mpItem['label'] ?? '');
+                    $desc = trim($mpItem['description'] ?? '');
+                    $imgPath = trim($mpItem['existing_image'] ?? '');
+                    $pdfPath = trim($mpItem['existing_pdf'] ?? '');
+
+                    if (!empty($mpItem['delete_image'])) $imgPath = '';
+                    if (!empty($mpItem['delete_pdf'])) $pdfPath = '';
+
+                    // Upload master plan image
+                    if (isset($_FILES['master_plans']['name'][$mpIdx]['image']) && !empty($_FILES['master_plans']['name'][$mpIdx]['image']) && $_FILES['master_plans']['error'][$mpIdx]['image'] === UPLOAD_ERR_OK) {
+                        $fData = [
+                            'name'     => $_FILES['master_plans']['name'][$mpIdx]['image'],
+                            'type'     => $_FILES['master_plans']['type'][$mpIdx]['image'],
+                            'tmp_name' => $_FILES['master_plans']['tmp_name'][$mpIdx]['image'],
+                            'error'    => $_FILES['master_plans']['error'][$mpIdx]['image'],
+                            'size'     => $_FILES['master_plans']['size'][$mpIdx]['image'],
+                        ];
+                        $up = uploadImage($fData, 'projects/master_plans');
+                        if ($up['success']) {
+                            $imgPath = $up['path'];
+                        } else {
+                            $errors[] = "Master Plan #" . ($mpIdx + 1) . " Image: " . $up['error'];
+                        }
+                    }
+
+                    // Upload master plan PDF
+                    if (isset($_FILES['master_plans']['name'][$mpIdx]['pdf']) && !empty($_FILES['master_plans']['name'][$mpIdx]['pdf']) && $_FILES['master_plans']['error'][$mpIdx]['pdf'] === UPLOAD_ERR_OK) {
+                        $fData = [
+                            'name'     => $_FILES['master_plans']['name'][$mpIdx]['pdf'],
+                            'type'     => $_FILES['master_plans']['type'][$mpIdx]['pdf'],
+                            'tmp_name' => $_FILES['master_plans']['tmp_name'][$mpIdx]['pdf'],
+                            'error'    => $_FILES['master_plans']['error'][$mpIdx]['pdf'],
+                            'size'     => $_FILES['master_plans']['size'][$mpIdx]['pdf'],
+                        ];
+                        $up = uploadPdf($fData, 'master_plans');
+                        if ($up['success']) {
+                            $pdfPath = $up['path'];
+                        } else {
+                            $errors[] = "Master Plan #" . ($mpIdx + 1) . " PDF: " . $up['error'];
+                        }
+                    }
+
+                    if ($lbl !== '' || $desc !== '' || $imgPath !== '' || $pdfPath !== '') {
+                        $finalMasterPlans[] = [
+                            'label'       => $lbl ?: 'Master Plan',
+                            'description' => $desc,
+                            'image'       => $imgPath,
+                            'pdf'         => $pdfPath,
+                        ];
+                    }
+                }
+            }
+
+            $data['master_plans_json'] = json_encode($finalMasterPlans);
+
+            if (!empty($finalMasterPlans[0])) {
+                $data['master_plan_image']       = $finalMasterPlans[0]['image'];
+                $data['master_plan_label']       = $finalMasterPlans[0]['label'];
+                $data['master_plan_description'] = $finalMasterPlans[0]['description'];
+                $data['master_plan_pdf']         = $finalMasterPlans[0]['pdf'];
             } else {
-                $errors[] = 'Master Plan PDF: ' . $up['error'];
+                $data['master_plan_image']       = null;
+                $data['master_plan_label']       = null;
+                $data['master_plan_description'] = null;
+                $data['master_plan_pdf']         = null;
             }
         }
 
@@ -905,47 +969,73 @@ require __DIR__ . '/../includes/header.php';
         </div>
       </div>
 
-      <!-- ─── MASTER PLAN ─── -->
+      <!-- ─── DEDICATED DYNAMIC MASTER PLANS ─── -->
+      <input type="hidden" name="master_plans_submitted" value="1">
       <div class="adm-card">
-        <div class="adm-card-title"><i class="fas fa-map me-2 text-primary"></i>Master Plan & Site Layout</div>
-        <p class="text-muted small mb-3">Upload the master plan / site layout image, custom label, description, and optional master plan PDF brochure.</p>
-        <div class="row g-3">
-          <div class="col-md-6">
-            <label class="adm-form-label fw-bold">Master Plan Image</label>
-            <?php if (!empty($row['master_plan_image'])): ?>
-            <div class="mb-2 text-center p-2 border bg-light rounded">
-              <img src="<?= upload($row['master_plan_image']) ?>" style="max-height:140px; max-width:100%; object-fit:contain; border-radius:6px; background:#fff; padding:4px;">
-              <label style="font-size:11px; cursor:pointer; color:#dc2626; display:block; margin-top:4px;">
-                <input type="checkbox" name="delete_master_plan_image"> Delete Master Plan Image
-              </label>
-            </div>
-            <?php endif; ?>
-            <input type="file" name="master_plan_image" class="form-control" accept="image/*">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <div class="adm-card-title mb-0"><i class="fas fa-map me-2 text-primary"></i>Dynamic Master Plans & Layouts</div>
+            <p class="text-muted small mb-0">Add as many master plans and site layouts as required. Provide custom title, image, PDF layout document, and description for each.</p>
           </div>
+          <button type="button" class="btn btn-sm btn-primary" id="addMasterPlanBtn"><i class="fas fa-plus me-1"></i>Add Master Plan</button>
+        </div>
 
-          <div class="col-md-6 d-flex flex-column gap-2">
-            <div>
-              <label class="adm-form-label fw-bold">Master Plan Label / Title</label>
-              <input type="text" name="master_plan_label" class="form-control" placeholder="Master Plan" value="<?= htmlspecialchars($row['master_plan_label'] ?? 'Master Plan') ?>">
+        <div id="masterPlansContainer" class="d-flex flex-column gap-3">
+          <?php if (empty($masterPlansList)): ?>
+            <div class="text-muted text-center py-4 bg-light rounded border border-dashed" id="noMasterPlansHint">
+              <i class="fas fa-map fa-2x mb-2 text-secondary d-block"></i>
+              <p class="mb-2">No master plans added yet.</p>
+              <button type="button" class="btn btn-sm btn-outline-primary" onclick="addMasterPlanRow()"><i class="fas fa-plus me-1"></i>Add First Master Plan</button>
             </div>
-            <div>
-              <label class="adm-form-label fw-bold">Master Plan PDF / Layout Document</label>
-              <?php if (!empty($row['master_plan_pdf'])): ?>
-              <div class="mb-2">
-                <a href="<?= upload($row['master_plan_pdf']) ?>" target="_blank" style="font-size:12px;"><i class="fas fa-file-pdf me-1 text-danger"></i>View Master Plan PDF</a>
-                <label style="font-size:12px;cursor:pointer;display:block;margin-top:4px;" class="text-danger">
-                  <input type="checkbox" name="delete_master_plan_pdf" value="1"> Delete PDF
-                </label>
+          <?php else: ?>
+            <?php foreach ($masterPlansList as $mpIdx => $mpItem): ?>
+              <div class="card border border-light-subtle shadow-sm master-plan-row" data-index="<?= $mpIdx ?>">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+                  <span class="fw-bold text-dark"><i class="fas fa-map text-muted me-2"></i>Master Plan #<span class="mp-num"><?= $mpIdx + 1 ?></span></span>
+                  <button type="button" class="btn btn-sm btn-outline-danger border-0 remove-mp-btn" title="Remove Master Plan"><i class="fas fa-trash-alt me-1"></i>Remove</button>
+                </div>
+                <div class="card-body p-3">
+                  <input type="hidden" name="master_plans[<?= $mpIdx ?>][existing_image]" value="<?= htmlspecialchars($mpItem['image'] ?? '') ?>">
+                  <input type="hidden" name="master_plans[<?= $mpIdx ?>][existing_pdf]" value="<?= htmlspecialchars($mpItem['pdf'] ?? '') ?>">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold">Master Plan Label / Title</label>
+                      <input type="text" name="master_plans[<?= $mpIdx ?>][label]" class="form-control form-control-sm" placeholder="e.g. Overall Master Plan, Phase 1 Layout, Tower Placement" value="<?= htmlspecialchars($mpItem['label'] ?? 'Master Plan') ?>">
+                    </div>
+                    <div class="col-md-6">
+                      <label class="form-label small fw-bold">Master Plan PDF / Layout Document</label>
+                      <?php if (!empty($mpItem['pdf'])): ?>
+                        <div class="d-flex align-items-center gap-2 mb-1 p-1 bg-light rounded border">
+                          <a href="<?= upload($mpItem['pdf']) ?>" target="_blank" class="small text-danger fw-bold"><i class="fas fa-file-pdf me-1"></i>View Current PDF</a>
+                          <label class="ms-auto small text-danger cursor-pointer mb-0">
+                            <input type="checkbox" name="master_plans[<?= $mpIdx ?>][delete_pdf]" value="1"> Delete PDF
+                          </label>
+                        </div>
+                      <?php endif; ?>
+                      <input type="file" name="master_plans[<?= $mpIdx ?>][pdf]" class="form-control form-control-sm" accept="application/pdf">
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label small fw-bold">Master Plan Image</label>
+                      <?php if (!empty($mpItem['image'])): ?>
+                        <div class="d-flex align-items-center gap-3 mb-2 p-2 bg-light rounded border">
+                          <img src="<?= upload($mpItem['image']) ?>" style="height:60px; max-width:120px; object-fit:contain; border-radius:4px; background:#fff;">
+                          <span class="small text-muted text-break"><?= htmlspecialchars($mpItem['image']) ?></span>
+                          <label class="ms-auto small text-danger cursor-pointer mb-0">
+                            <input type="checkbox" name="master_plans[<?= $mpIdx ?>][delete_image]" value="1"> Delete Image
+                          </label>
+                        </div>
+                      <?php endif; ?>
+                      <input type="file" name="master_plans[<?= $mpIdx ?>][image]" class="form-control form-control-sm" accept="image/*">
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label small fw-bold">Description / Key Highlights</label>
+                      <textarea name="master_plans[<?= $mpIdx ?>][description]" class="form-control form-control-sm" rows="2" placeholder="Overview of zoning, green spaces, towers, amenities placement..."><?= htmlspecialchars($mpItem['description'] ?? '') ?></textarea>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <?php endif; ?>
-              <input type="file" name="master_plan_pdf" class="form-control" accept="application/pdf">
-            </div>
-          </div>
-
-          <div class="col-12">
-            <label class="adm-form-label fw-bold">Master Plan Description / Key Highlights</label>
-            <textarea name="master_plan_description" class="form-control" rows="3" placeholder="Overview of the master plan, zoning, open spaces, tower layout..."><?= htmlspecialchars($row['master_plan_description'] ?? '') ?></textarea>
-          </div>
+            <?php endforeach; ?>
+          <?php endif; ?>
         </div>
       </div>
 
@@ -1206,6 +1296,82 @@ document.addEventListener("DOMContentLoaded", function() {
                 if (row) {
                     row.remove();
                     reindexFloorPlans();
+                }
+            }
+        });
+    }
+
+    // Dynamic Master Plans Repeater
+    const masterPlansContainer = document.getElementById("masterPlansContainer");
+    const addMasterPlanBtn = document.getElementById("addMasterPlanBtn");
+    let mpCounter = <?= count($masterPlansList) ?>;
+
+    window.addMasterPlanRow = function() {
+        if (!masterPlansContainer) return;
+        const noHint = document.getElementById("noMasterPlansHint");
+        if (noHint) noHint.style.display = "none";
+
+        const idx = mpCounter++;
+        const cardDiv = document.createElement("div");
+        cardDiv.className = "card border border-light-subtle shadow-sm master-plan-row";
+        cardDiv.dataset.index = idx;
+        cardDiv.innerHTML = `
+            <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+              <span class="fw-bold text-dark"><i class="fas fa-map text-muted me-2"></i>Master Plan #<span class="mp-num">${masterPlansContainer.querySelectorAll('.master-plan-row').length + 1}</span></span>
+              <button type="button" class="btn btn-sm btn-outline-danger border-0 remove-mp-btn" title="Remove Master Plan"><i class="fas fa-trash-alt me-1"></i>Remove</button>
+            </div>
+            <div class="card-body p-3">
+              <input type="hidden" name="master_plans[${idx}][existing_image]" value="">
+              <input type="hidden" name="master_plans[${idx}][existing_pdf]" value="">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold">Master Plan Label / Title</label>
+                  <input type="text" name="master_plans[${idx}][label]" class="form-control form-control-sm" placeholder="e.g. Master Plan Phase 1" value="Master Plan">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold">Master Plan PDF / Layout Document</label>
+                  <input type="file" name="master_plans[${idx}][pdf]" class="form-control form-control-sm" accept="application/pdf">
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-bold">Master Plan Image</label>
+                  <input type="file" name="master_plans[${idx}][image]" class="form-control form-control-sm" accept="image/*">
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-bold">Description / Key Highlights</label>
+                  <textarea name="master_plans[${idx}][description]" class="form-control form-control-sm" rows="2" placeholder="Overview of zoning, green spaces, towers, amenities placement..."></textarea>
+                </div>
+              </div>
+            </div>
+        `;
+        masterPlansContainer.appendChild(cardDiv);
+        reindexMasterPlans();
+    };
+
+    function reindexMasterPlans() {
+        if (!masterPlansContainer) return;
+        const rows = masterPlansContainer.querySelectorAll(".master-plan-row");
+        rows.forEach((row, i) => {
+            const numEl = row.querySelector(".mp-num");
+            if (numEl) numEl.textContent = i + 1;
+        });
+        const noHint = document.getElementById("noMasterPlansHint");
+        if (noHint) {
+            noHint.style.display = rows.length === 0 ? "block" : "none";
+        }
+    }
+
+    if (addMasterPlanBtn) {
+        addMasterPlanBtn.addEventListener("click", window.addMasterPlanRow);
+    }
+
+    if (masterPlansContainer) {
+        masterPlansContainer.addEventListener("click", function(e) {
+            const btn = e.target.closest(".remove-mp-btn");
+            if (btn) {
+                const row = btn.closest(".master-plan-row");
+                if (row) {
+                    row.remove();
+                    reindexMasterPlans();
                 }
             }
         });
