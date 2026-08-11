@@ -42,6 +42,26 @@ if (empty($sliders)) {
             <!-- Content injected by JS -->
         </div>
       </div>
+
+      <!-- BHK Quick Filter Pills -->
+      <div class="mt-4 d-flex flex-wrap justify-content-center gap-2" style="max-width:700px; margin:0 auto;">
+        <span class="text-white-50 fw-500 me-1 d-flex align-items-center" style="font-size:0.88rem;"><i class="fas fa-bed me-1"></i> Quick Filter:</span>
+        <?php
+        $bhkPills = [
+            'studio' => '🛋️ Studio',
+            '1'      => '🏠 1 BHK',
+            '2'      => '🏡 2 BHK',
+            '3'      => '🏘️ 3 BHK',
+            '4'      => '🏰 4 BHK',
+            '5'      => '🏯 5 BHK',
+        ];
+        foreach ($bhkPills as $val => $label):
+        ?>
+        <a href="<?= PUBLIC_URL ?>projects?bhk=<?= urlencode($val) ?>"
+           class="bhk-pill"
+           title="Browse <?= $label ?> Projects"><?= $label ?></a>
+        <?php endforeach; ?>
+      </div>
       
       <div class="my-4 text-white fw-bold" style="font-size: 1.4rem; text-shadow: 0 2px 4px rgba(0,0,0,0.6);">OR</div>
       
@@ -64,6 +84,30 @@ if (empty($sliders)) {
 #smartSearchDropdown::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
 .smart-search-item { transition: background-color 0.2s; cursor: pointer; }
 .smart-search-item:hover { background-color: rgba(229,175,83,0.1); }
+
+/* BHK Quick-Filter Pills on Hero */
+.bhk-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 7px 16px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 50px;
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+}
+.bhk-pill:hover {
+    background: var(--pr-primary);
+    border-color: var(--pr-primary);
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(229,175,83,0.4);
+}
 </style>
 <script>
 document.addEventListener("DOMContentLoaded", function() {

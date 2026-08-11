@@ -151,6 +151,49 @@ class AjaxController extends Controller {
         $qLike = '%' . $q . '%';
         $results = [];
 
+        // ── BHK / Configuration shortcut detection ───────────────────────
+        // If user types "2 bhk", "3 bhk mumbai", "studio flat", etc.
+        // show a direct filter shortcut at the TOP of results.
+        $bhkNum    = null;
+        $isStudio  = false;
+        $qRemainder = $q; // residual text after removing the BHK part
+
+        if (preg_match('/(\d+)\s*bhk/i', $q, $m)) {
+            $bhkNum     = $m[1];
+            $qRemainder = trim(preg_replace('/\d+\s*bhk\s*,?\s*/i', '', $q));
+        } elseif (preg_match('/\bstudio\b/i', $q)) {
+            $isStudio   = true;
+            $qRemainder = trim(preg_replace('/\bstudio\b\s*,?\s*/i', '', $q));
+        }
+
+        if ($bhkNum !== null || $isStudio) {
+            $bhkVal   = $isStudio ? 'studio' : $bhkNum;
+            $bhkLabel = $isStudio ? 'Studio' : "{$bhkNum} BHK";
+            $baseUrl  = PUBLIC_URL . 'projects?bhk=' . urlencode($bhkVal);
+            if ($qRemainder) $baseUrl .= '&q=' . urlencode($qRemainder);
+
+            // BHK-only shortcut
+            $results[] = [
+                'type'     => 'Configuration',
+                'icon'     => 'fas fa-bed',
+                'title'    => "Show all {$bhkLabel} projects",
+                'subtitle' => 'Filter by configuration',
+                'url'      => PUBLIC_URL . 'projects?bhk=' . urlencode($bhkVal),
+            ];
+
+            // BHK + location shortcut (if remainder looks like a city/locality)
+            if ($qRemainder) {
+                $results[] = [
+                    'type'     => 'Configuration',
+                    'icon'     => 'fas fa-map-marker-alt',
+                    'title'    => "{$bhkLabel} in \"" . ucwords($qRemainder) . '"',
+                    'subtitle' => 'Search by config + location',
+                    'url'      => $baseUrl,
+                ];
+            }
+        }
+        // ─────────────────────────────────────────────────────────────────
+
         // 1. Search Countries
         $stmt = $pdo->prepare("SELECT name, slug FROM countries WHERE status='active' AND name LIKE ? LIMIT 3");
         $stmt->execute([$qLike]);
@@ -173,12 +216,25 @@ class AjaxController extends Controller {
         ");
         $stmt->execute([$qLike]);
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            $results[] = [
+            $cityEntry = [
                 'type' => 'City',
                 'icon' => 'fas fa-city',
                 'title' => $row['name'] . ', ' . strtoupper($row['country_slug']),
                 'url' => PUBLIC_URL . 'location/' . $row['country_slug'] . '/' . $row['state_slug'] . '/' . $row['slug']
             ];
+            // If BHK detected, also add a BHK-in-City shortcut
+            if ($bhkNum !== null || $isStudio) {
+                $bhkVal   = $isStudio ? 'studio' : $bhkNum;
+                $bhkLabel = $isStudio ? 'Studio' : "{$bhkNum} BHK";
+                $results[] = [
+                    'type'     => 'Configuration',
+                    'icon'     => 'fas fa-bed',
+                    'title'    => "{$bhkLabel} in " . $row['name'],
+                    'subtitle' => 'Filter projects by BHK + city',
+                    'url'      => PUBLIC_URL . 'projects?bhk=' . urlencode($bhkVal) . '&q=' . urlencode($row['name']),
+                ];
+            }
+            $results[] = $cityEntry;
         }
 
         // 3. Search Localities
@@ -204,26 +260,41 @@ class AjaxController extends Controller {
         $stmt = $pdo->prepare("SELECT name, slug FROM builders WHERE status='active' AND name LIKE ? LIMIT 4");
         $stmt->execute([$qLike]);
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
-            $results[] = [
+            $devEntry = [
                 'type' => 'Developer',
                 'icon' => 'fas fa-hard-hat',
                 'title' => $row['name'],
                 'url' => PUBLIC_URL . 'developer/' . $row['slug']
             ];
+            // If BHK detected, also add BHK-by-developer shortcut
+            if ($bhkNum !== null || $isStudio) {
+                $bhkVal   = $isStudio ? 'studio' : $bhkNum;
+                $bhkLabel = $isStudio ? 'Studio' : "{$bhkNum} BHK";
+                $results[] = [
+                    'type'     => 'Configuration',
+                    'icon'     => 'fas fa-bed',
+                    'title'    => "{$bhkLabel} by " . $row['name'],
+                    'subtitle' => 'Filter by BHK + developer',
+                    'url'      => PUBLIC_URL . 'projects?bhk=' . urlencode($bhkVal) . '&q=' . urlencode($row['name']),
+                ];
+            }
+            $results[] = $devEntry;
         }
 
-        // 5. Search Projects
+        // 5. Search Projects (by name AND unit_types)
         $stmt = $pdo->prepare("
-            SELECT p.name, p.slug, l.name as locality_name, c.name as city_name 
+            SELECT p.name, p.slug, p.unit_types, l.name as locality_name, c.name as city_name 
             FROM projects p 
             LEFT JOIN localities l ON p.locality_id = l.id
             LEFT JOIN cities c ON p.city_id = c.id
-            WHERE p.status IN ('upcoming','under_construction','ready_to_move','new_launch') AND p.name LIKE ? LIMIT 6
+            WHERE p.status IN ('upcoming','under_construction','ready_to_move','new_launch') 
+              AND (p.name LIKE ? OR p.unit_types LIKE ?) LIMIT 6
         ");
-        $stmt->execute([$qLike]);
+        $stmt->execute([$qLike, $qLike]);
         foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $loc = $row['locality_name'] ? $row['locality_name'] . ', ' : '';
             $subtext = $loc . ($row['city_name'] ?? '');
+            if ($row['unit_types']) $subtext = ($subtext ? $subtext . ' · ' : '') . $row['unit_types'];
             $results[] = [
                 'type' => 'Project',
                 'icon' => 'fas fa-building',

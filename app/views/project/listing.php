@@ -268,7 +268,7 @@
           </div>
 
           <!-- City -->
-          <div class="mb-5">
+          <div class="mb-4">
             <span class="filter-section-title">Location (City)</span>
             <select name="city" class="form-select shadow-none border" style="cursor: pointer;">
               <option value="">Worldwide (All Cities)</option>
@@ -278,6 +278,19 @@
               </option>
               <?php endforeach; ?>
             </select>
+          </div>
+
+          <!-- BHK / Configuration Filter (Pills) -->
+          <div class="mb-4">
+            <span class="filter-section-title"><i class="fas fa-bed me-1"></i> Configuration (BHK)</span>
+            <div class="custom-radio-group">
+              <input type="radio" name="bhk" value="" id="bhk_all" <?= !$filters['bhk'] ? 'checked' : '' ?>>
+              <label for="bhk_all">Any</label>
+              <?php foreach (['studio' => 'Studio', '1' => '1 BHK', '2' => '2 BHK', '3' => '3 BHK', '4' => '4 BHK', '5' => '5 BHK', '6' => '6+ BHK'] as $val => $lbl): ?>
+              <input type="radio" name="bhk" value="<?= $val ?>" id="bhk_<?= $val ?>" <?= $filters['bhk'] === (string)$val ? 'checked' : '' ?>>
+              <label for="bhk_<?= $val ?>"><?= $lbl ?></label>
+              <?php endforeach; ?>
+            </div>
           </div>
 
           <div class="d-grid gap-2">
@@ -295,6 +308,11 @@
       <div class="control-bar d-flex align-items-center justify-content-between flex-wrap gap-3">
         <p class="mb-0 fw-600 text-dark">
           Showing <span style="color:var(--pr-primary); font-size:1.1rem;"><?= number_format($total) ?></span> highly curated projects
+          <?php if ($filters['bhk']): ?>
+          &nbsp;<span class="badge rounded-pill" style="background:var(--pr-primary); color:#fff; font-size:0.8rem;">
+            <?= $filters['bhk'] === 'studio' ? 'Studio' : $filters['bhk'].' BHK' ?> <a href="<?= PUBLIC_URL ?>projects?<?= http_build_query(array_filter(array_merge($filters, ['bhk'=>'']))) ?>" class="text-white ms-1" style="text-decoration:none;">&times;</a>
+          </span>
+          <?php endif; ?>
         </p>
         <form method="get" class="d-flex align-items-center gap-3">
           <?php foreach ($filters as $k => $v): if (!$v || $k === 'sort') continue; ?>

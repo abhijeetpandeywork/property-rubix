@@ -11,14 +11,38 @@ class ProjectController extends Controller {
         $cityId = (int)($_GET['city']  ?? 0);
         $budget = $_GET['budget']      ?? '';
         $sort   = $_GET['sort']        ?? 'featured';
+        $bhk    = trim($_GET['bhk']    ?? ''); // e.g. "1", "2", "3", "4", "5", "studio"
 
         $where = ['1=1'];
         $args  = [];
 
-        if ($q)      { $where[] = '(p.name LIKE ? OR p.address LIKE ? OR b.name LIKE ?)'; $args = array_merge($args, ["%$q%","%$q%","%$q%"]); }
+        // BHK/Configuration filter: parse query for "N BHK" patterns too
+        if (!$bhk && $q) {
+            if (preg_match('/(\d+)\s*bhk/i', $q, $m)) {
+                $bhk = $m[1];
+                // strip the BHK part from q so it doesn't double-filter
+                $q = trim(preg_replace('/(\d+)\s*bhk\s*,?\s*/i', '', $q));
+            } elseif (preg_match('/\bstudio\b/i', $q)) {
+                $bhk = 'studio';
+                $q = trim(preg_replace('/\bstudio\b\s*,?\s*/i', '', $q));
+            }
+        }
+
+        if ($q)      { $where[] = '(p.name LIKE ? OR p.address LIKE ? OR b.name LIKE ? OR p.unit_types LIKE ?)'; $args = array_merge($args, ["%$q%","%$q%","%$q%","%$q%"]); }
         if ($type)   { $where[] = 'p.type = ?';     $args[] = $type; }
         if ($status) { $where[] = 'p.status = ?';   $args[] = $status; }
         if ($cityId) { $where[] = 'p.city_id = ?';  $args[] = $cityId; }
+        if ($bhk) {
+            if (strtolower($bhk) === 'studio') {
+                $where[] = 'p.unit_types LIKE ?'; $args[] = '%studio%';
+            } else {
+                // Match "2 BHK", "2BHK", "2bhk" — flexible search in unit_types
+                $where[] = '(p.unit_types LIKE ? OR p.unit_types LIKE ? OR p.unit_types LIKE ?)';
+                $args[] = "%{$bhk} BHK%";  // "2 BHK"
+                $args[] = "%{$bhk}BHK%";   // "2BHK"
+                $args[] = "%{$bhk}bhk%";   // "2bhk"
+            }
+        }
         if ($budget === 'under50l')   { $where[] = 'p.price_min < 5000000'; }
         elseif ($budget === '50l-1cr') { $where[] = 'p.price_min BETWEEN 5000000 AND 10000000'; }
         elseif ($budget === '1cr-3cr') { $where[] = 'p.price_min BETWEEN 10000000 AND 30000000'; }
@@ -55,14 +79,16 @@ class ProjectController extends Controller {
 
         $cities = $pdo->query("SELECT id, name FROM cities WHERE status='active' ORDER BY name")->fetchAll();
 
+        $bhkLabel = $bhk ? ($bhk === 'studio' ? 'Studio' : "{$bhk} BHK") : '';
+        $titleParts = array_filter([$q, $bhkLabel]);
         $this->view('project/listing', [
-            'pageTitle' => 'All Properties' . ($q ? " — \"$q\"" : ''),
+            'pageTitle' => 'All Properties' . ($titleParts ? ' — "' . implode(' + ', $titleParts) . '"' : ''),
             'metaDesc'  => 'Browse all residential, commercial, and plot projects on PropertyRubix.',
             'projects'  => $projects->fetchAll(),
             'pager'     => $pager,
             'total'     => $total,
             'cities'    => $cities,
-            'filters'   => compact('q','type','status','cityId','budget','sort'),
+            'filters'   => compact('q','type','status','cityId','budget','sort','bhk'),
         ]);
     }
 
