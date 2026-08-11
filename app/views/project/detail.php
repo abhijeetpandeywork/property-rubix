@@ -662,47 +662,173 @@ body {
         <?php endif; ?>
 
         <?php
-        // ── Dedicated Floor Plan Slots ────────────────────────────────────
-        $fpSlots = [];
-        for ($s = 1; $s <= 6; $s++) {
-            $img = $p["fp_{$s}_image"] ?? null;
-            $lbl = trim($p["fp_{$s}_label"] ?? '');
-            if (!empty($img)) {
-                $fpSlots[] = ['image' => $img, 'label' => $lbl ?: "Floor Plan {$s}"];
+        // ── Helper for Rendering Floor Plan Cards ─────────────────────────
+        if (!function_exists('renderFrontendFloorPlanCard')) {
+            function renderFrontendFloorPlanCard($fp) {
+                $img     = !empty($fp['image']) ? upload($fp['image']) : '';
+                $title   = trim($fp['plan_name'] ?? '');
+                $config  = trim($fp['configuration'] ?? '');
+                $area    = trim($fp['area'] ?? '');
+                $price   = trim($fp['price'] ?? '');
+                $ctaText = trim($fp['cta_text'] ?? '') ?: 'View Floor Plan';
+                $ctaUrl  = trim($fp['cta_url'] ?? '');
+                $target  = ($ctaUrl && (str_starts_with($ctaUrl, 'http') || str_starts_with($ctaUrl, '/'))) ? '_blank' : '';
+                $modalTarget = (!$ctaUrl || str_starts_with($ctaUrl, '#')) ? ($ctaUrl ?: '#enquiryModal') : '';
+                ?>
+                <div class="col-12 col-md-6 col-lg-4">
+                  <div class="card h-100 border-0 shadow-sm rounded-3 overflow-hidden bg-white hover-shadow transition" style="border: 1px solid #eaeaea !important;">
+                    <?php if ($img): ?>
+                      <div class="position-relative overflow-hidden bg-light text-center border-bottom" style="height: 220px;">
+                        <a href="<?= $img ?>" target="_blank" title="<?= e($title ?: $config ?: 'Floor Plan') ?>">
+                          <img src="<?= $img ?>" alt="<?= e($title ?: $config ?: 'Floor Plan') ?>" class="w-100 h-100" style="object-fit: contain; padding: 12px;" loading="lazy">
+                          <div class="position-absolute top-0 end-0 m-2 bg-dark bg-opacity-75 text-white rounded-circle p-2 d-flex align-items-center justify-content-center" style="width:36px; height:36px;">
+                            <i class="fas fa-search-plus"></i>
+                          </div>
+                        </a>
+                      </div>
+                    <?php endif; ?>
+
+                    <div class="card-body p-3 d-flex flex-column">
+                      <div class="d-flex justify-content-between align-items-start mb-2">
+                        <?php if ($config): ?>
+                          <span class="badge bg-primary-subtle text-primary fw-bold px-2 py-1" style="font-size:0.85rem; border:1px solid rgba(13,110,253,0.2);"><?= e($config) ?></span>
+                        <?php endif; ?>
+                        <?php if ($price): ?>
+                          <span class="fw-bold ms-auto" style="font-size:0.95rem; color:#b08d55 !important;"><?= e($price) ?></span>
+                        <?php endif; ?>
+                      </div>
+
+                      <?php if ($title): ?>
+                        <h5 class="fw-bold text-dark mb-1" style="font-size:1.05rem;"><?= e($title) ?></h5>
+                      <?php endif; ?>
+
+                      <?php if ($area): ?>
+                        <div class="text-muted small mb-3"><i class="fas fa-ruler-combined me-1 text-secondary"></i>Carpet Area: <span class="fw-semibold text-dark"><?= e($area) ?></span></div>
+                      <?php endif; ?>
+
+                      <div class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center gap-2">
+                        <?php if ($img): ?>
+                          <a href="<?= $img ?>" target="_blank" class="btn btn-sm btn-outline-secondary flex-grow-1"><i class="fas fa-eye me-1"></i>Enlarge</a>
+                        <?php endif; ?>
+
+                        <?php if ($modalTarget): ?>
+                          <button type="button" class="btn btn-sm btn-dark fw-bold flex-grow-1" style="background:#111; border-color:#b08d55;" data-bs-toggle="modal" data-bs-target="<?= e($modalTarget) ?>"><i class="fas fa-calendar-check me-1"></i><?= e($ctaText) ?></button>
+                        <?php elseif ($ctaUrl): ?>
+                          <a href="<?= e($ctaUrl) ?>" <?= $target ? 'target="_blank"' : '' ?> class="btn btn-sm btn-dark fw-bold flex-grow-1" style="background:#111; border-color:#b08d55;"><i class="fas fa-arrow-right me-1"></i><?= e($ctaText) ?></a>
+                        <?php endif; ?>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <?php
             }
         }
+
+        // ── Dynamic & Custom Floor Plans ───────────────────────────────────
+        $dbFloorPlans = $floorPlans ?? [];
+
+        // Fallback for legacy slots if project_floor_plans database entries are empty
+        if (empty($dbFloorPlans)) {
+            for ($s = 1; $s <= 6; $s++) {
+                $img = $p["fp_{$s}_image"] ?? null;
+                $lbl = trim($p["fp_{$s}_label"] ?? '');
+                if (!empty($img)) {
+                    $dbFloorPlans[] = [
+                        'id'            => 0,
+                        'configuration' => '',
+                        'plan_name'     => $lbl ?: "Floor Plan {$s}",
+                        'area'          => '',
+                        'price'         => '',
+                        'image'         => $img,
+                        'cta_text'      => 'View Floor Plan',
+                        'cta_url'       => '',
+                    ];
+                }
+            }
+        }
+
         $masterPlanImg   = $p['master_plan_image'] ?? null;
         $masterPlanLabel = trim($p['master_plan_label'] ?? 'Master Plan') ?: 'Master Plan';
-        $hasFpSection    = !empty($fpSlots) || !empty($masterPlanImg);
+        $masterPlanDesc  = trim($p['master_plan_description'] ?? '');
+        $masterPlanPdf   = trim($p['master_plan_pdf'] ?? '');
+        $hasFpSection    = !empty($dbFloorPlans) || !empty($masterPlanImg) || !empty($masterPlanPdf);
+
+        // Group floor plans by configuration for filter tabs if multiple configurations exist
+        $configsMap = [];
+        foreach ($dbFloorPlans as $fp) {
+            $cfg = trim($fp['configuration'] ?? '') ?: 'General';
+            $configsMap[$cfg][] = $fp;
+        }
+        $hasMultiConfigs = count($configsMap) > 1;
         ?>
 
         <?php if ($hasFpSection): ?>
         <div class="lux-section glass-panel" id="floor-plans">
-          <h2 class="lux-section-title"><i class="fas fa-layer-group"></i> Floor Plans</h2>
-
-          <?php if (!empty($fpSlots)): ?>
-          <div class="row g-4 mb-4">
-            <?php foreach ($fpSlots as $fp): ?>
-            <div class="col-6 col-md-4">
-              <div class="fp-slot-card h-100">
-                <a href="<?= upload($fp['image']) ?>" target="_blank" class="fp-slot-thumb" title="<?= e($fp['label']) ?>">
-                  <img src="<?= upload($fp['image']) ?>" alt="<?= e($fp['label']) ?>" loading="lazy">
-                  <div class="fp-slot-zoom"><i class="fas fa-search-plus"></i></div>
-                </a>
-                <div class="fp-slot-label"><?= e($fp['label']) ?></div>
-              </div>
-            </div>
-            <?php endforeach; ?>
+          <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2 border-bottom pb-3">
+            <h2 class="lux-section-title mb-0"><i class="fas fa-layer-group text-primary me-2"></i> Floor Plans & Layouts</h2>
+            <?php if (!empty($p['brochure_pdf'])): ?>
+              <a href="<?= upload($p['brochure_pdf']) ?>" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold"><i class="fas fa-download me-1"></i> Download Project Brochure</a>
+            <?php endif; ?>
           </div>
+
+          <?php if (!empty($dbFloorPlans)): ?>
+            <?php if ($hasMultiConfigs): ?>
+              <!-- Filter Tabs by Configuration -->
+              <ul class="nav nav-pills conn-tabs mb-4 flex-nowrap overflow-auto" id="fpFilterTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#fp-tab-all" type="button">All Floor Plans</button>
+                </li>
+                <?php $cIdx = 0; foreach ($configsMap as $cfgName => $cfgList): $cIdx++; ?>
+                  <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#fp-tab-<?= $cIdx ?>" type="button"><?= e($cfgName) ?></button>
+                  </li>
+                <?php endforeach; ?>
+              </ul>
+            <?php endif; ?>
+
+            <div class="tab-content" id="fpTabsContent">
+              <!-- All Floor Plans Tab -->
+              <div class="tab-pane fade show active" id="fp-tab-all" role="tabpanel">
+                <div class="row g-4 mb-4">
+                  <?php foreach ($dbFloorPlans as $fp): ?>
+                    <?php renderFrontendFloorPlanCard($fp); ?>
+                  <?php endforeach; ?>
+                </div>
+              </div>
+
+              <?php if ($hasMultiConfigs): ?>
+                <?php $cIdx = 0; foreach ($configsMap as $cfgName => $cfgList): $cIdx++; ?>
+                  <div class="tab-pane fade" id="fp-tab-<?= $cIdx ?>" role="tabpanel">
+                    <div class="row g-4 mb-4">
+                      <?php foreach ($cfgList as $fp): ?>
+                        <?php renderFrontendFloorPlanCard($fp); ?>
+                      <?php endforeach; ?>
+                    </div>
+                  </div>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </div>
           <?php endif; ?>
 
-          <?php if (!empty($masterPlanImg)): ?>
-          <div class="fp-master-wrap">
-            <div class="fp-master-badge"><i class="fas fa-map me-2"></i><?= e($masterPlanLabel) ?></div>
-            <a href="<?= upload($masterPlanImg) ?>" target="_blank" class="fp-master-link">
-              <img src="<?= upload($masterPlanImg) ?>" alt="<?= e($masterPlanLabel) ?>" class="fp-master-img" loading="lazy">
-              <div class="fp-master-overlay"><i class="fas fa-search-plus fa-2x"></i><span>View Full Size</span></div>
-            </a>
+          <?php if (!empty($masterPlanImg) || !empty($masterPlanPdf) || !empty($masterPlanDesc)): ?>
+          <div class="fp-master-wrap mt-5 p-4 bg-white rounded-3 border shadow-sm">
+            <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+              <div class="fp-master-badge mb-0" style="font-size:1.1rem; font-weight:700;"><i class="fas fa-map me-2 text-primary"></i><?= e($masterPlanLabel) ?></div>
+              <?php if (!empty($masterPlanPdf)): ?>
+                <a href="<?= upload($masterPlanPdf) ?>" target="_blank" class="btn btn-sm btn-danger rounded-pill px-3 fw-bold"><i class="fas fa-file-pdf me-1"></i> Download Master Plan Layout PDF</a>
+              <?php endif; ?>
+            </div>
+
+            <?php if (!empty($masterPlanDesc)): ?>
+              <p class="text-muted small mb-3"><?= nl2br(e($masterPlanDesc)) ?></p>
+            <?php endif; ?>
+
+            <?php if (!empty($masterPlanImg)): ?>
+              <a href="<?= upload($masterPlanImg) ?>" target="_blank" class="fp-master-link d-block position-relative rounded overflow-hidden text-center border">
+                <img src="<?= upload($masterPlanImg) ?>" alt="<?= e($masterPlanLabel) ?>" class="fp-master-img img-fluid" style="max-height:500px; width:100%; object-fit:contain; background:#fafafa; padding:10px;" loading="lazy">
+                <div class="fp-master-overlay"><i class="fas fa-search-plus fa-2x mb-2 text-white"></i><span class="d-block text-white fw-bold">View Full Master Plan</span></div>
+              </a>
+            <?php endif; ?>
           </div>
           <?php endif; ?>
         </div>

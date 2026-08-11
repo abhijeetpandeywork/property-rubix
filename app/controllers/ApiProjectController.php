@@ -198,7 +198,7 @@ class ApiProjectController extends ApiBaseController {
         }
 
         // Floor plans
-        $fpStmt = $pdo->prepare("SELECT id, plan_name, configuration, area, price, price_numeric, image, sort_order FROM project_floor_plans WHERE project_id = ? ORDER BY sort_order");
+        $fpStmt = $pdo->prepare("SELECT id, plan_name, configuration, area, price, price_numeric, image, cta_text, cta_url, sort_order FROM project_floor_plans WHERE project_id = ? ORDER BY sort_order ASC, id ASC");
         $fpStmt->execute([$project['id']]);
         $project['floor_plans'] = $fpStmt->fetchAll(PDO::FETCH_ASSOC);
         foreach ($project['floor_plans'] as &$fp) {

@@ -18,10 +18,15 @@ if ($action === 'delete' && $id) {
 }
 
 // ── Load row for edit
+$floorPlansList = [];
 if ($action === 'edit' && $id) {
     $stmt = $pdo->prepare("SELECT * FROM projects WHERE id=?");
     $stmt->execute([$id]);
     $row = $stmt->fetch() ?: [];
+
+    $fpStmt = $pdo->prepare("SELECT * FROM project_floor_plans WHERE project_id=? ORDER BY sort_order ASC, id ASC");
+    $fpStmt->execute([$id]);
+    $floorPlansList = $fpStmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 // ── Save (new or edit)
@@ -112,36 +117,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
                 'Entertainment' => trim($_POST['conn_ent'] ?? '')
             ]) : ($_POST['connectivity'] ?? ''),
             'highlights'       => $_POST['highlights'] ?? '',
-            // Floor Plan Labels (saved as text — images handled separately below)
-            'fp_1_label'  => trim($_POST['fp_1_label']  ?? ''),
-            'fp_2_label'  => trim($_POST['fp_2_label']  ?? ''),
-            'fp_3_label'  => trim($_POST['fp_3_label']  ?? ''),
-            'fp_4_label'  => trim($_POST['fp_4_label']  ?? ''),
-            'fp_5_label'  => trim($_POST['fp_5_label']  ?? ''),
-            'fp_6_label'  => trim($_POST['fp_6_label']  ?? ''),
-            'master_plan_label' => trim($_POST['master_plan_label'] ?? 'Master Plan') ?: 'Master Plan',
+            'master_plan_label'       => trim($_POST['master_plan_label'] ?? 'Master Plan') ?: 'Master Plan',
+            'master_plan_description' => trim($_POST['master_plan_description'] ?? ''),
         ];
 
         // Process Amenities text to JSON
         if (isset($_POST['amenities'])) {
             $amenitiesArr = array_filter(array_map('trim', explode("\n", $_POST['amenities'])));
             $data['amenities'] = json_encode(array_values($amenitiesArr));
-        }
-
-        // Handle 6 individual floor plan image slots
-        for ($slot = 1; $slot <= 6; $slot++) {
-            $deleteKey = "delete_fp_{$slot}_image";
-            $fileKey   = "fp_{$slot}_image";
-            if (!empty($_POST[$deleteKey])) {
-                $data[$fileKey] = null;
-            } elseif (!empty($_FILES[$fileKey]['name'])) {
-                $up = uploadImage($_FILES[$fileKey], 'projects/floor_plans');
-                if ($up['success']) {
-                    $data[$fileKey] = $up['path'];
-                } else {
-                    $errors[] = "Floor Plan $slot: " . $up['error'];
-                }
-            }
         }
 
         // Handle master plan image
@@ -153,6 +136,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
                 $data['master_plan_image'] = $up['path'];
             } else {
                 $errors[] = 'Master Plan: ' . $up['error'];
+            }
+        }
+
+        // Handle master plan PDF
+        if (!empty($_POST['delete_master_plan_pdf'])) {
+            $data['master_plan_pdf'] = null;
+        } elseif (!empty($_FILES['master_plan_pdf']['name'])) {
+            $up = uploadPdf($_FILES['master_plan_pdf'], 'projects/master_plan');
+            if ($up['success']) {
+                $data['master_plan_pdf'] = $up['path'];
+            } else {
+                $errors[] = 'Master Plan PDF: ' . $up['error'];
             }
         }
 
@@ -287,6 +282,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['new','edit'])) 
                     $id = (int)$pdo->lastInsertId();
                     logAction('CREATE', 'projects', $id);
                 }
+
+                // ── Sync Dynamic Floor Plans (project_floor_plans table)
+                if (isset($_POST['floor_plans_submitted']) && $id) {
+                    $submittedFp = $_POST['floor_plans'] ?? [];
+                    $savedIds    = [];
+
+                    if (is_array($submittedFp)) {
+                        foreach ($submittedFp as $index => $fp) {
+                            $fpId          = !empty($fp['id']) ? (int)$fp['id'] : null;
+                            $planName      = trim($fp['plan_name'] ?? '');
+                            $configuration = trim($fp['configuration'] ?? '');
+                            $area          = trim($fp['area'] ?? '');
+                            $price         = trim($fp['price'] ?? '');
+                            $priceNumeric  = (isset($fp['price_numeric']) && $fp['price_numeric'] !== '' && is_numeric($fp['price_numeric'])) ? (float)$fp['price_numeric'] : null;
+                            $ctaText       = trim($fp['cta_text'] ?? '') ?: 'View Floor Plan';
+                            $ctaUrl        = trim($fp['cta_url'] ?? '');
+                            $sortOrder     = (int)($fp['sort_order'] ?? $index);
+                            $existingImg   = trim($fp['existing_image'] ?? '');
+
+                            if (!empty($fp['delete_image'])) {
+                                $existingImg = '';
+                            }
+
+                            // Check if new image uploaded for this item index
+                            $imagePath = $existingImg;
+                            if (isset($_FILES['floor_plans']['name'][$index]['image']) && !empty($_FILES['floor_plans']['name'][$index]['image']) && $_FILES['floor_plans']['error'][$index]['image'] === UPLOAD_ERR_OK) {
+                                $fileData = [
+                                    'name'     => $_FILES['floor_plans']['name'][$index]['image'],
+                                    'type'     => $_FILES['floor_plans']['type'][$index]['image'],
+                                    'tmp_name' => $_FILES['floor_plans']['tmp_name'][$index]['image'],
+                                    'error'    => $_FILES['floor_plans']['error'][$index]['image'],
+                                    'size'     => $_FILES['floor_plans']['size'][$index]['image'],
+                                ];
+                                $up = uploadImage($fileData, 'projects/floor_plans');
+                                if ($up['success']) {
+                                    $imagePath = $up['path'];
+                                } else {
+                                    $errors[] = "Floor Plan #" . ($index + 1) . ": " . $up['error'];
+                                }
+                            }
+
+                            // Only save if at least one field or image is provided
+                            if ($planName !== '' || $configuration !== '' || $area !== '' || $price !== '' || $imagePath !== '') {
+                                if ($fpId) {
+                                    $upd = $pdo->prepare("UPDATE project_floor_plans SET plan_name=?, configuration=?, area=?, price=?, price_numeric=?, image=?, cta_text=?, cta_url=?, sort_order=? WHERE id=? AND project_id=?");
+                                    $upd->execute([$planName, $configuration, $area, $price, $priceNumeric, $imagePath, $ctaText, $ctaUrl, $sortOrder, $fpId, $id]);
+                                    $savedIds[] = $fpId;
+                                } else {
+                                    $ins = $pdo->prepare("INSERT INTO project_floor_plans (project_id, plan_name, configuration, area, price, price_numeric, image, cta_text, cta_url, sort_order) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                                    $ins->execute([$id, $planName, $configuration, $area, $price, $priceNumeric, $imagePath, $ctaText, $ctaUrl, $sortOrder]);
+                                    $savedIds[] = (int)$pdo->lastInsertId();
+                                }
+                            }
+                        }
+                    }
+
+                    // Delete floor plans removed in admin form
+                    if (!empty($savedIds)) {
+                        $inClause = implode(',', array_fill(0, count($savedIds), '?'));
+                        $delStmt  = $pdo->prepare("DELETE FROM project_floor_plans WHERE project_id = ? AND id NOT IN ($inClause)");
+                        $delStmt->execute(array_merge([$id], $savedIds));
+                    } else {
+                        $delStmt = $pdo->prepare("DELETE FROM project_floor_plans WHERE project_id = ?");
+                        $delStmt->execute([$id]);
+                    }
+                }
+
                 header('Location: ' . BASE_URL . 'admin/projects/?saved=1');
                 exit;
             } catch (PDOException $e) {
@@ -761,50 +823,98 @@ require __DIR__ . '/../includes/header.php';
         </div>
       </div>
 
-      <!-- ─── DEDICATED FLOOR PLAN SLOTS ─── -->
+      <!-- ─── DEDICATED DYNAMIC FLOOR PLANS ─── -->
+      <input type="hidden" name="floor_plans_submitted" value="1">
       <div class="adm-card">
-        <div class="adm-card-title"><i class="fas fa-layer-group me-2 text-primary"></i>Floor Plans (Up to 6 Slots)</div>
-        <p class="text-muted small mb-3">Upload a floor plan image for each BHK type and write a custom label below it (e.g. "1 BHK Floor Plan", "2 BHK — 1250 sq.ft." etc.).</p>
-        <div class="row g-4">
-          <?php
-          $fpSlotLabels = ['fp_1','fp_2','fp_3','fp_4','fp_5','fp_6'];
-          $fpDefaultHints = ['1 BHK Floor Plan','2 BHK Floor Plan','3 BHK Floor Plan','4 BHK Floor Plan','5 BHK Floor Plan','Penthouse Floor Plan'];
-          foreach ($fpSlotLabels as $idx => $fpKey):
-              $slot = $idx + 1;
-              $imgCol  = "{$fpKey}_image";
-              $lblCol  = "{$fpKey}_label";
-              $curImg  = $row[$imgCol] ?? null;
-              $curLbl  = $row[$lblCol] ?? '';
-          ?>
-          <div class="col-md-6 col-lg-4">
-            <div class="p-3 border rounded-3 bg-light h-100">
-              <div class="fw-bold text-dark mb-2" style="font-size:0.9rem;">Floor Plan <?= $slot ?></div>
-              <?php if (!empty($curImg)): ?>
-              <div class="mb-2 text-center">
-                <img src="<?= upload($curImg) ?>" style="max-height:100px; max-width:100%; object-fit:contain; border-radius:6px; border:1px solid #ddd; background:#fff; padding:4px;">
-                <label style="font-size:11px; cursor:pointer; color:#dc2626; display:block; margin-top:4px;">
-                  <input type="checkbox" name="delete_<?= $imgCol ?>"> Delete Image
-                </label>
-              </div>
-              <?php endif; ?>
-              <input type="file" name="<?= $imgCol ?>" class="form-control form-control-sm mb-2" accept="image/*">
-              <input type="text" name="<?= $lblCol ?>" class="form-control form-control-sm" placeholder="<?= $fpDefaultHints[$idx] ?>" value="<?= htmlspecialchars($curLbl) ?>">
-              <small class="text-muted" style="font-size:10px;">Label shown below floor plan on website</small>
-            </div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <div class="adm-card-title mb-0"><i class="fas fa-layer-group me-2 text-primary"></i>Dynamic Floor Plans</div>
+            <p class="text-muted small mb-0">Add as many floor plans as required across all configurations (or leave empty if optional). Specify configuration, pricing, area, unit type, image, and CTA button.</p>
           </div>
-          <?php endforeach; ?>
+          <button type="button" class="btn btn-sm btn-primary" id="addFloorPlanBtn"><i class="fas fa-plus me-1"></i>Add Floor Plan</button>
+        </div>
+
+        <div id="floorPlansContainer" class="d-flex flex-column gap-3">
+          <?php if (empty($floorPlansList)): ?>
+            <div class="text-muted text-center py-4 bg-light rounded border border-dashed" id="noFloorPlansHint">
+              <i class="fas fa-drafting-compass fa-2x mb-2 text-secondary d-block"></i>
+              <p class="mb-2">No floor plans added yet.</p>
+              <button type="button" class="btn btn-sm btn-outline-primary" onclick="addFloorPlanRow()"><i class="fas fa-plus me-1"></i>Add First Floor Plan</button>
+            </div>
+          <?php else: ?>
+            <?php foreach ($floorPlansList as $fpIdx => $fpItem): ?>
+              <div class="card border border-light-subtle shadow-sm floor-plan-row" data-index="<?= $fpIdx ?>">
+                <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+                  <span class="fw-bold text-dark"><i class="fas fa-grip-lines text-muted me-2 cursor-move"></i>Floor Plan #<span class="fp-num"><?= $fpIdx + 1 ?></span></span>
+                  <button type="button" class="btn btn-sm btn-outline-danger border-0 remove-fp-btn" title="Remove Floor Plan"><i class="fas fa-trash-alt me-1"></i>Remove</button>
+                </div>
+                <div class="card-body p-3">
+                  <input type="hidden" name="floor_plans[<?= $fpIdx ?>][id]" value="<?= htmlspecialchars($fpItem['id'] ?? '') ?>">
+                  <input type="hidden" name="floor_plans[<?= $fpIdx ?>][existing_image]" value="<?= htmlspecialchars($fpItem['image'] ?? '') ?>">
+                  <div class="row g-3">
+                    <div class="col-md-3">
+                      <label class="form-label small fw-bold">Configuration</label>
+                      <input type="text" name="floor_plans[<?= $fpIdx ?>][configuration]" class="form-control form-control-sm" placeholder="e.g. 2 BHK, 3 BHK + Study, Villa" value="<?= htmlspecialchars($fpItem['configuration'] ?? '') ?>">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label small fw-bold">Unit Type / Plan Title</label>
+                      <input type="text" name="floor_plans[<?= $fpIdx ?>][plan_name]" class="form-control form-control-sm" placeholder="e.g. Type A, Penthouse, Suite" value="<?= htmlspecialchars($fpItem['plan_name'] ?? '') ?>">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label small fw-bold">Area / Size</label>
+                      <input type="text" name="floor_plans[<?= $fpIdx ?>][area]" class="form-control form-control-sm" placeholder="e.g. 1,450 Sq.Ft / 135 Sq.M" value="<?= htmlspecialchars($fpItem['area'] ?? '') ?>">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label small fw-bold">Price Display</label>
+                      <input type="text" name="floor_plans[<?= $fpIdx ?>][price]" class="form-control form-control-sm" placeholder="e.g. ₹ 1.85 Cr* / $550,000 / AED 2M" value="<?= htmlspecialchars($fpItem['price'] ?? '') ?>">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label small fw-bold">Numeric Price (Optional)</label>
+                      <input type="number" step="0.01" name="floor_plans[<?= $fpIdx ?>][price_numeric]" class="form-control form-control-sm" placeholder="e.g. 18500000" value="<?= htmlspecialchars($fpItem['price_numeric'] ?? '') ?>">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label small fw-bold">CTA Button Text</label>
+                      <input type="text" name="floor_plans[<?= $fpIdx ?>][cta_text]" class="form-control form-control-sm" placeholder="View Floor Plan" value="<?= htmlspecialchars($fpItem['cta_text'] ?? 'View Floor Plan') ?>">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label small fw-bold">CTA Link / Target</label>
+                      <input type="text" name="floor_plans[<?= $fpIdx ?>][cta_url]" class="form-control form-control-sm" placeholder="e.g. #enquireModal or URL" value="<?= htmlspecialchars($fpItem['cta_url'] ?? '') ?>">
+                    </div>
+                    <div class="col-md-3">
+                      <label class="form-label small fw-bold">Sort Order</label>
+                      <input type="number" name="floor_plans[<?= $fpIdx ?>][sort_order]" class="form-control form-control-sm" value="<?= (int)($fpItem['sort_order'] ?? $fpIdx) ?>">
+                    </div>
+                    <div class="col-12">
+                      <label class="form-label small fw-bold">Floor Plan Image</label>
+                      <?php if (!empty($fpItem['image'])): ?>
+                        <div class="d-flex align-items-center gap-3 mb-2 p-2 bg-light rounded border">
+                          <img src="<?= upload($fpItem['image']) ?>" style="height:60px; max-width:100px; object-fit:contain; border-radius:4px; background:#fff;">
+                          <span class="small text-muted text-break"><?= htmlspecialchars($fpItem['image']) ?></span>
+                          <label class="ms-auto small text-danger cursor-pointer mb-0">
+                            <input type="checkbox" name="floor_plans[<?= $fpIdx ?>][delete_image]" value="1"> Delete Image
+                          </label>
+                        </div>
+                      <?php endif; ?>
+                      <input type="file" name="floor_plans[<?= $fpIdx ?>][image]" class="form-control form-control-sm" accept="image/*">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          <?php endif; ?>
         </div>
       </div>
 
       <!-- ─── MASTER PLAN ─── -->
       <div class="adm-card">
-        <div class="adm-card-title"><i class="fas fa-map me-2 text-primary"></i>Master Plan</div>
-        <p class="text-muted small mb-3">Upload the master plan / site plan image and write a custom label (default: "Master Plan").</p>
+        <div class="adm-card-title"><i class="fas fa-map me-2 text-primary"></i>Master Plan & Site Layout</div>
+        <p class="text-muted small mb-3">Upload the master plan / site layout image, custom label, description, and optional master plan PDF brochure.</p>
         <div class="row g-3">
           <div class="col-md-6">
+            <label class="adm-form-label fw-bold">Master Plan Image</label>
             <?php if (!empty($row['master_plan_image'])): ?>
-            <div class="mb-2 text-center">
-              <img src="<?= upload($row['master_plan_image']) ?>" style="max-height:140px; max-width:100%; object-fit:contain; border-radius:6px; border:1px solid #ddd; background:#fff; padding:4px;">
+            <div class="mb-2 text-center p-2 border bg-light rounded">
+              <img src="<?= upload($row['master_plan_image']) ?>" style="max-height:140px; max-width:100%; object-fit:contain; border-radius:6px; background:#fff; padding:4px;">
               <label style="font-size:11px; cursor:pointer; color:#dc2626; display:block; margin-top:4px;">
                 <input type="checkbox" name="delete_master_plan_image"> Delete Master Plan Image
               </label>
@@ -812,10 +922,29 @@ require __DIR__ . '/../includes/header.php';
             <?php endif; ?>
             <input type="file" name="master_plan_image" class="form-control" accept="image/*">
           </div>
-          <div class="col-md-6 d-flex flex-column justify-content-end">
-            <label class="adm-form-label">Master Plan Label</label>
-            <input type="text" name="master_plan_label" class="form-control" placeholder="Master Plan" value="<?= htmlspecialchars($row['master_plan_label'] ?? 'Master Plan') ?>">
-            <small class="text-muted">Text shown below master plan image on website</small>
+
+          <div class="col-md-6 d-flex flex-column gap-2">
+            <div>
+              <label class="adm-form-label fw-bold">Master Plan Label / Title</label>
+              <input type="text" name="master_plan_label" class="form-control" placeholder="Master Plan" value="<?= htmlspecialchars($row['master_plan_label'] ?? 'Master Plan') ?>">
+            </div>
+            <div>
+              <label class="adm-form-label fw-bold">Master Plan PDF / Layout Document</label>
+              <?php if (!empty($row['master_plan_pdf'])): ?>
+              <div class="mb-2">
+                <a href="<?= upload($row['master_plan_pdf']) ?>" target="_blank" style="font-size:12px;"><i class="fas fa-file-pdf me-1 text-danger"></i>View Master Plan PDF</a>
+                <label style="font-size:12px;cursor:pointer;display:block;margin-top:4px;" class="text-danger">
+                  <input type="checkbox" name="delete_master_plan_pdf" value="1"> Delete PDF
+                </label>
+              </div>
+              <?php endif; ?>
+              <input type="file" name="master_plan_pdf" class="form-control" accept="application/pdf">
+            </div>
+          </div>
+
+          <div class="col-12">
+            <label class="adm-form-label fw-bold">Master Plan Description / Key Highlights</label>
+            <textarea name="master_plan_description" class="form-control" rows="3" placeholder="Overview of the master plan, zoning, open spaces, tower layout..."><?= htmlspecialchars($row['master_plan_description'] ?? '') ?></textarea>
           </div>
         </div>
       </div>
@@ -984,6 +1113,100 @@ document.addEventListener("DOMContentLoaded", function() {
                 autoQrPreviewWrapper.style.display = "none";
             } else {
                 updateReraQrPreview();
+            }
+        });
+    }
+
+    // ── Dynamic Floor Plan Repeater ──
+    const floorPlansContainer = document.getElementById("floorPlansContainer");
+    const addFloorPlanBtn = document.getElementById("addFloorPlanBtn");
+    const noFloorPlansHint = document.getElementById("noFloorPlansHint");
+
+    window.addFloorPlanRow = function() {
+        if (!floorPlansContainer) return;
+        if (noFloorPlansHint) noFloorPlansHint.style.display = "none";
+
+        const index = floorPlansContainer.querySelectorAll(".floor-plan-row").length;
+        const rowDiv = document.createElement("div");
+        rowDiv.className = "card border border-light-subtle shadow-sm floor-plan-row";
+        rowDiv.dataset.index = index;
+        rowDiv.innerHTML = `
+            <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
+              <span class="fw-bold text-dark"><i class="fas fa-grip-lines text-muted me-2 cursor-move"></i>Floor Plan #<span class="fp-num">\${index + 1}</span></span>
+              <button type="button" class="btn btn-sm btn-outline-danger border-0 remove-fp-btn" title="Remove Floor Plan"><i class="fas fa-trash-alt me-1"></i>Remove</button>
+            </div>
+            <div class="card-body p-3">
+              <input type="hidden" name="floor_plans[\${index}][id]" value="">
+              <input type="hidden" name="floor_plans[\${index}][existing_image]" value="">
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <label class="form-label small fw-bold">Configuration</label>
+                  <input type="text" name="floor_plans[\${index}][configuration]" class="form-control form-control-sm" placeholder="e.g. 2 BHK, 3 BHK + Study, Villa">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-bold">Unit Type / Plan Title</label>
+                  <input type="text" name="floor_plans[\${index}][plan_name]" class="form-control form-control-sm" placeholder="e.g. Type A, Penthouse, Suite">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-bold">Area / Size</label>
+                  <input type="text" name="floor_plans[\${index}][area]" class="form-control form-control-sm" placeholder="e.g. 1,450 Sq.Ft / 135 Sq.M">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-bold">Price Display</label>
+                  <input type="text" name="floor_plans[\${index}][price]" class="form-control form-control-sm" placeholder="e.g. ₹ 1.85 Cr* / $550,000 / AED 2M">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-bold">Numeric Price (Optional)</label>
+                  <input type="number" step="0.01" name="floor_plans[\${index}][price_numeric]" class="form-control form-control-sm" placeholder="e.g. 18500000">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-bold">CTA Button Text</label>
+                  <input type="text" name="floor_plans[\${index}][cta_text]" class="form-control form-control-sm" placeholder="View Floor Plan" value="View Floor Plan">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-bold">CTA Link / Target</label>
+                  <input type="text" name="floor_plans[\${index}][cta_url]" class="form-control form-control-sm" placeholder="e.g. #enquireModal or URL">
+                </div>
+                <div class="col-md-3">
+                  <label class="form-label small fw-bold">Sort Order</label>
+                  <input type="number" name="floor_plans[\${index}][sort_order]" class="form-control form-control-sm" value="\${index}">
+                </div>
+                <div class="col-12">
+                  <label class="form-label small fw-bold">Floor Plan Image</label>
+                  <input type="file" name="floor_plans[\${index}][image]" class="form-control form-control-sm" accept="image/*">
+                </div>
+              </div>
+            </div>
+        `;
+        floorPlansContainer.appendChild(rowDiv);
+        reindexFloorPlans();
+    };
+
+    function reindexFloorPlans() {
+        if (!floorPlansContainer) return;
+        const rows = floorPlansContainer.querySelectorAll(".floor-plan-row");
+        rows.forEach((row, i) => {
+            const numEl = row.querySelector(".fp-num");
+            if (numEl) numEl.textContent = i + 1;
+        });
+        if (noFloorPlansHint) {
+            noFloorPlansHint.style.display = rows.length === 0 ? "block" : "none";
+        }
+    }
+
+    if (addFloorPlanBtn) {
+        addFloorPlanBtn.addEventListener("click", window.addFloorPlanRow);
+    }
+
+    if (floorPlansContainer) {
+        floorPlansContainer.addEventListener("click", function(e) {
+            const btn = e.target.closest(".remove-fp-btn");
+            if (btn) {
+                const row = btn.closest(".floor-plan-row");
+                if (row) {
+                    row.remove();
+                    reindexFloorPlans();
+                }
             }
         });
     }
