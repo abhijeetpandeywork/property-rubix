@@ -1088,7 +1088,7 @@ body {
         </div>
         <?php endif; ?>
 
-        <!-- EMI Calculator (Multi-Currency & Multi-Country JS UI) -->
+        <!-- EMI Calculator (Matching exact screenshot fields & 22 Currency list) -->
         <?php
         $cSlug = strtolower($p['country_slug'] ?? $p['country_name'] ?? '');
         $defaultCurr = 'INR';
@@ -1101,49 +1101,114 @@ body {
         } elseif (str_contains($cSlug, 'uk') || str_contains($cSlug, 'kingdom') || str_contains($cSlug, 'britain')) {
             $defaultCurr = 'GBP';
         }
+        $basePrice = $p['price_min'] ? $p['price_min'] : 300000;
         ?>
         <div class="lux-section glass-panel" id="emi-calculator-section">
-          <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3 border-bottom pb-3">
-              <h2 class="lux-section-title mb-0"><i class="fas fa-calculator text-primary"></i> Mortgage & EMI Calculator</h2>
-              <div class="d-flex align-items-center gap-2">
-                  <label for="emiCurrencySelect" class="small fw-bold text-muted mb-0"><i class="fas fa-globe me-1 text-primary"></i> Currency / Region:</label>
-                  <select id="emiCurrencySelect" class="form-select form-select-sm fw-bold shadow-sm" style="width: auto; border-radius: 8px; border-color: rgba(229,175,83,0.5); background: #ffffff;">
-                      <option value="INR" <?= $defaultCurr === 'INR' ? 'selected' : '' ?> data-symbol="₹" data-locale="en-IN" data-rate="8.5" data-min="500000" data-max="100000000" data-step="500000" data-def="4000000">🇮🇳 India (INR - ₹)</option>
-                      <option value="AED" <?= $defaultCurr === 'AED' ? 'selected' : '' ?> data-symbol="AED " data-locale="en-US" data-rate="4.5" data-min="100000" data-max="20000000" data-step="50000" data-def="1500000">🇦🇪 UAE (AED)</option>
-                      <option value="USD" <?= $defaultCurr === 'USD' ? 'selected' : '' ?> data-symbol="$" data-locale="en-US" data-rate="6.8" data-min="50000" data-max="10000000" data-step="10000" data-def="500000">🇺🇸 USA (USD - $)</option>
-                      <option value="CAD" <?= $defaultCurr === 'CAD' ? 'selected' : '' ?> data-symbol="CA$ " data-locale="en-CA" data-rate="5.5" data-min="50000" data-max="10000000" data-step="10000" data-def="650000">🇨🇦 Canada (CAD)</option>
-                      <option value="GBP" <?= $defaultCurr === 'GBP' ? 'selected' : '' ?> data-symbol="£" data-locale="en-GB" data-rate="5.2" data-min="50000" data-max="10000000" data-step="10000" data-def="450000">🇬🇧 UK (GBP - £)</option>
-                      <option value="EUR" <?= $defaultCurr === 'EUR' ? 'selected' : '' ?> data-symbol="€" data-locale="de-DE" data-rate="4.0" data-min="50000" data-max="10000000" data-step="10000" data-def="400000">🇪🇺 Europe (EUR - €)</option>
-                  </select>
-              </div>
+          <div class="border-bottom pb-3 mb-4">
+              <h2 class="lux-section-title mb-0" style="font-size: 1.5rem; font-weight: 800; letter-spacing: 0.5px; text-transform: uppercase;">
+                <i class="fas fa-calculator text-primary me-2"></i> EMI CALCULATOR
+              </h2>
           </div>
 
-          <div class="row align-items-center">
-              <div class="col-md-7">
+          <div class="row g-4">
+              <!-- Left Column: Inputs -->
+              <div class="col-lg-7">
                   <div class="emi-calc-box">
-                      <div class="mb-3">
-                          <label class="fw-bold mb-2 text-muted">Loan Amount (<span id="emiCurrencySymbolLabel">₹</span>)</label>
-                          <?php $basePrice = $p['price_min'] ? $p['price_min'] : 5000000; ?>
-                          <input type="range" class="form-range" id="emiLoanRange" min="1000000" max="100000000" step="500000" value="<?= $basePrice * 0.8 ?>">
-                          <div class="fw-800 text-dark" style="font-size:1.5rem;" id="emiLoanVal">₹<?= number_format($basePrice * 0.8) ?></div>
+                      <!-- 1. Choose Currency -->
+                      <div class="mb-4">
+                          <label for="emiCurrencySelect" class="form-label fw-bold text-dark mb-1">Choose Currency:</label>
+                          <select id="emiCurrencySelect" class="form-select form-select-lg fw-bold shadow-sm" style="border-radius: 10px; border: 1.5px solid #d1d5db; font-size: 1.05rem;">
+                              <option value="INR" <?= $defaultCurr === 'INR' ? 'selected' : '' ?> data-symbol="₹ " data-locale="en-IN" data-rate="8.5" data-min="50000" data-max="100000000" data-step="50000" data-def="300000">₹ INR (Indian Rupee)</option>
+                              <option value="AED" <?= $defaultCurr === 'AED' ? 'selected' : '' ?> data-symbol="د.إ " data-locale="ar-AE" data-rate="4.5" data-min="10000" data-max="20000000" data-step="10000" data-def="1500000">د.إ AED (United Arab Emirates)</option>
+                              <option value="CNY" data-symbol="¥ " data-locale="zh-CN" data-rate="4.2" data-min="50000" data-max="50000000" data-step="10000" data-def="2500000">¥ CNY (Chinese Yuan)</option>
+                              <option value="JPY" data-symbol="¥ " data-locale="ja-JP" data-rate="1.8" data-min="500000" data-max="500000000" data-step="100000" data-def="30000000">¥ JPY (Japanese Yen)</option>
+                              <option value="KRW" data-symbol="₩ " data-locale="ko-KR" data-rate="3.8" data-min="5000000" data-max="2000000000" data-step="1000000" data-def="400000000">₩ KRW (South Korean Won)</option>
+                              <option value="SGD" data-symbol="$ " data-locale="en-SG" data-rate="3.5" data-min="10000" data-max="10000000" data-step="10000" data-def="800000">$ SGD (Singapore Dollar)</option>
+                              <option value="THB" data-symbol="฿ " data-locale="th-TH" data-rate="5.0" data-min="50000" data-max="100000000" data-step="50000" data-def="5000000">฿ THB (Thai Baht)</option>
+                              <option value="SAR" data-symbol="ر.س " data-locale="ar-SA" data-rate="4.8" data-min="10000" data-max="20000000" data-step="10000" data-def="1500000">ر.س SAR (Saudi Riyal)</option>
+                              <option value="QAR" data-symbol="ر.ق " data-locale="ar-QA" data-rate="4.6" data-min="10000" data-max="20000000" data-step="10000" data-def="1500000">ر.ق QAR (Qatari Riyal)</option>
+                              <option value="EGP" data-symbol="ج.م " data-locale="ar-EG" data-rate="13.5" data-min="50000" data-max="20000000" data-step="25000" data-def="2000000">ج.م EGP (Egyptian Pound)</option>
+                              <option value="ILS" data-symbol="₪ " data-locale="he-IL" data-rate="4.2" data-min="50000" data-max="10000000" data-step="10000" data-def="1500000">₪ ILS (Israeli New Shekel)</option>
+                              <option value="EUR" data-symbol="€ " data-locale="de-DE" data-rate="4.0" data-min="10000" data-max="10000000" data-step="10000" data-def="400000">€ EUR (Euro)</option>
+                              <option value="GBP" <?= $defaultCurr === 'GBP' ? 'selected' : '' ?> data-symbol="£ " data-locale="en-GB" data-rate="5.2" data-min="10000" data-max="10000000" data-step="10000" data-def="450000">£ GBP (British Pound)</option>
+                              <option value="RUB" data-symbol="₽ " data-locale="ru-RU" data-rate="16.0" data-min="500000" data-max="100000000" data-step="100000" data-def="10000000">₽ RUB (Russian Ruble)</option>
+                              <option value="CHF" data-symbol="CHF " data-locale="de-CH" data-rate="2.2" data-min="10000" data-max="10000000" data-step="10000" data-def="600000">CHF (Swiss Franc)</option>
+                              <option value="SEK" data-symbol="kr " data-locale="sv-SE" data-rate="4.5" data-min="100000" data-max="50000000" data-step="50000" data-def="4000000">kr SEK (Swedish Krona)</option>
+                              <option value="USD" <?= $defaultCurr === 'USD' ? 'selected' : '' ?> data-symbol="$ " data-locale="en-US" data-rate="6.8" data-min="10000" data-max="10000000" data-step="10000" data-def="500000">$ USD (US Dollar)</option>
+                              <option value="CAD" <?= $defaultCurr === 'CAD' ? 'selected' : '' ?> data-symbol="CA$ " data-locale="en-CA" data-rate="5.5" data-min="10000" data-max="10000000" data-step="10000" data-def="650000">$ CAD (Canadian Dollar)</option>
+                              <option value="MXN" data-symbol="$ " data-locale="es-MX" data-rate="10.5" data-min="100000" data-max="50000000" data-step="50000" data-def="3500000">$ MXN (Mexican Peso)</option>
+                              <option value="BRL" data-symbol="R$ " data-locale="pt-BR" data-rate="11.0" data-min="50000" data-max="20000000" data-step="25000" data-def="1000000">R$ BRL (Brazilian Real)</option>
+                              <option value="AUD" data-symbol="A$ " data-locale="en-AU" data-rate="6.2" data-min="10000" data-max="10000000" data-step="10000" data-def="750000">$ AUD (Australian Dollar)</option>
+                              <option value="NZD" data-symbol="NZ$ " data-locale="en-NZ" data-rate="6.5" data-min="10000" data-max="10000000" data-step="10000" data-def="700000">NZ$ NZD (New Zealand Dollar)</option>
+                          </select>
                       </div>
-                      <div class="mb-3">
-                          <label class="fw-bold mb-2 text-muted">Interest Rate (%)</label>
-                          <input type="range" class="form-range" id="emiRateRange" min="2" max="18" step="0.1" value="8.5">
-                          <div class="fw-800 text-dark" style="font-size:1.5rem;" id="emiRateVal">8.5%</div>
+
+                      <!-- 2. Loan Amount -->
+                      <div class="mb-4">
+                          <div class="d-flex justify-content-between align-items-center mb-1">
+                              <label for="emiLoanInput" class="form-label fw-bold text-dark mb-0">Loan Amount</label>
+                              <span class="small text-muted font-monospace" id="emiCurrencySymbolLabel">₹</span>
+                          </div>
+                          <div class="input-group input-group-lg shadow-sm mb-2" style="border-radius:10px; overflow:hidden;">
+                              <span class="input-group-text bg-light fw-bold text-dark border-end-0" id="emiLoanSymbolAddon">₹</span>
+                              <input type="number" id="emiLoanInput" class="form-control fw-bold border-start-0 text-dark" value="<?= (int)($basePrice * 0.8) ?>" step="1000" min="0">
+                          </div>
+                          <input type="range" class="form-range" id="emiLoanRange" min="50000" max="100000000" step="50000" value="<?= (int)($basePrice * 0.8) ?>">
                       </div>
+
+                      <!-- 3. Advance Payment -->
+                      <div class="mb-4">
+                          <div class="d-flex justify-content-between align-items-center mb-1">
+                              <label class="form-label fw-bold text-dark mb-0">Advance Payment</label>
+                              <div class="fw-bold text-primary" style="font-size:1.1rem;" id="emiAdvVal">7500</div>
+                          </div>
+                          <input type="range" class="form-range" id="emiAdvRange" min="0" max="<?= (int)($basePrice * 0.5) ?>" step="500" value="7500">
+                      </div>
+
+                      <!-- 4. Duration -->
+                      <div class="mb-4">
+                          <div class="d-flex justify-content-between align-items-center mb-1">
+                              <label class="form-label fw-bold text-dark mb-0">Duration</label>
+                              <div class="fw-bold text-dark" style="font-size:1.1rem;" id="emiTenureVal">22 Years</div>
+                          </div>
+                          <input type="range" class="form-range" id="emiTenureRange" min="1" max="30" step="1" value="22">
+                      </div>
+
+                      <!-- 5. Interest Rate -->
                       <div class="mb-3">
-                          <label class="fw-bold mb-2 text-muted">Loan Tenure (Years)</label>
-                          <input type="range" class="form-range" id="emiTenureRange" min="1" max="30" step="1" value="20">
-                          <div class="fw-800 text-dark" style="font-size:1.5rem;" id="emiTenureVal">20 Years</div>
+                          <div class="d-flex justify-content-between align-items-center mb-1">
+                              <label class="form-label fw-bold text-dark mb-0">Interest Rate</label>
+                              <div class="fw-bold text-dark" style="font-size:1.1rem;" id="emiRateVal">15%</div>
+                          </div>
+                          <input type="range" class="form-range" id="emiRateRange" min="1" max="25" step="0.1" value="15">
                       </div>
                   </div>
               </div>
-              <div class="col-md-5 mt-4 mt-md-0">
-                  <div class="emi-result text-center p-4">
-                      <div class="text-white-50 fw-bold mb-2 text-uppercase" style="letter-spacing:1px; font-size:0.85rem;">Your Monthly EMI</div>
-                      <div class="fw-900" style="font-size:2.8rem; font-family:'Outfit';" id="emiResultVal">₹0</div>
-                      <div class="mt-3 text-white-50" style="font-size:0.85rem;">*Estimated figures based on selected currency & bank rates.</div>
+
+              <!-- Right Column: Result Card -->
+              <div class="col-lg-5">
+                  <div class="emi-result-card p-4 rounded-4 shadow-lg text-center d-flex flex-column justify-content-center h-100" style="background: linear-gradient(135deg, #f7cb46 0%, #eab308 100%); color: #0f172a; min-height: 320px; border: 1px solid rgba(255,255,255,0.4);">
+                      <div class="text-uppercase fw-800 tracking-wider mb-2" style="font-size: 0.85rem; opacity: 0.85; letter-spacing: 1px;">ESTIMATED MONTHLY EMI</div>
+                      <div class="display-5 fw-900 my-2" style="font-family: 'Outfit', sans-serif; letter-spacing: -0.5px;" id="emiResultVal">₹ 3799.28 <span style="font-size:1.1rem; font-weight:700;">/ MONTH</span></div>
+                      
+                      <div class="p-3 mt-3 bg-white rounded-3 shadow-sm border border-light text-start small">
+                          <div class="d-flex justify-content-between mb-1 text-muted">
+                              <span>Net Loan Principal:</span>
+                              <strong class="text-dark" id="emiNetPrincipalVal">₹ 2,92,500</strong>
+                          </div>
+                          <div class="d-flex justify-content-between mb-1 text-muted">
+                              <span>Total Interest Payable:</span>
+                              <strong class="text-dark" id="emiTotalInterestVal">₹ 7,10,510</strong>
+                          </div>
+                          <div class="d-flex justify-content-between border-top pt-1 mt-1">
+                              <span class="fw-bold text-dark">Total Amount Payable:</span>
+                              <strong class="text-primary fw-800" id="emiTotalPayableVal">₹ 10,03,010</strong>
+                          </div>
+                      </div>
+
+                      <div class="mt-3 text-muted small" style="font-size: 0.78rem; opacity: 0.8;">
+                          *Bank rates & taxes subject to region & lender policy.
+                      </div>
                   </div>
               </div>
           </div>
@@ -1422,42 +1487,60 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // Multi-Currency & Multi-Country EMI Calculator Logic
-    const currSelect   = document.getElementById('emiCurrencySelect');
-    const loanRange    = document.getElementById('emiLoanRange');
-    const rateRange    = document.getElementById('emiRateRange');
-    const tenureRange  = document.getElementById('emiTenureRange');
-    const loanVal      = document.getElementById('emiLoanVal');
-    const rateVal      = document.getElementById('emiRateVal');
-    const tenureVal    = document.getElementById('emiTenureVal');
-    const resultVal    = document.getElementById('emiResultVal');
-    const symbolLabel  = document.getElementById('emiCurrencySymbolLabel');
+    // Advanced Multi-Currency Mortgage & EMI Calculator Logic
+    const currSelect    = document.getElementById('emiCurrencySelect');
+    const loanInput     = document.getElementById('emiLoanInput');
+    const loanRange     = document.getElementById('emiLoanRange');
+    const advRange      = document.getElementById('emiAdvRange');
+    const tenureRange   = document.getElementById('emiTenureRange');
+    const rateRange     = document.getElementById('emiRateRange');
 
-    function updateCurrencyConfig() {
-        if (!currSelect || !loanRange) return;
+    const symbolAddon   = document.getElementById('emiLoanSymbolAddon');
+    const symbolLabel   = document.getElementById('emiCurrencySymbolLabel');
+    const advVal        = document.getElementById('emiAdvVal');
+    const tenureVal     = document.getElementById('emiTenureVal');
+    const rateVal       = document.getElementById('emiRateVal');
+
+    const resultVal     = document.getElementById('emiResultVal');
+    const netPrinVal    = document.getElementById('emiNetPrincipalVal');
+    const totIntVal     = document.getElementById('emiTotalInterestVal');
+    const totPayVal     = document.getElementById('emiTotalPayableVal');
+
+    function updateCurrencyDefaults() {
+        if (!currSelect || !loanInput) return;
         const opt = currSelect.options[currSelect.selectedIndex];
         if (!opt) return;
 
-        const symbol  = opt.dataset.symbol || '₹';
+        const symbol  = opt.dataset.symbol || '₹ ';
         const rate    = parseFloat(opt.dataset.rate || '8.5');
-        const minVal  = parseFloat(opt.dataset.min || '500000');
+        const minVal  = parseFloat(opt.dataset.min || '50000');
         const maxVal  = parseFloat(opt.dataset.max || '100000000');
-        const stepVal = parseFloat(opt.dataset.step || '500000');
-        const defVal  = parseFloat(opt.dataset.def || '4000000');
+        const stepVal = parseFloat(opt.dataset.step || '50000');
+        const defVal  = parseFloat(opt.dataset.def || '300000');
 
+        if (symbolAddon) symbolAddon.textContent = symbol.trim();
         if (symbolLabel) symbolLabel.textContent = symbol.trim();
 
-        // Update range min/max/step if currency changed
-        loanRange.min = minVal;
-        loanRange.max = maxVal;
+        loanRange.min  = minVal;
+        loanRange.max  = maxVal;
         loanRange.step = stepVal;
+        loanInput.min  = 0;
+        loanInput.step = stepVal;
 
-        let currentLoan = parseFloat(loanRange.value);
-        if (isNaN(currentLoan) || currentLoan < minVal || currentLoan > maxVal) {
+        // If currency changed or uninitialized, update default loan amount
+        let currentLoan = parseFloat(loanInput.value);
+        if (isNaN(currentLoan) || currSelect.dataset.lastSelected !== currSelect.value) {
+            loanInput.value = defVal;
             loanRange.value = defVal;
+            currSelect.dataset.lastSelected = currSelect.value;
         }
 
-        if (rateRange && (!rateRange.dataset.userModified)) {
+        if (advRange) {
+            advRange.max = Math.round(parseFloat(loanInput.value) * 0.5);
+            advRange.step = Math.max(500, Math.round(parseFloat(loanInput.value) / 100));
+        }
+
+        if (rateRange && !rateRange.dataset.userModified) {
             rateRange.value = rate;
         }
 
@@ -1465,41 +1548,65 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 
     function calculateEMI() {
-        if (!loanRange || !currSelect) return;
+        if (!loanInput || !currSelect) return;
         const opt = currSelect.options[currSelect.selectedIndex];
-        const symbol = opt ? (opt.dataset.symbol || '₹') : '₹';
-        const locale = opt ? (opt.dataset.locale || 'en-IN') : 'en-IN';
+        const symbol = opt ? (opt.dataset.symbol || '₹ ') : '₹ ';
 
-        const p = parseFloat(loanRange.value);
-        const r = parseFloat(rateRange.value) / 12 / 100;
-        const n = parseFloat(tenureRange.value) * 12;
-        
-        loanVal.textContent = symbol + p.toLocaleString(locale);
-        rateVal.textContent = rateRange.value + '%';
-        tenureVal.textContent = tenureRange.value + ' Years';
+        const totalLoan = parseFloat(loanInput.value) || 0;
+        const advPay    = parseFloat(advRange ? advRange.value : 0) || 0;
+        const netP      = Math.max(0, totalLoan - advPay);
+
+        const annualRate = parseFloat(rateRange ? rateRange.value : 8.5) || 0;
+        const years      = parseFloat(tenureRange ? tenureRange.value : 22) || 1;
+
+        const r = annualRate / 12 / 100;
+        const n = years * 12;
+
+        if (advVal) advVal.textContent = symbol + Math.round(advPay).toLocaleString();
+        if (tenureVal) tenureVal.textContent = years + ' Years';
+        if (rateVal) rateVal.textContent = annualRate + '%';
 
         let emi = 0;
-        if (r > 0) {
-            emi = p * r * (Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-        } else {
-            emi = p / n;
+        if (r > 0 && n > 0 && netP > 0) {
+            emi = (netP * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+        } else if (n > 0 && netP > 0) {
+            emi = netP / n;
         }
-        resultVal.textContent = symbol + Math.round(emi).toLocaleString(locale);
+
+        const totalPayable = emi * n;
+        const totalInterest = Math.max(0, totalPayable - netP);
+
+        if (resultVal) {
+            resultVal.innerHTML = `${symbol}${emi.toFixed(2)} <span style="font-size:1.1rem; font-weight:700;">/ MONTH</span>`;
+        }
+        if (netPrinVal) netPrinVal.textContent = symbol + Math.round(netP).toLocaleString();
+        if (totIntVal) totIntVal.textContent = symbol + Math.round(totalInterest).toLocaleString();
+        if (totPayVal) totPayVal.textContent = symbol + Math.round(totalPayable).toLocaleString();
     }
-    
-    if (loanRange && currSelect) {
-        currSelect.addEventListener('change', function() {
-            if (rateRange) delete rateRange.dataset.userModified;
-            updateCurrencyConfig();
+
+    if (loanInput && currSelect) {
+        loanInput.addEventListener('input', function() {
+            loanRange.value = this.value;
+            if (advRange) advRange.max = Math.round(parseFloat(this.value) * 0.5);
+            calculateEMI();
         });
-        rateRange.addEventListener('input', function() {
+        loanRange.addEventListener('input', function() {
+            loanInput.value = this.value;
+            if (advRange) advRange.max = Math.round(parseFloat(this.value) * 0.5);
+            calculateEMI();
+        });
+        advRange?.addEventListener('input', calculateEMI);
+        tenureRange?.addEventListener('input', calculateEMI);
+        rateRange?.addEventListener('input', function() {
             this.dataset.userModified = "true";
             calculateEMI();
         });
-        loanRange.addEventListener('input', calculateEMI);
-        tenureRange.addEventListener('input', calculateEMI);
-        
-        updateCurrencyConfig();
+        currSelect.addEventListener('change', function() {
+            if (rateRange) delete rateRange.dataset.userModified;
+            updateCurrencyDefaults();
+        });
+
+        updateCurrencyDefaults();
     }
 });
 
