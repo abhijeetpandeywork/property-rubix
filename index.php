@@ -51,9 +51,12 @@ $router->get('/location/{country}/{state}', 'LocationController', 'state');
 $router->get('/location/{country}/{state}/{city}', 'LocationController', 'city');
 $router->get('/location/{country}/{state}/{city}/{locality}', 'LocationController', 'locality');
 
-// Developer
+// Developer & Builder routes
 $router->get('/developer', 'DeveloperController', 'index');
 $router->get('/developer/{slug}', 'DeveloperController', 'profile');
+$router->get('/builder', 'DeveloperController', 'index');
+$router->get('/builder/{slug}', 'DeveloperController', 'profile');
+$router->get('/builders', 'DeveloperController', 'index');
 
 // Blog
 $router->get('/blog', 'BlogController', 'listing');

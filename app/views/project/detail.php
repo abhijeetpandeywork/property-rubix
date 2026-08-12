@@ -1129,7 +1129,7 @@ body {
           <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2 border-bottom pb-3">
               <h2 class="lux-section-title mb-0"><i class="fas fa-building text-primary"></i> About the Developer — <?= e($bName) ?></h2>
               <?php if ($bSlug): ?>
-              <a href="<?= PUBLIC_URL ?>builder/<?= e($bSlug) ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold">
+              <a href="<?= PUBLIC_URL ?>developer/<?= e($bSlug) ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold">
                   <i class="fas fa-city me-1"></i> View All Projects by <?= e($bName) ?>
               </a>
               <?php endif; ?>

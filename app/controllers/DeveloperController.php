@@ -33,12 +33,13 @@ class DeveloperController extends Controller {
 
     public function profile(array $params): void {
         $pdo = db();
+        $slug = trim($params['slug'] ?? '');
         $stmt = $pdo->prepare(
             "SELECT b.*, co.name AS country_name FROM builders b
              LEFT JOIN countries co ON co.id = b.country_id
-             WHERE b.slug=? AND b.status='active'"
+             WHERE LOWER(b.slug) = LOWER(?) AND (b.status = 'active' OR b.status IS NULL)"
         );
-        $stmt->execute([$params['slug']]);
+        $stmt->execute([$slug]);
         $builder = $stmt->fetch();
         if (!$builder) { http_response_code(404); $this->view('errors/404', []); return; }
 
