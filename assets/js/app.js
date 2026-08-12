@@ -100,6 +100,10 @@
     btn.disabled = true;
 
     const data = new FormData(this);
+    // Combine phone code + phone
+    const code  = data.get('phone_code') || '';
+    const phone = data.get('phone') || '';
+    if (code) { data.set('phone', code + ' ' + phone); }
 
     try {
       const res  = await fetch((window.BASE_URL || '/') + 'ajax/submit-site-visit', { method: 'POST', body: data, headers: { 'X-Requested-With': 'XMLHttpRequest' } });

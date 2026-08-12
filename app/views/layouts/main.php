@@ -87,27 +87,50 @@ $canonicalUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https
 <!-- ══ FLOATING BUTTONS ════════════════════════════════════════════════════ -->
 <div class="floating-actions d-flex flex-column gap-2" style="position: fixed; bottom: 80px; right: 20px; z-index: 9999; align-items: flex-end;">
     <style>
+      .fab-btn {
+        min-width: 140px;
+        padding: 10px 22px;
+        border-radius: 30px;
+        font-weight: 700;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        transition: transform 0.2s, box-shadow 0.2s;
+        text-decoration: none;
+      }
+      .fab-btn:hover {
+        transform: translateY(-2px);
+        text-decoration: none;
+        color: #fff;
+      }
       @keyframes pulseSV {
         0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
         70% { box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); }
         100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
       }
+      .fab-sv {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: #1a0a00;
+        animation: pulseSV 2s infinite;
+      }
+      .fab-sv:hover { color: #1a0a00; box-shadow: 0 8px 24px rgba(245,158,11,0.4); }
+      
+      .fab-call { background: #007bff; color: #ffffff; box-shadow: 0 6px 16px rgba(0,123,255,0.25); }
+      .fab-call:hover { background: #0069d9; }
+      
+      .fab-wa { background: #25D366; color: #ffffff; box-shadow: 0 6px 16px rgba(37,211,102,0.25); }
+      .fab-wa:hover { background: #1ebc59; }
     </style>
-    <button type="button" class="btn d-flex align-items-center shadow-lg" data-bs-toggle="modal" data-bs-target="#siteVisitModal" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #1a0a00; border-radius: 30px; font-weight: 800; padding: 8px 20px; border: none; margin-bottom: 5px; animation: pulseSV 2s infinite;" title="Book Site Visit">
+    <button type="button" class="fab-btn fab-sv" data-bs-toggle="modal" data-bs-target="#siteVisitModal" title="Book Site Visit">
         <i class="fas fa-car-side me-2"></i> Site Visit
     </button>
-    <a href="tel:<?= e(preg_replace('/[^+\d]/', '', $phone)) ?>"
-       class="btn d-flex align-items-center shadow-lg"
-       style="background: #007bff; color: #ffffff; border-radius: 30px; font-weight: bold; padding: 8px 20px;"
-       title="Call Us">
+    <a href="tel:<?= e(preg_replace('/[^+\d]/', '', $phone)) ?>" class="fab-btn fab-call" title="Call Us">
         <i class="fas fa-phone-alt me-2"></i> Call Us
     </a>
-    <a href="https://wa.me/<?= e($wa) ?>?text=<?= urlencode('Hi, I found you on PropertyRubix. I need help with a property.') ?>"
-       class="btn d-flex align-items-center shadow-lg"
-       target="_blank" rel="noopener"
-       style="background: #25D366; color: #ffffff; border-radius: 30px; font-weight: bold; padding: 8px 20px;"
-       title="WhatsApp Us">
-        <i class="fab fa-whatsapp me-2 fs-5"></i> WhatsApp
+    <a href="https://wa.me/<?= e($wa) ?>?text=<?= urlencode('Hi, I found you on PropertyRubix. I need help with a property.') ?>" class="fab-btn fab-wa" target="_blank" rel="noopener" title="WhatsApp Us">
+        <i class="fab fa-whatsapp me-2" style="font-size:1.1rem;"></i> WhatsApp
     </a>
 </div>
 
@@ -134,7 +157,27 @@ $canonicalUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https
               <input type="email" class="form-control" name="email" placeholder="Email">
             </div>
             <div class="col-12">
-              <input type="tel" class="form-control" name="phone" placeholder="Phone Number" required pattern="[0-9+\s\-]{8,15}">
+              <div class="input-group">
+                <select name="phone_code" class="form-select fw-bold shadow-none" style="max-width:110px;">
+                  <option value="+91" selected>🇮🇳 +91</option>
+                  <option value="+1">🇺🇸 +1</option>
+                  <option value="+1">🇨🇦 +1</option>
+                  <option value="+44">🇬🇧 +44</option>
+                  <option value="+971">🇦🇪 +971</option>
+                  <option value="+61">🇦🇺 +61</option>
+                  <option value="+65">🇸🇬 +65</option>
+                  <option value="+60">🇲🇾 +60</option>
+                  <option value="+49">🇩🇪 +49</option>
+                  <option value="+33">🇫🇷 +33</option>
+                  <option value="+966">🇸🇦 +966</option>
+                  <option value="+974">🇶🇦 +974</option>
+                  <option value="+965">🇰🇼 +965</option>
+                  <option value="+880">🇧🇩 +880</option>
+                  <option value="+92">🇵🇰 +92</option>
+                  <option value="+977">🇳🇵 +977</option>
+                </select>
+                <input type="tel" class="form-control" name="phone" placeholder="Phone Number" required pattern="[0-9]{7,15}">
+              </div>
             </div>
             <div class="col-12">
               <textarea class="form-control" name="query" rows="3" placeholder="Query"></textarea>
