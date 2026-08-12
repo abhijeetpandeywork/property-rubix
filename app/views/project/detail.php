@@ -1101,7 +1101,29 @@ body {
         } elseif (str_contains($cSlug, 'uk') || str_contains($cSlug, 'kingdom') || str_contains($cSlug, 'britain')) {
             $defaultCurr = 'GBP';
         }
-        $basePrice = $p['price_min'] ? $p['price_min'] : 300000;
+        $basePrice = 0;
+        if (!empty($p['price_min']) && $p['price_min'] > 0) {
+            $basePrice = (float)$p['price_min'];
+        } elseif (!empty($p['price_display'])) {
+            $pd = strtolower(trim($p['price_display']));
+            if (preg_match('/([\d\.]+)\s*(cr|crore)/i', $pd, $m)) {
+                $basePrice = (float)$m[1] * 10000000;
+            } elseif (preg_match('/([\d\.]+)\s*(lakh|lac|lacs)/i', $pd, $m)) {
+                $basePrice = (float)$m[1] * 100000;
+            } elseif (preg_match('/([\d\.]+)\s*(k|thousand)/i', $pd, $m)) {
+                $basePrice = (float)$m[1] * 1000;
+            } elseif (preg_match('/([\d\.]+)\s*(m|million)/i', $pd, $m)) {
+                $basePrice = (float)$m[1] * 1000000;
+            } else {
+                if (preg_match('/([\d\.,]+)/', $pd, $m)) {
+                    $basePrice = (float)str_replace(',', '', $m[1]);
+                }
+            }
+        }
+        
+        if ($basePrice <= 0) {
+            $basePrice = 300000; // ultimate fallback
+        }
         ?>
         <div class="lux-section glass-panel" id="emi-calculator-section">
           <div class="border-bottom pb-3 mb-4">
