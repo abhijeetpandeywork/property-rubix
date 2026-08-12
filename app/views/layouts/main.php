@@ -152,6 +152,59 @@ $canonicalUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https
       /* WhatsApp Button */
       .fab-wa { background: linear-gradient(135deg, #22c55e, #16a34a); }
       .fab-wa:hover { box-shadow: 0 12px 28px rgba(22,163,74,0.35); }
+
+      /* Mobile Responsive App Tab Bar */
+      @media (max-width: 768px) {
+        body {
+          padding-bottom: 75px !important;
+        }
+        .fab-container {
+          bottom: 0 !important;
+          right: 0 !important;
+          width: 100% !important;
+          flex-direction: row !important;
+          gap: 0 !important;
+          padding: 8px 10px 15px 10px !important;
+          background: rgba(255, 255, 255, 0.95);
+          backdrop-filter: blur(10px);
+          border-top: 1px solid #eaeaea;
+          justify-content: space-between !important;
+          box-shadow: 0 -4px 15px rgba(0,0,0,0.05);
+        }
+        .fab-btn {
+          width: 32% !important;
+          border-radius: 12px !important;
+          height: 48px !important;
+          flex-direction: column !important;
+          padding: 0 !important;
+          animation: none !important; /* disable pulse */
+          box-shadow: none !important;
+          position: relative !important;
+          justify-content: center !important;
+        }
+        .fab-btn:hover {
+          width: 32% !important;
+          transform: none !important;
+        }
+        .fab-icon {
+          position: static !important;
+          height: 20px !important;
+          width: 100% !important;
+          font-size: 1.1rem !important;
+          margin-top: 4px !important;
+        }
+        .fab-text {
+          position: static !important;
+          opacity: 1 !important;
+          font-size: 0.65rem !important;
+          text-align: center !important;
+          margin: 0 !important;
+          width: 100% !important;
+          line-height: 1.2 !important;
+          margin-top: 2px !important;
+          font-weight: 600 !important;
+        }
+      }
     </style>
 
     <button type="button" class="fab-btn fab-sv" data-bs-toggle="modal" data-bs-target="#siteVisitModal">

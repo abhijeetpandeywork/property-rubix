@@ -294,6 +294,12 @@ body {
     border: 1px solid rgba(0,0,0,0.05); border-radius: 24px; padding: 35px;
     box-shadow: 0 25px 60px rgba(0,0,0,0.05);
 }
+@media (max-width: 768px) {
+    .glass-sidebar { padding: 20px !important; }
+    .price-display { font-size: 1.8rem !important; }
+    .bento-grid { grid-template-columns: 1fr !important; }
+    .lux-section-title { font-size: 1.5rem !important; }
+}
 .price-display { font-size: 2.25rem; font-weight: 900; color: #0f172a; margin-bottom: 25px; font-family: 'Outfit', sans-serif; }
 
 /* ─── Floor Plan Slot Cards ──────────────────────────── */
@@ -1323,7 +1329,7 @@ body {
             
             <!-- RERA Block Centered -->
             <?php if (!empty($p['builder_name']) || !empty($p['rera_id']) || !empty($p['rera_qr_code'])): ?>
-            <div class="text-center mt-5 pt-4 border-top" style="background:#fdfcf9; border-radius:16px; padding:25px 20px; border:1px solid #f0eade;">
+            <div class="text-center mt-5 pt-4 border-top" style="background:#fdfcf9; border-radius:16px; padding:25px 10px; border:1px solid #f0eade;">
                 <?php if (!empty($p['builder_logo'])): ?>
                     <img src="<?= upload($p['builder_logo']) ?>" alt="<?= e($p['builder_name']) ?>" style="max-height:80px; max-width:220px; object-fit:contain; margin-bottom:15px; border-radius:8px;">
                 <?php elseif (!empty($p['builder_name'])): ?>
@@ -1373,7 +1379,7 @@ body {
                 
                 <p class="mb-1 text-muted" style="font-size:0.9rem;">RERA Website:</p>
                 <div class="mb-2">
-                    <a href="<?= e($reraLink) ?>" target="_blank" class="fw-bold text-decoration-none d-inline-block px-3 py-1 rounded" style="color:var(--pr-primary); word-break:break-all; font-size:1rem; background:rgba(229,175,83,0.12); border:1px solid rgba(229,175,83,0.35);"><?= e($reraLink) ?></a>
+                    <a href="<?= e($reraLink) ?>" target="_blank" class="fw-bold text-decoration-none d-inline-block px-2 px-md-3 py-1 rounded" style="color:var(--pr-primary); word-break:break-all; font-size: clamp(0.75rem, 3vw, 1rem); background:rgba(229,175,83,0.12); border:1px solid rgba(229,175,83,0.35); max-width: 100%;"><?= e($reraLink) ?></a>
                 </div>
                 
                 <?php if (!empty($p['rera_id'])): ?>
