@@ -29,9 +29,19 @@
     document.body.style.overflow = '';
   }
 
+  window.openDrawer = openDrawer;
+  window.closeDrawer = closeDrawer;
+
   toggle?.addEventListener('click', openDrawer);
   closeBtn?.addEventListener('click', closeDrawer);
   overlay?.addEventListener('click', closeDrawer);
+
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('#drawerClose') || e.target.closest('.drawer-close')) {
+      e.preventDefault();
+      closeDrawer();
+    }
+  });
 
   // Close on Escape
   document.addEventListener('keydown', (e) => {

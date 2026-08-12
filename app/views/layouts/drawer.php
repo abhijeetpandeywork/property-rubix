@@ -19,8 +19,8 @@ $igUrl  = getSetting('social_instagram', '#');
         <h3 class="fw-bold mb-0 text-dark m-0" style="font-size:1.4rem; letter-spacing:-0.5px;">property<span style="color:#a9804b;">rubix</span></h3>
       <?php endif; ?>
     </a>
-    <button class="drawer-close" id="drawerClose" aria-label="Close menu" style="background: #fff; border: 1px solid #ddd; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; color: #000; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; top: -5px; right: -5px;">
-      <i class="fas fa-times"></i>
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu" onclick="if(typeof closeDrawer==='function') closeDrawer(); else if(window.closeDrawer) window.closeDrawer();" style="background: #fff; border: 1px solid #ddd; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; color: #000; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; top: -5px; right: -5px; z-index: 10001; pointer-events: auto;">
+      <i class="fas fa-times" style="pointer-events: none;"></i>
     </button>
   </div>
 
