@@ -86,8 +86,15 @@ $canonicalUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https
 
 <!-- ══ FLOATING BUTTONS ════════════════════════════════════════════════════ -->
 <div class="floating-actions d-flex flex-column gap-2" style="position: fixed; bottom: 80px; right: 20px; z-index: 9999; align-items: flex-end;">
-    <button type="button" class="btn shadow-lg d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#siteVisitModal" style="background: var(--pr-secondary); color: var(--pr-primary); border-radius: 50%; width: 50px; height: 50px; border: 3px solid var(--pr-primary); margin-bottom: 5px; padding: 0;">
-        <i class="fas fa-bullseye" style="font-size: 1.5rem;"></i>
+    <style>
+      @keyframes pulseSV {
+        0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
+        70% { box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+      }
+    </style>
+    <button type="button" class="btn d-flex align-items-center shadow-lg" data-bs-toggle="modal" data-bs-target="#siteVisitModal" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #1a0a00; border-radius: 30px; font-weight: 800; padding: 8px 20px; border: none; margin-bottom: 5px; animation: pulseSV 2s infinite;" title="Book Site Visit">
+        <i class="fas fa-car-side me-2"></i> Site Visit
     </button>
     <a href="tel:<?= e(preg_replace('/[^+\d]/', '', $phone)) ?>"
        class="btn d-flex align-items-center shadow-lg"
