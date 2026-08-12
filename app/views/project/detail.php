@@ -1145,10 +1145,7 @@ body {
 
                       <!-- 2. Loan Amount -->
                       <div class="mb-4">
-                          <div class="d-flex justify-content-between align-items-center mb-1">
-                              <label for="emiLoanInput" class="form-label fw-bold text-dark mb-0">Loan Amount</label>
-                              <span class="small text-muted font-monospace" id="emiCurrencySymbolLabel">₹</span>
-                          </div>
+                          <label for="emiLoanInput" class="form-label fw-bold text-dark mb-1">Loan Amount</label>
                           <div class="input-group input-group-lg shadow-sm mb-2" style="border-radius:10px; overflow:hidden;">
                               <span class="input-group-text bg-light fw-bold text-dark border-end-0" id="emiLoanSymbolAddon">₹</span>
                               <input type="number" id="emiLoanInput" class="form-control fw-bold border-start-0 text-dark" value="<?= (int)($basePrice * 0.8) ?>" step="1000" min="0">
@@ -1496,7 +1493,6 @@ document.addEventListener("DOMContentLoaded", function() {
     const rateRange     = document.getElementById('emiRateRange');
 
     const symbolAddon   = document.getElementById('emiLoanSymbolAddon');
-    const symbolLabel   = document.getElementById('emiCurrencySymbolLabel');
     const advVal        = document.getElementById('emiAdvVal');
     const tenureVal     = document.getElementById('emiTenureVal');
     const rateVal       = document.getElementById('emiRateVal');
@@ -1519,7 +1515,6 @@ document.addEventListener("DOMContentLoaded", function() {
         const defVal  = parseFloat(opt.dataset.def || '300000');
 
         if (symbolAddon) symbolAddon.textContent = symbol.trim();
-        if (symbolLabel) symbolLabel.textContent = symbol.trim();
 
         loanRange.min  = minVal;
         loanRange.max  = maxVal;
