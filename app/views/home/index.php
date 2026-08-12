@@ -33,7 +33,7 @@ if (empty($sliders)) {
         <!-- Search Input -->
         <form action="<?= PUBLIC_URL ?>projects" method="get" class="d-flex align-items-center bg-white" style="border-radius: 50px; padding: 5px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); border: 2px solid rgba(229,175,83,0.5);">
           <div class="px-3 text-muted"><i class="fas fa-search fs-5"></i></div>
-          <input type="text" name="q" id="smartSearchInput" class="form-control border-0 shadow-none fw-500" placeholder="Search by city, developer, neighborhood, or project..." style="height: 55px; font-size: 1.15rem; background: transparent; color: #333;" autocomplete="off">
+          <input type="text" name="q" id="smartSearchInput" class="form-control border-0 shadow-none fw-500" placeholder="Search by city, developer, neighborhood, or project..." style="height: 55px; font-size: 1.15rem; background: transparent; color: #333;" autocomplete="off" required>
           <button type="submit" class="btn btn-primary rounded-pill px-4" style="height: 55px; font-weight: 600; font-size: 1.1rem; background: #8a6736; border: none;">Search</button>
         </form>
 
