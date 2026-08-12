@@ -614,7 +614,7 @@ body {
         <div class="lux-section glass-panel">
           <div class="d-flex justify-content-between align-items-center mb-4">
               <h2 class="lux-section-title mb-0" style="font-size: 1.5rem;"><i class="fas fa-route"></i> Connectivity</h2>
-              <button type="button" class="btn btn-sm text-white" style="background: var(--pr-primary); font-weight: 600;" data-bs-toggle="modal" data-bs-target="#enquiryModal"><i class="fas fa-download me-1"></i> Download Connectivity</button>
+              <button type="button" class="btn btn-sm text-white download-gate-btn" style="background: var(--pr-primary); font-weight: 600;" data-download-url="" data-download-label="Connectivity Details"><i class="fas fa-download me-1"></i> Download Connectivity</button>
           </div>
           
           <ul class="nav nav-pills conn-tabs mb-4 flex-nowrap overflow-auto" id="connTabs" role="tablist" style="padding-bottom: 10px;">
@@ -1635,17 +1635,24 @@ document.addEventListener("DOMContentLoaded", function() {
         loanInput.min  = 0;
         loanInput.step = stepVal;
 
-        // If currency changed or uninitialized, update default loan amount
-        let currentLoan = parseFloat(loanInput.value);
-        if (isNaN(currentLoan) || currSelect.dataset.lastSelected !== currSelect.value) {
-            loanInput.value = defVal;
-            loanRange.value = defVal;
+        // Always anchor loan/advance to project price, regardless of currency change
+        const projectLoan = <?= (int)($basePrice * 0.8) ?>;
+        const projectAdv  = <?= (int)($basePrice * 0.2) ?>;
+
+        // If currency changed or uninitialized, reset to project price values
+        if (isNaN(parseFloat(loanInput.value)) || currSelect.dataset.lastSelected !== currSelect.value) {
+            loanInput.value = projectLoan;
+            loanRange.value = projectLoan;
             currSelect.dataset.lastSelected = currSelect.value;
         }
 
         if (advRange) {
-            advRange.max = Math.round(parseFloat(loanInput.value) * 0.5);
-            advRange.step = Math.max(500, Math.round(parseFloat(loanInput.value) / 100));
+            advRange.max   = Math.round(parseFloat(loanInput.value) * 0.5);
+            advRange.step  = Math.max(500, Math.round(parseFloat(loanInput.value) / 100));
+            // Only reset advance if currency just changed
+            if (currSelect.dataset.lastSelected === currSelect.value && isNaN(parseFloat(advRange.value))) {
+                advRange.value = projectAdv;
+            }
         }
 
         if (rateRange && !rateRange.dataset.userModified) {
@@ -1777,11 +1784,11 @@ document.getElementById('downloadGateForm')?.addEventListener('submit', async fu
         const res  = await fetch("<?= $ajaxUrl ?>", { method:'POST', body:data, headers:{'X-Requested-With':'XMLHttpRequest'} });
         const json = await res.json();
         if (json.success) {
-            resDiv.style.display = 'block';
-            resDiv.innerHTML = '<span class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i>Thank you! Your download is starting…</span>';
-            // Auto trigger download
-            const pendingUrl = document.getElementById('downloadGateModal').dataset.pendingUrl;
+            const pendingUrl = document.getElementById('downloadGateModal').dataset.pendingUrl || '';
             if (pendingUrl) {
+                resDiv.style.display = 'block';
+                resDiv.innerHTML = '<span class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i>Thank you! Your download is starting…</span>';
+                // Auto trigger download
                 setTimeout(() => {
                     const a = document.createElement('a');
                     a.href = pendingUrl;
@@ -1796,6 +1803,16 @@ document.getElementById('downloadGateForm')?.addEventListener('submit', async fu
                         if (m) m.hide();
                     }, 2000);
                 }, 800);
+            } else {
+                // No file to download (e.g. Connectivity) — show success + contact CTA
+                resDiv.style.display = 'block';
+                resDiv.innerHTML = `<div class="text-success fw-bold mb-3"><i class="fas fa-check-circle me-1"></i>Thank you! Our team will share the details with you shortly.</div>
+                <a href="https://wa.me/<?= e(str_replace(['+', ' '], '', $wa)) ?>?text=<?= urlencode("Hi, I requested Connectivity details for {$p['name']}.") ?>" target="_blank" class="btn btn-sm fw-bold w-100" style="background:#25D366; color:#fff; border-radius:10px;"><i class="fab fa-whatsapp me-2"></i>Get Details on WhatsApp</a>`;
+                // Close modal after 5s
+                setTimeout(() => {
+                    const m = bootstrap.Modal.getInstance(document.getElementById('downloadGateModal'));
+                    if (m) m.hide();
+                }, 5000);
             }
         } else {
             resDiv.style.display = 'block';

@@ -12,7 +12,9 @@ class AjaxController extends Controller {
         }
 
         $name       = trim($_POST['name']         ?? '');
-        $phone      = trim($_POST['phone']        ?? '');
+        $phoneRaw   = trim($_POST['phone']        ?? '');
+        $phoneCode  = trim($_POST['phone_code']   ?? '');
+        $phone      = $phoneCode ? $phoneCode . $phoneRaw : $phoneRaw;
         $email      = trim($_POST['email']        ?? '');
         $message    = trim($_POST['message']      ?? '');
         $projectName= trim($_POST['project_name'] ?? '');
