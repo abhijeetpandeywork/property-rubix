@@ -1116,6 +1116,64 @@ body {
           </div>
         </div>
 
+        <!-- ── About the Developer Section ── -->
+        <?php if (!empty($p['builder_name'])): 
+            $bName  = $p['builder_name'];
+            $bLogo  = !empty($p['builder_logo']) ? upload($p['builder_logo']) : '';
+            $bDesc  = !empty($p['builder_desc']) ? $p['builder_desc'] : '';
+            $bYear  = !empty($p['established_year']) ? $p['established_year'] : '';
+            $bTotal = !empty($p['builder_total']) ? $p['builder_total'] : '';
+            $bSlug  = !empty($p['builder_slug']) ? $p['builder_slug'] : '';
+        ?>
+        <div class="lux-section glass-panel" id="about-developer">
+          <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2 border-bottom pb-3">
+              <h2 class="lux-section-title mb-0"><i class="fas fa-building text-primary"></i> About the Developer — <?= e($bName) ?></h2>
+              <?php if ($bSlug): ?>
+              <a href="<?= PUBLIC_URL ?>builder/<?= e($bSlug) ?>" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold">
+                  <i class="fas fa-city me-1"></i> View All Projects by <?= e($bName) ?>
+              </a>
+              <?php endif; ?>
+          </div>
+
+          <div class="row align-items-center g-4">
+              <?php if ($bLogo): ?>
+              <div class="col-md-3 text-center">
+                  <div class="p-3 bg-light rounded-4 border shadow-sm d-inline-block w-100" style="max-width:180px;">
+                      <img src="<?= e($bLogo) ?>" alt="<?= e($bName) ?>" class="img-fluid" style="max-height:90px; object-fit:contain;">
+                  </div>
+              </div>
+              <?php endif; ?>
+
+              <div class="<?= $bLogo ? 'col-md-9' : 'col-12' ?>">
+                  <h3 class="fw-bold text-dark mb-2" style="font-size:1.4rem;"><?= e($bName) ?></h3>
+                  
+                  <?php if ($bYear || $bTotal): ?>
+                  <div class="d-flex gap-4 mb-3 flex-wrap">
+                      <?php if ($bYear): ?>
+                      <div class="d-flex align-items-center gap-2 text-muted small">
+                          <i class="fas fa-calendar-alt text-primary"></i> Established: <strong class="text-dark"><?= e($bYear) ?></strong>
+                      </div>
+                      <?php endif; ?>
+                      <?php if ($bTotal): ?>
+                      <div class="d-flex align-items-center gap-2 text-muted small">
+                          <i class="fas fa-city text-primary"></i> Total Projects: <strong class="text-dark"><?= e($bTotal) ?>+ Projects</strong>
+                      </div>
+                      <?php endif; ?>
+                  </div>
+                  <?php endif; ?>
+
+                  <?php if ($bDesc): ?>
+                  <div class="lux-description text-muted" style="font-size: 1.02rem; line-height: 1.7; white-space: pre-wrap;"><?= e($bDesc) ?></div>
+                  <?php else: ?>
+                  <p class="text-muted mb-0" style="font-size: 1.02rem; line-height: 1.7;">
+                      <strong><?= e($bName) ?></strong> is one of the premier real estate developers, renowned for delivering landmark residential and commercial projects built with superior construction standards, architectural excellence, and luxury lifestyle amenities.
+                  </p>
+                  <?php endif; ?>
+              </div>
+          </div>
+        </div>
+        <?php endif; ?>
+
       </div>
 
       <!-- ── RIGHT SIDEBAR (Sticky Glassmorphic) ── -->
