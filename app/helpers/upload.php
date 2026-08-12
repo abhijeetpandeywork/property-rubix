@@ -16,7 +16,7 @@ define('ALLOWED_IMAGE_TYPES', [
     'image/x-icon'
 ]);
 define('ALLOWED_PDF_TYPES',   ['application/pdf']);
-define('MAX_UPLOAD_SIZE', 10 * 1024 * 1024); // 10 MB
+define('MAX_UPLOAD_SIZE', 15 * 1024 * 1024); // 15 MB
 
 /**
  * Upload an image file.
@@ -37,7 +37,7 @@ function uploadFile(array $file, string $subdir, array $allowedMimes): array {
         return ['success' => false, 'path' => null, 'error' => uploadError($file['error'])];
     }
     if ($file['size'] > MAX_UPLOAD_SIZE) {
-        return ['success' => false, 'path' => null, 'error' => 'File too large (max 10 MB).'];
+        return ['success' => false, 'path' => null, 'error' => 'File too large (max 15 MB).'];
     }
 
     $mime = mime_content_type($file['tmp_name']);
