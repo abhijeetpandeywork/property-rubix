@@ -42,7 +42,7 @@ body {
 .custom-proj-header .container-fluid {
     display: flex; align-items: center; justify-content: space-between;
 }
-.cph-logo img { max-height: 70px; object-fit: contain; }
+.cph-actions { display: flex; align-items: center; gap: 16px; }
 .cph-btn, a.cph-btn {
     display: inline-flex !important; align-items: center !important; gap: 8px !important; font-weight: 700 !important; color: #0f172a !important;
     background: #ffffff !important; padding: 8px 20px !important; border-radius: 8px !important; text-decoration: none !important;
@@ -51,8 +51,8 @@ body {
 }
 .cph-btn:hover, a.cph-btn:hover { background: #b08d55 !important; color: #ffffff !important; }
 .cph-btn:hover i, a.cph-btn:hover i { color: #ffffff !important; }
-.cph-hamburger { font-size: 1.5rem; color: #111; cursor: pointer; padding-left: 15px; border-left: 1px solid #ccc; display: flex; flex-direction: column; gap: 5px; }
-.cph-hamburger span { display: block; width: 25px; height: 3px; background: #111; }
+.cph-hamburger { font-size: 1.5rem; color: #111; cursor: pointer; padding-left: 4px; border-left: none !important; display: flex; flex-direction: column; gap: 5px; }
+.cph-hamburger span { display: block; width: 25px; height: 3px; background: #111; border-radius: 2px; }
 
 /* --- Marquee --- */
 .marquee-bar {
@@ -442,7 +442,7 @@ body {
             <a href="https://wa.me/<?= e(str_replace(['+',' '],'',$wa)) ?>?text=<?= urlencode("Hi, I'm interested in {$p['name']}.") ?>" target="_blank" class="cph-btn" style="color:#0f172a !important;">
                 <i class="fab fa-whatsapp" style="color:#25D366;"></i> <span>WhatsApp</span>
             </a>
-            <div class="cph-hamburger" onclick="document.getElementById('drawerToggle').click();">
+            <div class="cph-hamburger" onclick="document.getElementById('drawerToggle').click();" style="border-left: none !important;">
                 <span></span><span></span><span></span>
             </div>
         </div>
