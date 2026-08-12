@@ -84,53 +84,87 @@ $canonicalUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https
 <!-- ══ FOOTER ══════════════════════════════════════════════════════════════ -->
 <?php require __DIR__ . '/footer.php'; ?>
 
-<!-- ══ FLOATING BUTTONS ════════════════════════════════════════════════════ -->
-<div class="floating-actions d-flex flex-column gap-2" style="position: fixed; bottom: 80px; right: 20px; z-index: 9999; align-items: flex-end;">
+<!-- ══ PREMIUM EXPANDING FLOATING BUTTONS ════════════════════════════════════ -->
+<div class="fab-container" style="position: fixed; bottom: 80px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 14px; align-items: flex-end;">
     <style>
       .fab-btn {
-        min-width: 140px;
-        padding: 10px 22px;
-        border-radius: 30px;
+        height: 56px;
+        border-radius: 28px;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        border: none;
+        text-decoration: none;
+        overflow: hidden;
+        color: #fff;
         font-weight: 700;
-        font-size: 0.95rem;
+        font-size: 1rem;
+        white-space: nowrap;
+        width: 56px; /* Starts as a perfect circle */
+        transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s, transform 0.3s;
+        flex-direction: row-reverse; /* Keeps icon anchored to the right */
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+      }
+      .fab-btn:hover {
+        width: 165px; /* Expands to show text */
+        text-decoration: none;
+        color: #fff;
+        transform: translateY(-3px);
+      }
+      .fab-icon {
+        width: 24px;
         display: flex;
         align-items: center;
         justify-content: center;
-        border: none;
-        transition: transform 0.2s, box-shadow 0.2s;
-        text-decoration: none;
+        font-size: 1.25rem;
+        flex-shrink: 0;
       }
-      .fab-btn:hover {
-        transform: translateY(-2px);
-        text-decoration: none;
-        color: #fff;
+      .fab-text {
+        margin-right: 14px;
+        opacity: 0;
+        transition: opacity 0.25s ease;
+        transition-delay: 0s;
       }
-      @keyframes pulseSV {
-        0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
-        70% { box-shadow: 0 0 0 15px rgba(245, 158, 11, 0); }
-        100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+      .fab-btn:hover .fab-text {
+        opacity: 1;
+        transition-delay: 0.15s;
       }
+      
+      /* Site Visit Button */
       .fab-sv {
         background: linear-gradient(135deg, #f59e0b, #d97706);
         color: #1a0a00;
         animation: pulseSV 2s infinite;
       }
-      .fab-sv:hover { color: #1a0a00; box-shadow: 0 8px 24px rgba(245,158,11,0.4); }
-      
-      .fab-call { background: #007bff; color: #ffffff; box-shadow: 0 6px 16px rgba(0,123,255,0.25); }
-      .fab-call:hover { background: #0069d9; }
-      
-      .fab-wa { background: #25D366; color: #ffffff; box-shadow: 0 6px 16px rgba(37,211,102,0.25); }
-      .fab-wa:hover { background: #1ebc59; }
+      .fab-sv:hover { color: #1a0a00; box-shadow: 0 12px 28px rgba(245,158,11,0.35); }
+      @keyframes pulseSV {
+        0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.6); }
+        70% { box-shadow: 0 0 0 16px rgba(245, 158, 11, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+      }
+
+      /* Call Button */
+      .fab-call { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+      .fab-call:hover { box-shadow: 0 12px 28px rgba(37,99,235,0.35); }
+
+      /* WhatsApp Button */
+      .fab-wa { background: linear-gradient(135deg, #22c55e, #16a34a); }
+      .fab-wa:hover { box-shadow: 0 12px 28px rgba(22,163,74,0.35); }
     </style>
-    <button type="button" class="fab-btn fab-sv" data-bs-toggle="modal" data-bs-target="#siteVisitModal" title="Book Site Visit">
-        <i class="fas fa-car-side me-2"></i> Site Visit
+
+    <button type="button" class="fab-btn fab-sv" data-bs-toggle="modal" data-bs-target="#siteVisitModal">
+        <span class="fab-icon"><i class="fas fa-car-side"></i></span>
+        <span class="fab-text">Site Visit</span>
     </button>
-    <a href="tel:<?= e(preg_replace('/[^+\d]/', '', $phone)) ?>" class="fab-btn fab-call" title="Call Us">
-        <i class="fas fa-phone-alt me-2"></i> Call Us
+    
+    <a href="tel:<?= e(preg_replace('/[^+\d]/', '', $phone)) ?>" class="fab-btn fab-call">
+        <span class="fab-icon"><i class="fas fa-phone-alt"></i></span>
+        <span class="fab-text">Call Us</span>
     </a>
-    <a href="https://wa.me/<?= e($wa) ?>?text=<?= urlencode('Hi, I found you on PropertyRubix. I need help with a property.') ?>" class="fab-btn fab-wa" target="_blank" rel="noopener" title="WhatsApp Us">
-        <i class="fab fa-whatsapp me-2" style="font-size:1.1rem;"></i> WhatsApp
+    
+    <a href="https://wa.me/<?= e($wa) ?>?text=<?= urlencode('Hi, I found you on PropertyRubix. I need help with a property.') ?>" class="fab-btn fab-wa" target="_blank" rel="noopener">
+        <span class="fab-icon"><i class="fab fa-whatsapp" style="font-size:1.4rem;"></i></span>
+        <span class="fab-text">WhatsApp</span>
     </a>
 </div>
 
