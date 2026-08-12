@@ -1237,17 +1237,19 @@ body {
                 }
 
                 // Determine QR Code: custom uploaded image OR dynamically auto-generated from RERA ID + portal
+                // Determine QR Code: custom uploaded image OR dynamically auto-generated clean URL for scanners
                 $qrCodeUrl = '';
                 if (!empty($p['rera_qr_code'])) {
                     $qrCodeUrl = upload($p['rera_qr_code']);
                 } elseif (!empty($p['rera_id'])) {
-                    $qrData = $reraLink . ' (RERA Reg: ' . $p['rera_id'] . ')';
-                    $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=' . urlencode($qrData) . '&margin=6';
+                    // Use clean URL so mobile camera QR scanners immediately open the RERA portal
+                    $qrData = $reraLink;
+                    $qrCodeUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' . urlencode($qrData) . '&margin=4';
                 }
                 ?>
                 
                 <?php if ($qrCodeUrl): ?>
-                <div class="mb-3 d-inline-block p-2 bg-white rounded-3 shadow-sm border cursor-pointer" data-lightbox="gallery" data-src="<?= e($qrCodeUrl) ?>" data-title="RERA QR Code - <?= e($p['name']) ?>">
+                <div class="mb-3 d-inline-block p-2 bg-white rounded-3 shadow-sm border cursor-pointer" data-lightbox="gallery" data-src="<?= e($qrCodeUrl) ?>" data-title="RERA Registration QR Code - <?= e($p['name']) ?> (Reg: <?= e($p['rera_id']) ?>)">
                     <img src="<?= e($qrCodeUrl) ?>" alt="RERA QR Code" style="width:160px; height:160px; object-fit:contain; display:block;">
                 </div>
                 <?php endif; ?>
