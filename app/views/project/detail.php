@@ -1533,10 +1533,16 @@ ob_start();
     <div class="modal-content glass-panel" style="border-radius:24px; border:none; box-shadow:0 30px 60px rgba(0,0,0,0.2);">
       <div class="modal-header border-0 pb-0 flex-column justify-content-center position-relative pt-4">
         <button type="button" class="btn-close position-absolute" data-bs-dismiss="modal" aria-label="Close" style="right:20px; top:20px;"></button>
-        <div class="text-center mb-3">
-          <div style="width:60px; height:60px; background:linear-gradient(135deg,#f7cb46,#eab308); border-radius:16px; display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px;">
-            <i class="fas fa-file-download fa-2x" style="color:#0f172a;"></i>
-          </div>
+        <div class="text-center mb-2">
+          <?php if (!empty($p['project_logo'])): ?>
+              <img src="<?= upload($p['project_logo']) ?>" alt="Logo" style="max-height:80px; object-fit:contain; margin-bottom:10px;">
+          <?php elseif (!empty($p['builder_logo'])): ?>
+              <img src="<?= upload($p['builder_logo']) ?>" alt="Logo" style="max-height:80px; object-fit:contain; margin-bottom:10px;">
+          <?php else: ?>
+              <div style="width:60px; height:60px; background:linear-gradient(135deg,#f7cb46,#eab308); border-radius:16px; display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px; margin-left:auto; margin-right:auto;">
+                <i class="fas fa-file-download fa-2x" style="color:#0f172a;"></i>
+              </div>
+          <?php endif; ?>
         </div>
         <h4 class="modal-title fw-900 text-center" id="downloadGateModalLabel">Get Your Free <span id="downloadGateFileLabel">Brochure</span></h4>
       </div>
