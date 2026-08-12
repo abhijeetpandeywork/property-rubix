@@ -92,7 +92,6 @@ $canonicalUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https
         border-radius: 28px;
         display: flex;
         align-items: center;
-        padding: 0 16px;
         border: none;
         text-decoration: none;
         overflow: hidden;
@@ -102,32 +101,35 @@ $canonicalUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https
         white-space: nowrap;
         width: 56px; /* Starts as a perfect circle */
         transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s, transform 0.3s;
-        flex-direction: row-reverse; /* Keeps icon anchored to the right */
         box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        position: relative;
       }
       .fab-btn:hover {
-        width: 165px; /* Expands to show text */
+        width: 160px; /* Expands to show text */
         text-decoration: none;
         color: #fff;
         transform: translateY(-3px);
       }
       .fab-icon {
-        width: 24px;
+        position: absolute;
+        right: 0;
+        width: 56px;
+        height: 56px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.25rem;
-        flex-shrink: 0;
+        font-size: 1.3rem;
       }
       .fab-text {
-        margin-right: 14px;
+        position: absolute;
+        right: 52px;
         opacity: 0;
         transition: opacity 0.25s ease;
         transition-delay: 0s;
       }
       .fab-btn:hover .fab-text {
         opacity: 1;
-        transition-delay: 0.15s;
+        transition-delay: 0.1s;
       }
       
       /* Site Visit Button */
