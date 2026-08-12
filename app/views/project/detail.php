@@ -1187,17 +1187,18 @@ body {
                 <?= View::priceRange($p['price_min'], $p['price_max'], (bool)$p['price_on_request'], $p['price_display'] ?? '') ?>
             </div>
 
-            <button type="button" class="btn w-100 py-3 mb-3 fw-bold shadow-lg text-white" style="border-radius:12px; font-size:1.1rem; background: var(--pr-primary); border:none;" data-bs-toggle="modal" data-bs-target="#enquiryModal">
-                Enquire Now
-            </button>
+            <div class="d-flex flex-column gap-3 mt-4">
+              <button type="button" class="btn w-100 py-3 fw-bold shadow-sm text-dark" style="border-radius:12px; font-size:1.05rem; background: var(--pr-primary); border:none;" data-bs-toggle="modal" data-bs-target="#enquiryModal">
+                  <i class="fas fa-paper-plane me-2"></i> Enquire Now
+              </button>
 
-            <div class="d-grid gap-3 mt-4">
               <a href="https://wa.me/<?= e(str_replace(['+',' '],'',$wa)) ?>?text=<?= urlencode("Hi, I'm interested in {$p['name']}. Please share details.") ?>"
-                 target="_blank" class="btn py-3 fw-bold text-white shadow-sm" style="background: #25D366; border-radius:12px;">
+                 target="_blank" class="btn w-100 py-3 fw-bold text-white shadow-sm" style="background: #25D366; border-radius:12px; font-size:1.05rem; border:none;">
                 <i class="fab fa-whatsapp me-2"></i> Chat on WhatsApp
               </a>
+
               <?php if ($p['brochure_pdf']): ?>
-              <a href="<?= upload($p['brochure_pdf']) ?>" target="_blank" class="btn btn-outline-dark py-3 fw-bold shadow-sm" style="border-radius:12px;">
+              <a href="<?= upload($p['brochure_pdf']) ?>" target="_blank" class="btn btn-outline-dark w-100 py-3 fw-bold shadow-sm" style="border-radius:12px; font-size:1.05rem;">
                 <i class="fas fa-download me-2"></i> Download Brochure
               </a>
               <?php endif; ?>
