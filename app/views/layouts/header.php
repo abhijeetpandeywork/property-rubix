@@ -15,7 +15,7 @@ $siteName = getSetting('site_name') ?: 'PropertyRubix';
   <div class="header-inner container-fluid px-3 px-md-4 justify-content-between">
 
     <!-- Logo -->
-    <a href="<?= PUBLIC_URL ?>" class="header-logo d-flex flex-column align-items-start justify-content-center text-decoration-none" aria-label="<?= e($siteName) ?> home" style="gap: 1px; min-height: 40px;">
+    <a href="<?= PUBLIC_URL ?>" class="header-logo d-flex flex-column align-items-start justify-content-center text-decoration-none" aria-label="<?= e($siteName) ?> home" style="gap: 1px; min-height: 40px; outline: none; border: none; background: transparent; -webkit-tap-highlight-color: transparent;">
       <?php if (!empty($headerLogo)): ?>
         <img src="<?= upload($headerLogo) ?>" alt="<?= e($headerTitle ?? $siteName) ?>" style="max-height: 40px; width: auto; object-fit: contain;">
       <?php elseif (!empty($headerTitle)): ?>

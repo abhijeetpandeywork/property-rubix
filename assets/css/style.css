@@ -1203,3 +1203,41 @@ a.country-image-card {
   outline: none !important;
   -webkit-tap-highlight-color: transparent !important;
 }
+
+/* ── Reset Focus Outline, Background & Tap Highlight on Logos, Brands & Images ── */
+a, a:focus, a:active, a:focus-visible,
+a img, a:focus img, a:active img {
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.header-logo,
+.navbar-brand,
+.brand-logo,
+.project-logo,
+a.header-logo,
+a.navbar-brand,
+a.brand-logo {
+  outline: 0 !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-touch-callout: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.header-logo:focus, .header-logo:active, .header-logo:focus-visible, .header-logo:hover,
+.navbar-brand:focus, .navbar-brand:active, .navbar-brand:focus-visible, .navbar-brand:hover,
+a.header-logo:focus, a.header-logo:active, a.header-logo:hover,
+a.navbar-brand:focus, a.navbar-brand:active, a.navbar-brand:hover {
+  outline: 0 !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
