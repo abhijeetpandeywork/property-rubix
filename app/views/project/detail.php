@@ -43,14 +43,14 @@ body {
     display: flex; align-items: center; justify-content: space-between;
 }
 .cph-logo img { max-height: 70px; object-fit: contain; }
-.cph-actions { display: flex; align-items: center; gap: 15px; }
-.cph-btn {
-    display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: #fff;
-    background: #111; padding: 8px 20px; border-radius: 6px; text-decoration: none;
-    border: 1px solid #b08d55; /* gold border matching image */
-    font-size: 0.95rem; transition: background 0.3s;
+.cph-btn, a.cph-btn {
+    display: inline-flex !important; align-items: center !important; gap: 8px !important; font-weight: 700 !important; color: #0f172a !important;
+    background: #ffffff !important; padding: 8px 20px !important; border-radius: 8px !important; text-decoration: none !important;
+    border: 1.5px solid #b08d55 !important;
+    font-size: 0.95rem !important; transition: all 0.3s ease !important; box-shadow: 0 2px 6px rgba(0,0,0,0.04) !important;
 }
-.cph-btn:hover { background: #b08d55; color: #fff; }
+.cph-btn:hover, a.cph-btn:hover { background: #b08d55 !important; color: #ffffff !important; }
+.cph-btn:hover i, a.cph-btn:hover i { color: #ffffff !important; }
 .cph-hamburger { font-size: 1.5rem; color: #111; cursor: pointer; padding-left: 15px; border-left: 1px solid #ccc; display: flex; flex-direction: column; gap: 5px; }
 .cph-hamburger span { display: block; width: 25px; height: 3px; background: #111; }
 
@@ -436,11 +436,11 @@ body {
             <?php endif; ?>
         </div>
         <div class="cph-actions d-none d-md-flex">
-            <a href="tel:<?= e(str_replace(' ','',$phone)) ?>" class="cph-btn">
-                <i class="fas fa-phone-alt" style="color:var(--pr-primary);"></i> <?= e($phone) ?>
+            <a href="tel:<?= e(str_replace(' ','',$phone)) ?>" class="cph-btn" style="color:#0f172a !important;">
+                <i class="fas fa-phone-alt" style="color:#b08d55;"></i> <span><?= e($phone) ?></span>
             </a>
-            <a href="https://wa.me/<?= e(str_replace(['+',' '],'',$wa)) ?>?text=<?= urlencode("Hi, I'm interested in {$p['name']}.") ?>" target="_blank" class="cph-btn">
-                <i class="fab fa-whatsapp" style="color:#25D366;"></i> WhatsApp
+            <a href="https://wa.me/<?= e(str_replace(['+',' '],'',$wa)) ?>?text=<?= urlencode("Hi, I'm interested in {$p['name']}.") ?>" target="_blank" class="cph-btn" style="color:#0f172a !important;">
+                <i class="fab fa-whatsapp" style="color:#25D366;"></i> <span>WhatsApp</span>
             </a>
             <div class="cph-hamburger" onclick="document.getElementById('drawerToggle').click();">
                 <span></span><span></span><span></span>
