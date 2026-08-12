@@ -1064,12 +1064,13 @@ require __DIR__ . '/../includes/header.php';
 </form>
 
 <?php
-$extraScripts = '
+ob_start();
+?>
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const states = ' . json_encode($states) . ';
-    const cities = ' . json_encode($cities) . ';
-    const localities = ' . json_encode($localities) . ';
+    const states = <?= json_encode($states) ?>;
+    const cities = <?= json_encode($cities) ?>;
+    const localities = <?= json_encode($localities) ?>;
     
     const countrySelect = document.getElementById("countrySelect");
     const stateSelect = document.getElementById("stateSelect");
@@ -1077,8 +1078,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const localitySelect = document.getElementById("localitySelect");
     const locationAreaInput = document.getElementById("locationAreaInput");
     
-    let currentCityId = "' . ((int)($row['city_id'] ?? 0) ?: '') . '";
-    let currentLocalityId = "' . ((int)($row['locality_id'] ?? 0) ?: '') . '";
+    let currentCityId = "<?= ((int)($row['city_id'] ?? 0) ?: '') ?>";
+    let currentLocalityId = "<?= ((int)($row['locality_id'] ?? 0) ?: '') ?>";
     
     let currentCountryId = "";
     let currentStateId = "";
@@ -1088,66 +1089,78 @@ document.addEventListener("DOMContentLoaded", function() {
         if (city) {
             currentStateId = String(city.state_id);
             const state = states.find(s => String(s.id) === String(currentStateId));
-            if (state) currentCountryId = String(state.country_id);
+            if (state) {
+                currentCountryId = String(state.country_id);
+            }
         }
-    }
-    
-    if (countrySelect && currentCountryId) {
-        countrySelect.value = currentCountryId;
     }
     
     function updateStates() {
         if (!stateSelect) return;
-        const cId = countrySelect ? countrySelect.value : "";
-        stateSelect.innerHTML = \'<option value="">-- Select State --</option>\';
-        if (cId) {
-            states.filter(s => String(s.country_id) === String(cId)).forEach(s => {
-                const opt = new Option(s.name, s.id);
+        const selectedCountry = countrySelect ? countrySelect.value : "";
+        stateSelect.innerHTML = '<option value="">-- Select State --</option>';
+        citySelect.innerHTML = '<option value="">-- Select City --</option>';
+        localitySelect.innerHTML = '<option value="">-- Select Locality --</option>';
+        
+        if (selectedCountry) {
+            const filteredStates = states.filter(s => String(s.country_id) === String(selectedCountry));
+            filteredStates.forEach(s => {
+                const opt = document.createElement("option");
+                opt.value = s.id;
+                opt.textContent = s.name;
                 if (String(s.id) === String(currentStateId)) opt.selected = true;
                 stateSelect.appendChild(opt);
             });
+            if (currentStateId) updateCities();
         }
-        updateCities();
     }
-    
+
     function updateCities() {
         if (!citySelect) return;
-        const sId = stateSelect ? stateSelect.value : "";
-        citySelect.innerHTML = \'<option value="">-- Select City --</option>\';
-        if (sId) {
-            cities.filter(c => String(c.state_id) === String(sId)).forEach(c => {
-                const opt = new Option(c.name, c.id);
+        const selectedState = stateSelect ? stateSelect.value : "";
+        citySelect.innerHTML = '<option value="">-- Select City --</option>';
+        localitySelect.innerHTML = '<option value="">-- Select Locality --</option>';
+        
+        if (selectedState) {
+            const filteredCities = cities.filter(c => String(c.state_id) === String(selectedState));
+            filteredCities.forEach(c => {
+                const opt = document.createElement("option");
+                opt.value = c.id;
+                opt.textContent = c.name;
                 if (String(c.id) === String(currentCityId)) opt.selected = true;
                 citySelect.appendChild(opt);
             });
+            if (currentCityId) updateLocalities();
         }
-        updateLocalities();
     }
-    
+
     function updateLocalities() {
         if (!localitySelect) return;
-        const cId = citySelect ? citySelect.value : "";
-        localitySelect.innerHTML = \'<option value="">-- Select Locality --</option>\';
-        if (cId) {
-            localities.filter(l => String(l.city_id) === String(cId)).forEach(loc => {
-                const opt = new Option(loc.name, loc.id);
-                opt.dataset.name = loc.name;
-                if (String(loc.id) === String(currentLocalityId)) opt.selected = true;
+        const selectedCity = citySelect ? citySelect.value : "";
+        localitySelect.innerHTML = '<option value="">-- Select Locality --</option>';
+        
+        if (selectedCity) {
+            const filteredLocalities = localities.filter(l => String(l.city_id) === String(selectedCity));
+            filteredLocalities.forEach(l => {
+                const opt = document.createElement("option");
+                opt.value = l.id;
+                opt.textContent = l.name;
+                if (String(l.id) === String(currentLocalityId)) opt.selected = true;
                 localitySelect.appendChild(opt);
             });
         }
-        syncLocationArea();
     }
 
     function syncLocationArea() {
         if (!localitySelect || !locationAreaInput) return;
-        const selectedOpt = localitySelect.options[localitySelect.selectedIndex];
-        if (selectedOpt && selectedOpt.value && selectedOpt.dataset.name) {
-            locationAreaInput.value = selectedOpt.dataset.name;
+        const selectedOption = localitySelect.options[localitySelect.selectedIndex];
+        if (selectedOption && selectedOption.value) {
+            locationAreaInput.value = selectedOption.textContent.trim();
         }
     }
-    
+
     if (countrySelect) {
+        if (currentCountryId) countrySelect.value = currentCountryId;
         countrySelect.addEventListener("change", function() {
             currentStateId = "";
             currentCityId = "";
@@ -1222,48 +1235,48 @@ document.addEventListener("DOMContentLoaded", function() {
         rowDiv.dataset.index = index;
         rowDiv.innerHTML = `
             <div class="card-header bg-light d-flex justify-content-between align-items-center py-2">
-              <span class="fw-bold text-dark"><i class="fas fa-grip-lines text-muted me-2 cursor-move"></i>Floor Plan #<span class="fp-num">\${index + 1}</span></span>
+              <span class="fw-bold text-dark"><i class="fas fa-grip-lines text-muted me-2 cursor-move"></i>Floor Plan #<span class="fp-num">${index + 1}</span></span>
               <button type="button" class="btn btn-sm btn-outline-danger border-0 remove-fp-btn" title="Remove Floor Plan"><i class="fas fa-trash-alt me-1"></i>Remove</button>
             </div>
             <div class="card-body p-3">
-              <input type="hidden" name="floor_plans[\${index}][id]" value="">
-              <input type="hidden" name="floor_plans[\${index}][existing_image]" value="">
+              <input type="hidden" name="floor_plans[${index}][id]" value="">
+              <input type="hidden" name="floor_plans[${index}][existing_image]" value="">
               <div class="row g-3">
                 <div class="col-md-3">
                   <label class="form-label small fw-bold">Configuration</label>
-                  <input type="text" name="floor_plans[\${index}][configuration]" class="form-control form-control-sm" placeholder="e.g. 2 BHK, 3 BHK + Study, Villa">
+                  <input type="text" name="floor_plans[${index}][configuration]" class="form-control form-control-sm" placeholder="e.g. 2 BHK, 3 BHK + Study, Villa">
                 </div>
                 <div class="col-md-3">
                   <label class="form-label small fw-bold">Unit Type / Plan Title</label>
-                  <input type="text" name="floor_plans[\${index}][plan_name]" class="form-control form-control-sm" placeholder="e.g. Type A, Penthouse, Suite">
+                  <input type="text" name="floor_plans[${index}][plan_name]" class="form-control form-control-sm" placeholder="e.g. Type A, Penthouse, Suite">
                 </div>
                 <div class="col-md-3">
                   <label class="form-label small fw-bold">Area / Size</label>
-                  <input type="text" name="floor_plans[\${index}][area]" class="form-control form-control-sm" placeholder="e.g. 1,450 Sq.Ft / 135 Sq.M">
+                  <input type="text" name="floor_plans[${index}][area]" class="form-control form-control-sm" placeholder="e.g. 1,450 Sq.Ft / 135 Sq.M">
                 </div>
                 <div class="col-md-3">
                   <label class="form-label small fw-bold">Price Display</label>
-                  <input type="text" name="floor_plans[\${index}][price]" class="form-control form-control-sm" placeholder="e.g. ₹ 1.85 Cr* / $550,000 / AED 2M">
+                  <input type="text" name="floor_plans[${index}][price]" class="form-control form-control-sm" placeholder="e.g. ₹ 1.85 Cr* / $550,000 / AED 2M">
                 </div>
                 <div class="col-md-3">
                   <label class="form-label small fw-bold">Numeric Price (Optional)</label>
-                  <input type="number" step="0.01" name="floor_plans[\${index}][price_numeric]" class="form-control form-control-sm" placeholder="e.g. 18500000">
+                  <input type="number" step="0.01" name="floor_plans[${index}][price_numeric]" class="form-control form-control-sm" placeholder="e.g. 18500000">
                 </div>
                 <div class="col-md-3">
                   <label class="form-label small fw-bold">CTA Button Text</label>
-                  <input type="text" name="floor_plans[\${index}][cta_text]" class="form-control form-control-sm" placeholder="View Floor Plan" value="View Floor Plan">
+                  <input type="text" name="floor_plans[${index}][cta_text]" class="form-control form-control-sm" placeholder="View Floor Plan" value="View Floor Plan">
                 </div>
                 <div class="col-md-3">
                   <label class="form-label small fw-bold">CTA Link / Target</label>
-                  <input type="text" name="floor_plans[\${index}][cta_url]" class="form-control form-control-sm" placeholder="e.g. #enquireModal or URL">
+                  <input type="text" name="floor_plans[${index}][cta_url]" class="form-control form-control-sm" placeholder="e.g. #enquireModal or URL">
                 </div>
                 <div class="col-md-3">
                   <label class="form-label small fw-bold">Sort Order</label>
-                  <input type="number" name="floor_plans[\${index}][sort_order]" class="form-control form-control-sm" value="\${index}">
+                  <input type="number" name="floor_plans[${index}][sort_order]" class="form-control form-control-sm" value="${index}">
                 </div>
                 <div class="col-12">
                   <label class="form-label small fw-bold">Floor Plan Image</label>
-                  <input type="file" name="floor_plans[\${index}][image]" class="form-control form-control-sm" accept="image/*">
+                  <input type="file" name="floor_plans[${index}][image]" class="form-control form-control-sm" accept="image/*">
                 </div>
               </div>
             </div>
@@ -1380,7 +1393,9 @@ document.addEventListener("DOMContentLoaded", function() {
     // Initialize dropdowns on page load
     updateStates();
 });
-</script>'; 
+</script>
+<?php
+$extraScripts = ob_get_clean();
 require __DIR__ . '/../includes/footer.php'; 
 ?>
 
