@@ -421,12 +421,18 @@ body {
     <div class="container-fluid px-3 px-md-5">
         <div class="cph-logo d-flex align-items-center gap-3">
             <?php if ($p['project_logo']): ?>
-                <a href="<?= PUBLIC_URL ?>"><img src="<?= upload($p['project_logo']) ?>" alt="<?= e($p['name']) ?>" style="height:70px; width:auto; object-fit:contain;"></a>
+                <a href="<?= PUBLIC_URL ?>" class="d-inline-block text-decoration-none" style="outline:none; border:none; background:transparent; -webkit-tap-highlight-color:transparent;">
+                    <img src="<?= upload($p['project_logo']) ?>" alt="<?= e($p['name']) ?>" style="height:70px; width:auto; object-fit:contain; outline:none; border:none; background:transparent; -webkit-tap-highlight-color:transparent;">
+                </a>
             <?php endif; ?>
-            <?php if ($p['builder_logo']): ?>
-                <a href="<?= PUBLIC_URL ?>"><img src="<?= upload($p['builder_logo']) ?>" alt="<?= e($p['builder_name']) ?>" style="<?= $p['project_logo'] ? 'height:70px; border-left:2px solid #ddd; padding-left:15px;' : 'height:70px;' ?> width:auto; object-fit:contain;"></a>
+            <?php if ($p['builder_logo']): 
+                $bSlugLink = !empty($p['builder_slug']) ? PUBLIC_URL . 'developer/' . e($p['builder_slug']) : PUBLIC_URL;
+            ?>
+                <a href="<?= $bSlugLink ?>" class="d-inline-block text-decoration-none" style="outline:none; background:transparent; -webkit-tap-highlight-color:transparent;">
+                    <img src="<?= upload($p['builder_logo']) ?>" alt="<?= e($p['builder_name']) ?>" style="<?= $p['project_logo'] ? 'height:70px; border-left:2px solid #ddd; padding-left:15px;' : 'height:70px;' ?> width:auto; object-fit:contain; outline:none; background:transparent; -webkit-tap-highlight-color:transparent;">
+                </a>
             <?php elseif (!$p['project_logo']): ?>
-                <a href="<?= PUBLIC_URL ?>" class="text-dark fw-bold text-decoration-none fs-4"><?= e($p['builder_name']) ?></a>
+                <a href="<?= PUBLIC_URL ?>" class="text-dark fw-bold text-decoration-none fs-4" style="outline:none; border:none; background:transparent; -webkit-tap-highlight-color:transparent;"><?= e($p['builder_name']) ?></a>
             <?php endif; ?>
         </div>
         <div class="cph-actions d-none d-md-flex">

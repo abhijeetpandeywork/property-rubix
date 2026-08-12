@@ -1214,13 +1214,17 @@ a img, a:focus img, a:active img {
 .navbar-brand,
 .brand-logo,
 .project-logo,
+.cph-logo,
+.cph-logo a,
+.cph-logo img,
+.custom-proj-header a,
+.custom-proj-header img,
 a.header-logo,
 a.navbar-brand,
 a.brand-logo {
   outline: 0 !important;
   outline-offset: 0 !important;
   box-shadow: none !important;
-  border: 0 !important;
   background: transparent !important;
   background-color: transparent !important;
   -webkit-tap-highlight-color: transparent !important;
@@ -1229,6 +1233,8 @@ a.brand-logo {
   -webkit-user-select: none;
 }
 
+.cph-logo a:focus, .cph-logo a:active, .cph-logo a:focus-visible, .cph-logo a:hover,
+.custom-proj-header a:focus, .custom-proj-header a:active, .custom-proj-header a:focus-visible,
 .header-logo:focus, .header-logo:active, .header-logo:focus-visible, .header-logo:hover,
 .navbar-brand:focus, .navbar-brand:active, .navbar-brand:focus-visible, .navbar-brand:hover,
 a.header-logo:focus, a.header-logo:active, a.header-logo:hover,
@@ -1236,7 +1242,6 @@ a.navbar-brand:focus, a.navbar-brand:active, a.navbar-brand:hover {
   outline: 0 !important;
   outline-offset: 0 !important;
   box-shadow: none !important;
-  border: 0 !important;
   background: transparent !important;
   background-color: transparent !important;
   -webkit-tap-highlight-color: transparent !important;
