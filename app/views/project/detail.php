@@ -833,7 +833,7 @@ body {
           <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2 border-bottom pb-3">
             <h2 class="lux-section-title mb-0"><i class="fas fa-layer-group text-primary me-2"></i> Floor Plans & Layouts</h2>
             <?php if (!empty($p['brochure_pdf'])): ?>
-              <a href="<?= upload($p['brochure_pdf']) ?>" target="_blank" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold"><i class="fas fa-download me-1"></i> Download Project Brochure</a>
+              <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-bold download-gate-btn" data-download-url="<?= upload($p['brochure_pdf']) ?>" data-download-label="Project Brochure"><i class="fas fa-file-download me-1"></i> Download Project Brochure</button>
             <?php endif; ?>
           </div>
 
@@ -901,7 +901,7 @@ body {
               <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                 <div class="fp-master-badge mb-0" style="font-size:1.1rem; font-weight:700;"><i class="fas fa-map me-2 text-primary"></i><?= e($mpLbl) ?></div>
                 <?php if (!empty($mpPdf)): ?>
-                  <a href="<?= e($mpPdf) ?>" target="_blank" class="btn btn-sm btn-danger rounded-pill px-3 fw-bold"><i class="fas fa-file-pdf me-1"></i> Download <?= e($mpLbl) ?> Layout PDF</a>
+                  <button type="button" class="btn btn-sm btn-danger rounded-pill px-3 fw-bold download-gate-btn" data-download-url="<?= e($mpPdf) ?>" data-download-label="<?= e($mpLbl) ?> Layout PDF"><i class="fas fa-file-pdf me-1"></i> Download <?= e($mpLbl) ?> Layout PDF</button>
                 <?php endif; ?>
               </div>
 
@@ -1157,9 +1157,9 @@ body {
                       <div class="mb-4">
                           <div class="d-flex justify-content-between align-items-center mb-1">
                               <label class="form-label fw-bold text-dark mb-0">Advance Payment</label>
-                              <div class="fw-bold text-primary" style="font-size:1.1rem;" id="emiAdvVal">7500</div>
+                              <div class="fw-bold text-primary" style="font-size:1.1rem;" id="emiAdvVal"><?= number_format((int)($basePrice * 0.2)) ?></div>
                           </div>
-                          <input type="range" class="form-range" id="emiAdvRange" min="0" max="<?= (int)($basePrice * 0.5) ?>" step="500" value="7500">
+                          <input type="range" class="form-range" id="emiAdvRange" min="0" max="<?= (int)($basePrice * 0.5) ?>" step="500" value="<?= (int)($basePrice * 0.2) ?>">
                       </div>
 
                       <!-- 4. Duration -->
@@ -1293,9 +1293,9 @@ body {
               </a>
 
               <?php if ($p['brochure_pdf']): ?>
-              <a href="<?= upload($p['brochure_pdf']) ?>" target="_blank" class="btn btn-outline-dark w-100 py-3 fw-bold shadow-sm" style="border-radius:12px; font-size:1.05rem;">
-                <i class="fas fa-download me-2"></i> Download Brochure
-              </a>
+              <button type="button" class="btn btn-outline-dark w-100 py-3 fw-bold shadow-sm download-gate-btn" data-download-url="<?= upload($p['brochure_pdf']) ?>" data-download-label="Project Brochure" style="border-radius:12px; font-size:1.05rem;">
+                <i class="fas fa-file-download me-2"></i> Download Brochure
+              </button>
               <?php endif; ?>
             </div>
             
@@ -1450,7 +1450,43 @@ body {
             <input type="text"  class="form-control form-control-lg shadow-none" name="name"  placeholder="Full Name" required style="border-radius:12px; background:#f9f9f9; border:1px solid #eaeaea;">
           </div>
           <div class="mb-3">
-            <input type="tel"   class="form-control form-control-lg shadow-none" name="phone" placeholder="Phone Number" required style="border-radius:12px; background:#f9f9f9; border:1px solid #eaeaea;">
+            <div class="input-group input-group-lg">
+              <select name="phone_code" class="form-select fw-bold" style="max-width:130px; border-radius:12px 0 0 12px; background:#f9f9f9; border:1px solid #eaeaea; border-right:0;">
+                <option value="+91" selected>🇮🇳 +91</option>
+                <option value="+1">🇺🇸 +1</option>
+                <option value="+1">🇨🇦 +1</option>
+                <option value="+44">🇬🇧 +44</option>
+                <option value="+971">🇦🇪 +971</option>
+                <option value="+61">🇦🇺 +61</option>
+                <option value="+65">🇸🇬 +65</option>
+                <option value="+60">🇲🇾 +60</option>
+                <option value="+49">🇩🇪 +49</option>
+                <option value="+33">🇫🇷 +33</option>
+                <option value="+39">🇮🇹 +39</option>
+                <option value="+34">🇪🇸 +34</option>
+                <option value="+31">🇳🇱 +31</option>
+                <option value="+41">🇨🇭 +41</option>
+                <option value="+81">🇯🇵 +81</option>
+                <option value="+82">🇰🇷 +82</option>
+                <option value="+86">🇨🇳 +86</option>
+                <option value="+7">🇷🇺 +7</option>
+                <option value="+55">🇧🇷 +55</option>
+                <option value="+52">🇲🇽 +52</option>
+                <option value="+27">🇿🇦 +27</option>
+                <option value="+234">🇳🇬 +234</option>
+                <option value="+20">🇪🇬 +20</option>
+                <option value="+966">🇸🇦 +966</option>
+                <option value="+974">🇶🇦 +974</option>
+                <option value="+965">🇰🇼 +965</option>
+                <option value="+968">🇴🇲 +968</option>
+                <option value="+973">🇧🇭 +973</option>
+                <option value="+880">🇧🇩 +880</option>
+                <option value="+92">🇵🇰 +92</option>
+                <option value="+94">🇱🇰 +94</option>
+                <option value="+977">🇳🇵 +977</option>
+              </select>
+              <input type="tel" class="form-control fw-bold shadow-none" name="phone" placeholder="Phone Number" required pattern="[0-9]{7,14}" style="border-radius:0 12px 12px 0; background:#f9f9f9; border:1px solid #eaeaea; border-left:0;">
+            </div>
           </div>
           <div class="mb-4">
             <input type="email" class="form-control form-control-lg shadow-none" name="email" placeholder="Email Address" style="border-radius:12px; background:#f9f9f9; border:1px solid #eaeaea;">
@@ -1468,6 +1504,83 @@ body {
 $ajaxUrl = PUBLIC_URL . 'ajax/submit-enquiry';
 ob_start();
 ?>
+
+<!-- ── DOWNLOAD GATE MODAL ─────────────────────────────── -->
+<div class="modal fade" id="downloadGateModal" tabindex="-1" aria-labelledby="downloadGateModalLabel" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-panel" style="border-radius:24px; border:none; box-shadow:0 30px 60px rgba(0,0,0,0.2);">
+      <div class="modal-header border-0 pb-0 flex-column justify-content-center position-relative pt-4">
+        <button type="button" class="btn-close position-absolute" data-bs-dismiss="modal" aria-label="Close" style="right:20px; top:20px;"></button>
+        <div class="text-center mb-3">
+          <div style="width:60px; height:60px; background:linear-gradient(135deg,#f7cb46,#eab308); border-radius:16px; display:inline-flex; align-items:center; justify-content:center; margin-bottom:12px;">
+            <i class="fas fa-file-download fa-2x" style="color:#0f172a;"></i>
+          </div>
+        </div>
+        <h4 class="modal-title fw-900 text-center" id="downloadGateModalLabel">Get Your Free <span id="downloadGateFileLabel">Brochure</span></h4>
+      </div>
+      <div class="modal-body p-4 p-md-5 pt-3">
+        <p class="text-center text-muted mb-4" style="font-size:0.95rem;">Fill in your details below and your <span class="fw-bold" id="downloadGateFileLabel2">brochure</span> will download automatically.</p>
+        <form id="downloadGateForm" novalidate>
+          <?= csrfField() ?>
+          <input type="text" name="hp_name" style="display:none" tabindex="-1">
+          <input type="hidden" name="form_type" value="download_enquiry">
+          <input type="hidden" name="project_name" value="<?= e($p['name']) ?>">
+          <input type="hidden" name="download_label" id="downloadGateLabel" value="">
+          <div class="mb-3">
+            <input type="text" class="form-control form-control-lg shadow-none" name="name" placeholder="Full Name *" required style="border-radius:12px; background:#f9f9f9; border:1px solid #eaeaea;">
+          </div>
+          <div class="mb-3">
+            <div class="input-group input-group-lg">
+              <select name="phone_code" class="form-select fw-bold" style="max-width:130px; border-radius:12px 0 0 12px; background:#f9f9f9; border:1px solid #eaeaea; border-right:0;">
+                <option value="+91" selected>🇮🇳 +91</option>
+                <option value="+1">🇺🇸 +1</option>
+                <option value="+1">🇨🇦 +1</option>
+                <option value="+44">🇬🇧 +44</option>
+                <option value="+971">🇦🇪 +971</option>
+                <option value="+61">🇦🇺 +61</option>
+                <option value="+65">🇸🇬 +65</option>
+                <option value="+60">🇲🇾 +60</option>
+                <option value="+49">🇩🇪 +49</option>
+                <option value="+33">🇫🇷 +33</option>
+                <option value="+39">🇮🇹 +39</option>
+                <option value="+34">🇪🇸 +34</option>
+                <option value="+31">🇳🇱 +31</option>
+                <option value="+41">🇨🇭 +41</option>
+                <option value="+81">🇯🇵 +81</option>
+                <option value="+82">🇰🇷 +82</option>
+                <option value="+86">🇨🇳 +86</option>
+                <option value="+7">🇷🇺 +7</option>
+                <option value="+55">🇧🇷 +55</option>
+                <option value="+52">🇲🇽 +52</option>
+                <option value="+27">🇿🇦 +27</option>
+                <option value="+234">🇳🇬 +234</option>
+                <option value="+20">🇪🇬 +20</option>
+                <option value="+966">🇸🇦 +966</option>
+                <option value="+974">🇶🇦 +974</option>
+                <option value="+965">🇰🇼 +965</option>
+                <option value="+968">🇴🇲 +968</option>
+                <option value="+973">🇧🇭 +973</option>
+                <option value="+880">🇧🇩 +880</option>
+                <option value="+92">🇵🇰 +92</option>
+                <option value="+94">🇱🇰 +94</option>
+                <option value="+977">🇳🇵 +977</option>
+              </select>
+              <input type="tel" class="form-control fw-bold shadow-none" name="phone" placeholder="Phone Number *" required pattern="[0-9]{7,14}" style="border-radius:0 12px 12px 0; background:#f9f9f9; border:1px solid #eaeaea; border-left:0;">
+            </div>
+          </div>
+          <div class="mb-4">
+            <input type="email" class="form-control form-control-lg shadow-none" name="email" placeholder="Email Address" style="border-radius:12px; background:#f9f9f9; border:1px solid #eaeaea;">
+          </div>
+          <button type="submit" class="btn w-100 py-3 fw-bold shadow-lg text-dark" id="downloadGateSubmitBtn" style="border-radius:12px; font-size:1.1rem; background:linear-gradient(135deg,#f7cb46,#eab308); border:none;">
+            <i class="fas fa-download me-2"></i> Download Now
+          </button>
+          <div id="downloadGateResult" class="mt-3 text-center" style="display:none;"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 // Auto-Open Modal on Page Load
 document.addEventListener("DOMContentLoaded", function() {
@@ -1630,6 +1743,73 @@ document.getElementById("projectEnquiryForm")?.addEventListener("submit", async 
   finally { btn.disabled = false; btn.innerHTML = 'Submit Enquiry'; }
 });
 
+// ── Download Gate Buttons ───────────────────────────────
+document.querySelectorAll('.download-gate-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const url   = this.dataset.downloadUrl;
+        const label = this.dataset.downloadLabel || 'Document';
+        // Store url on the modal for use on submit
+        document.getElementById('downloadGateModal').dataset.pendingUrl = url;
+        document.getElementById('downloadGateLabel').value = label;
+        document.getElementById('downloadGateFileLabel').textContent  = label;
+        document.getElementById('downloadGateFileLabel2').textContent = label.toLowerCase();
+        // Reset form
+        const form = document.getElementById('downloadGateForm');
+        form.reset();
+        form.classList.remove('was-validated');
+        document.getElementById('downloadGateResult').style.display = 'none';
+        // Show modal
+        const dlModal = new bootstrap.Modal(document.getElementById('downloadGateModal'));
+        dlModal.show();
+    });
+});
+
+// Download Gate Form AJAX submit → auto-download on success
+document.getElementById('downloadGateForm')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    if (!this.checkValidity()) { this.classList.add('was-validated'); return; }
+    const btn    = document.getElementById('downloadGateSubmitBtn');
+    const resDiv = document.getElementById('downloadGateResult');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin me-2"></i>Please wait…';
+    const data = new FormData(this);
+    try {
+        const res  = await fetch("<?= $ajaxUrl ?>", { method:'POST', body:data, headers:{'X-Requested-With':'XMLHttpRequest'} });
+        const json = await res.json();
+        if (json.success) {
+            resDiv.style.display = 'block';
+            resDiv.innerHTML = '<span class="text-success fw-bold"><i class="fas fa-check-circle me-1"></i>Thank you! Your download is starting…</span>';
+            // Auto trigger download
+            const pendingUrl = document.getElementById('downloadGateModal').dataset.pendingUrl;
+            if (pendingUrl) {
+                setTimeout(() => {
+                    const a = document.createElement('a');
+                    a.href = pendingUrl;
+                    a.target = '_blank';
+                    a.download = '';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    // Close modal after 2s
+                    setTimeout(() => {
+                        const m = bootstrap.Modal.getInstance(document.getElementById('downloadGateModal'));
+                        if (m) m.hide();
+                    }, 2000);
+                }, 800);
+            }
+        } else {
+            resDiv.style.display = 'block';
+            resDiv.innerHTML = `<span class="text-danger fw-bold"><i class="fas fa-exclamation-circle me-1"></i>${json.message || 'Something went wrong.'}</span>`;
+        }
+    } catch(err) {
+        resDiv.style.display = 'block';
+        resDiv.innerHTML = '<span class="text-danger fw-bold"><i class="fas fa-exclamation-circle me-1"></i>Failed to send. Please try again.</span>';
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-download me-2"></i>Download Now';
+    }
+});
+
 // Interactive Lightbox Controller
 (function() {
     let lightboxItems = [];
@@ -1642,7 +1822,8 @@ document.getElementById("projectEnquiryForm")?.addEventListener("submit", async 
         <div class="pr-lightbox-toolbar">
             <div class="pr-lightbox-counter" id="prLightboxCounter">1 / 1</div>
             <div class="pr-lightbox-actions">
-                <a href="#" id="prLightboxDownload" target="_blank" download class="pr-lightbox-btn" title="Download Image"><i class="fas fa-download"></i></a>
+                <button type="button" class="pr-lightbox-btn" id="prLightboxZoomIn"  title="Zoom In (+)"><i class="fas fa-search-plus"></i></button>
+                <button type="button" class="pr-lightbox-btn" id="prLightboxZoomOut" title="Zoom Out (-)"><i class="fas fa-search-minus"></i></button>
                 <button type="button" class="pr-lightbox-btn" id="prLightboxClose" title="Close (Esc)"><i class="fas fa-times"></i></button>
             </div>
         </div>
@@ -1658,7 +1839,8 @@ document.getElementById("projectEnquiryForm")?.addEventListener("submit", async 
     const imgEl = modal.querySelector('#prLightboxImg');
     const counterEl = modal.querySelector('#prLightboxCounter');
     const captionEl = modal.querySelector('#prLightboxCaption');
-    const downloadEl = modal.querySelector('#prLightboxDownload');
+    let zoomLevel = 1.0;
+    const ZOOM_STEP = 0.3, ZOOM_MIN = 0.5, ZOOM_MAX = 4.0;
 
     function openLightbox(index) {
         if (lightboxItems.length === 0) return;
@@ -1671,6 +1853,13 @@ document.getElementById("projectEnquiryForm")?.addEventListener("submit", async 
     function closeLightbox() {
         modal.classList.remove('active');
         document.body.style.overflow = '';
+        zoomLevel = 1.0;
+        imgEl.style.transform = 'scale(1)';
+    }
+
+    function applyZoom() {
+        imgEl.style.transition = 'transform 0.2s ease';
+        imgEl.style.transform = `scale(${zoomLevel})`;
     }
 
     function updateLightbox() {
@@ -1680,13 +1869,13 @@ document.getElementById("projectEnquiryForm")?.addEventListener("submit", async 
         imgEl.style.opacity = '0';
         imgEl.style.transform = 'scale(0.95)';
 
+        zoomLevel = 1.0;
         setTimeout(() => {
             imgEl.src = item.src;
             imgEl.alt = item.title || 'Image View';
             counterEl.textContent = `${currentIndex + 1} / ${lightboxItems.length}`;
             captionEl.textContent = item.title || '';
             captionEl.style.display = item.title ? 'block' : 'none';
-            downloadEl.href = item.src;
 
             imgEl.onload = () => {
                 imgEl.style.opacity = '1';
@@ -1724,6 +1913,22 @@ document.getElementById("projectEnquiryForm")?.addEventListener("submit", async 
         document.getElementById('prLightboxClose')?.addEventListener('click', closeLightbox);
         document.getElementById('prLightboxPrev')?.addEventListener('click', () => openLightbox(currentIndex - 1));
         document.getElementById('prLightboxNext')?.addEventListener('click', () => openLightbox(currentIndex + 1));
+
+        document.getElementById('prLightboxZoomIn')?.addEventListener('click', () => {
+            zoomLevel = Math.min(ZOOM_MAX, zoomLevel + ZOOM_STEP);
+            applyZoom();
+        });
+        document.getElementById('prLightboxZoomOut')?.addEventListener('click', () => {
+            zoomLevel = Math.max(ZOOM_MIN, zoomLevel - ZOOM_STEP);
+            applyZoom();
+        });
+        // Scroll-to-zoom inside lightbox
+        modal.addEventListener('wheel', (e) => {
+            if (!modal.classList.contains('active')) return;
+            e.preventDefault();
+            zoomLevel = e.deltaY < 0 ? Math.min(ZOOM_MAX, zoomLevel + ZOOM_STEP * 0.5) : Math.max(ZOOM_MIN, zoomLevel - ZOOM_STEP * 0.5);
+            applyZoom();
+        }, { passive: false });
 
         modal.addEventListener('click', (e) => {
             if (e.target === modal || e.target.classList.contains('pr-lightbox-body')) {
