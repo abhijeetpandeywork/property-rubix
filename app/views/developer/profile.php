@@ -703,3 +703,138 @@
 </div><!-- /dp-body -->
 
 </div><!-- /dp-root -->
+
+<!-- ══════════════════════════════════════
+     ENQUIRY MODAL (self-contained for developer page)
+══════════════════════════════════════════ -->
+<div class="modal fade" id="enquiryModal" tabindex="-1" aria-labelledby="devEnquiryLabel" aria-hidden="true" data-bs-backdrop="static">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content" style="border-radius:24px; border:none; box-shadow:0 30px 80px rgba(0,0,0,0.25); overflow:hidden;">
+
+      <!-- Header with gold top bar -->
+      <div style="background: linear-gradient(135deg, #0f172a, #1e1b4b); padding: 28px 28px 20px; position:relative;">
+        <div style="position:absolute; top:0; left:0; right:0; height:3px; background: linear-gradient(90deg, #f59e0b, #7c3aed, #ec4899);"></div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="position:absolute; right:20px; top:20px;"></button>
+        <?php if (!empty($builder['logo'])): ?>
+        <div style="text-align:center; margin-bottom:14px;">
+          <img src="<?= upload($builder['logo']) ?>" alt="<?= e($builder['name']) ?>" style="max-height:60px; max-width:160px; object-fit:contain; filter:brightness(1.1);">
+        </div>
+        <?php endif; ?>
+        <h4 style="color:#fff; font-weight:800; text-align:center; margin:0; font-family:'Plus Jakarta Sans',sans-serif; font-size:1.3rem;" id="devEnquiryLabel">
+          Enquire About <?= e($builder['name']) ?>
+        </h4>
+        <p style="color:rgba(255,255,255,0.5); text-align:center; font-size:0.88rem; margin:8px 0 0;">
+          Our property expert will call you within 24 hours
+        </p>
+      </div>
+
+      <div class="modal-body p-4">
+        <form id="devEnquiryForm" novalidate>
+          <?= csrfField() ?>
+          <input type="text" name="hp_name" style="display:none" tabindex="-1">
+          <input type="hidden" name="form_type" value="enquiry">
+          <input type="hidden" name="project_name" value="<?= e($builder['name']) ?> — Developer Enquiry">
+
+          <div class="mb-3">
+            <input type="text" class="form-control form-control-lg shadow-none" name="name"
+              placeholder="Your Full Name *" required
+              style="border-radius:12px; background:#f8fafc; border:1.5px solid #e2e8f0; font-weight:600;">
+          </div>
+
+          <div class="mb-3">
+            <div class="input-group input-group-lg">
+              <select name="phone_code" class="form-select fw-bold shadow-none"
+                style="max-width:130px; border-radius:12px 0 0 12px; background:#f8fafc; border:1.5px solid #e2e8f0; border-right:0;">
+                <option value="+91" selected>🇮🇳 +91</option>
+                <option value="+1">🇺🇸 +1</option>
+                <option value="+1">🇨🇦 +1</option>
+                <option value="+44">🇬🇧 +44</option>
+                <option value="+971">🇦🇪 +971</option>
+                <option value="+61">🇦🇺 +61</option>
+                <option value="+65">🇸🇬 +65</option>
+                <option value="+60">🇲🇾 +60</option>
+                <option value="+49">🇩🇪 +49</option>
+                <option value="+33">🇫🇷 +33</option>
+                <option value="+966">🇸🇦 +966</option>
+                <option value="+974">🇶🇦 +974</option>
+                <option value="+965">🇰🇼 +965</option>
+                <option value="+880">🇧🇩 +880</option>
+                <option value="+92">🇵🇰 +92</option>
+                <option value="+977">🇳🇵 +977</option>
+              </select>
+              <input type="tel" class="form-control fw-bold shadow-none" name="phone"
+                placeholder="Phone Number *" required pattern="[0-9]{7,14}"
+                style="border-radius:0 12px 12px 0; background:#f8fafc; border:1.5px solid #e2e8f0; border-left:0;">
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <input type="email" class="form-control form-control-lg shadow-none" name="email"
+              placeholder="Email Address (optional)"
+              style="border-radius:12px; background:#f8fafc; border:1.5px solid #e2e8f0;">
+          </div>
+
+          <button type="submit" id="devEnquirySubmitBtn" class="btn w-100 py-3 fw-bold text-white shadow-sm"
+            style="border-radius:12px; font-size:1.05rem; background: linear-gradient(135deg,#f59e0b,#d97706); border:none; color:#1a0a00 !important; font-weight:800;">
+            <i class="fas fa-paper-plane me-2"></i> Submit Enquiry
+          </button>
+
+          <div id="devEnquiryResult" style="display:none; margin-top:16px; text-align:center; padding:14px; border-radius:12px;"></div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<?php $ajaxUrl = PUBLIC_URL . 'ajax/submit-enquiry'; ?>
+<script>
+document.getElementById('devEnquiryForm')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    if (!this.checkValidity()) { this.classList.add('was-validated'); return; }
+
+    const btn    = document.getElementById('devEnquirySubmitBtn');
+    const resDiv = document.getElementById('devEnquiryResult');
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin me-2"></i>Sending…';
+
+    const data = new FormData(this);
+    // Combine phone code + phone
+    const code  = data.get('phone_code') || '';
+    const phone = data.get('phone')      || '';
+    data.set('phone', code + phone);
+
+    try {
+        const res  = await fetch("<?= $ajaxUrl ?>", { method:'POST', body:data, headers:{'X-Requested-With':'XMLHttpRequest'} });
+        const json = await res.json();
+
+        resDiv.style.display = 'block';
+        if (json.success) {
+            resDiv.style.background = '#f0fdf4';
+            resDiv.innerHTML = '<span style="color:#16a34a; font-weight:700;"><i class="fas fa-check-circle me-2"></i>' + (json.message || '✅ Thank you! Our expert will contact you shortly.') + '</span>';
+            this.reset();
+            setTimeout(() => {
+                const modal = bootstrap.Modal.getInstance(document.getElementById('enquiryModal'));
+                if (modal) modal.hide();
+            }, 2500);
+        } else {
+            resDiv.style.background = '#fef2f2';
+            resDiv.innerHTML = '<span style="color:#dc2626; font-weight:700;"><i class="fas fa-exclamation-circle me-2"></i>' + (json.message || 'Something went wrong. Please try again.') + '</span>';
+        }
+    } catch(err) {
+        resDiv.style.display = 'block';
+        resDiv.style.background = '#fef2f2';
+        resDiv.innerHTML = '<span style="color:#dc2626; font-weight:700;"><i class="fas fa-exclamation-circle me-2"></i>Network error. Please try again.</span>';
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-paper-plane me-2"></i>Submit Enquiry';
+    }
+});
+
+// Reset result div when modal is closed
+document.getElementById('enquiryModal')?.addEventListener('hidden.bs.modal', function() {
+    document.getElementById('devEnquiryResult').style.display = 'none';
+    document.getElementById('devEnquiryForm').classList.remove('was-validated');
+});
+</script>
