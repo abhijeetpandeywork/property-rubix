@@ -19,8 +19,8 @@ $igUrl  = getSetting('social_instagram', '#');
         <h3 class="fw-bold mb-0 text-dark m-0" style="font-size:1.4rem; letter-spacing:-0.5px;">property<span style="color:#a9804b;">rubix</span></h3>
       <?php endif; ?>
     </a>
-    <button class="drawer-close" id="drawerClose" aria-label="Close menu" onclick="if(typeof closeDrawer==='function') closeDrawer(); else if(window.closeDrawer) window.closeDrawer();" style="background: #fff; border: 1px solid #ddd; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; color: #000; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.05); position: relative; top: -5px; right: -5px; z-index: 10001; pointer-events: auto;">
-      <i class="fas fa-times" style="pointer-events: none;"></i>
+    <button type="button" class="drawer-close" id="drawerClose" aria-label="Close menu" onclick="document.getElementById('siteDrawer')?.classList.remove('open'); document.getElementById('drawerOverlay')?.classList.remove('visible'); document.body.style.overflow='';" style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; color: #0f172a; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); position: relative; z-index: 99999; pointer-events: auto;">
+      <i class="fas fa-times fs-5" style="pointer-events: none; color: #0f172a;"></i>
     </button>
   </div>
 

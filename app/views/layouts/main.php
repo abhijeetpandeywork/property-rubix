@@ -65,7 +65,7 @@ $canonicalUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https
 <body class="mesh-bg <?= isset($bodyClass) ? e($bodyClass) : '' ?>">
 
 <!-- ══ DRAWER OVERLAY ══════════════════════════════════════════════════════ -->
-<div class="drawer-overlay" id="drawerOverlay" aria-hidden="true"></div>
+<div class="drawer-overlay" id="drawerOverlay" aria-hidden="true" onclick="document.getElementById('siteDrawer')?.classList.remove('open'); this.classList.remove('visible'); document.body.style.overflow='';"></div>
 
 <!-- ══ SLIDE-IN DRAWER ═════════════════════════════════════════════════════ -->
 <?php require __DIR__ . '/drawer.php'; ?>

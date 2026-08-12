@@ -21,11 +21,14 @@
   }
 
   function closeDrawer() {
-    drawer?.classList.remove('open');
-    overlay?.classList.remove('visible');
-    toggle?.classList.remove('open');
-    toggle?.setAttribute('aria-expanded', 'false');
-    drawer?.setAttribute('aria-hidden', 'true');
+    const d = document.getElementById('siteDrawer');
+    const o = document.getElementById('drawerOverlay');
+    const t = document.getElementById('drawerToggle');
+    d?.classList.remove('open');
+    o?.classList.remove('visible');
+    t?.classList.remove('open');
+    t?.setAttribute('aria-expanded', 'false');
+    d?.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
   }
 
@@ -38,10 +41,9 @@
 
   document.addEventListener('click', (e) => {
     if (e.target.closest('#drawerClose') || e.target.closest('.drawer-close')) {
-      e.preventDefault();
       closeDrawer();
     }
-  });
+  }, true);
 
   // Close on Escape
   document.addEventListener('keydown', (e) => {
