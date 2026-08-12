@@ -6,44 +6,49 @@
   'use strict';
 
   /* ── Drawer ────────────────────────────────────────────── */
-  const drawer  = document.getElementById('siteDrawer');
-  const overlay = document.getElementById('drawerOverlay');
-  const toggle  = document.getElementById('drawerToggle');
-  const closeBtn = document.getElementById('drawerClose');
+  function getDrawerElements() {
+    return {
+      drawer:  document.getElementById('siteDrawer'),
+      overlay: document.getElementById('drawerOverlay'),
+      toggle:  document.getElementById('drawerToggle'),
+      closeBtn: document.getElementById('drawerClose')
+    };
+  }
 
   function openDrawer() {
-    drawer?.classList.add('open');
-    overlay?.classList.add('visible');
-    toggle?.classList.add('open');
-    toggle?.setAttribute('aria-expanded', 'true');
-    drawer?.setAttribute('aria-hidden', 'false');
+    const els = getDrawerElements();
+    els.drawer?.classList.add('open');
+    els.overlay?.classList.add('visible');
+    els.toggle?.classList.add('open');
+    els.toggle?.setAttribute('aria-expanded', 'true');
+    els.drawer?.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
   }
 
   function closeDrawer() {
-    const d = document.getElementById('siteDrawer');
-    const o = document.getElementById('drawerOverlay');
-    const t = document.getElementById('drawerToggle');
-    d?.classList.remove('open');
-    o?.classList.remove('visible');
-    t?.classList.remove('open');
-    t?.setAttribute('aria-expanded', 'false');
-    d?.setAttribute('aria-hidden', 'true');
+    const els = getDrawerElements();
+    els.drawer?.classList.remove('open');
+    els.overlay?.classList.remove('visible');
+    els.toggle?.classList.remove('open');
+    els.toggle?.setAttribute('aria-expanded', 'false');
+    els.drawer?.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
   }
 
   window.openDrawer = openDrawer;
   window.closeDrawer = closeDrawer;
 
-  toggle?.addEventListener('click', openDrawer);
-  closeBtn?.addEventListener('click', closeDrawer);
-  overlay?.addEventListener('click', closeDrawer);
+  const toggleEl = document.getElementById('drawerToggle');
+  toggleEl?.addEventListener('click', openDrawer);
 
-  document.addEventListener('click', (e) => {
-    if (e.target.closest('#drawerClose') || e.target.closest('.drawer-close')) {
-      closeDrawer();
-    }
-  }, true);
+  ['click', 'touchstart'].forEach(evt => {
+    document.addEventListener(evt, (e) => {
+      const target = e.target;
+      if (target && (target.closest('#drawerClose') || target.closest('.drawer-close'))) {
+        closeDrawer();
+      }
+    }, { capture: true });
+  });
 
   // Close on Escape
   document.addEventListener('keydown', (e) => {

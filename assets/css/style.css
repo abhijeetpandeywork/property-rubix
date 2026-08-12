@@ -265,24 +265,24 @@ img { max-width: 100%; height: auto; }
   max-width: 90vw;
   height: 100vh;
   background: var(--pr-secondary);
-  z-index: 1100;
-  transform: translateX(100%);
-  transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+  z-index: 999999 !important;
+  transform: translateX(100%) !important;
+  transition: transform 0.32s cubic-bezier(0.4,0,0.2,1) !important;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
 }
-.site-drawer.open { transform: translateX(0); }
+.site-drawer.open { transform: translateX(0) !important; }
 .drawer-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.55);
-  z-index: 1050;
+  z-index: 999998 !important;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.32s ease;
 }
-.drawer-overlay.visible { opacity: 1; pointer-events: all; }
+.drawer-overlay.visible { opacity: 1 !important; pointer-events: all !important; }
 
 .drawer-header {
   display: flex;
@@ -291,20 +291,26 @@ img { max-width: 100%; height: auto; }
   padding: 20px 24px;
   border-bottom: 1px solid rgba(255,255,255,0.1);
   flex-shrink: 0;
+  position: relative;
+  z-index: 1000000 !important;
 }
 .drawer-logo .logo-text { color: white; -webkit-text-fill-color: white; font-size: 1.3rem; }
 .drawer-close {
-  background: rgba(255,255,255,0.1);
-  border: none;
-  color: white;
-  width: 36px; height: 36px;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 1rem;
-  transition: background var(--pr-transition);
+  background: #ffffff !important;
+  border: 2px solid #eab308 !important;
+  color: #000000 !important;
+  width: 40px !important; height: 40px !important;
+  border-radius: 50% !important;
+  cursor: pointer !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  font-size: 1.2rem !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
+  transition: all var(--pr-transition);
+  position: relative !important;
+  z-index: 1000001 !important;
+  pointer-events: auto !important;
 }
-.drawer-close:hover { background: rgba(255,255,255,0.2); }
+.drawer-close:hover { background: #eab308 !important; color: #ffffff !important; }
 
 .drawer-nav {
   padding: 16px 0;

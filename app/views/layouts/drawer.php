@@ -19,8 +19,8 @@ $igUrl  = getSetting('social_instagram', '#');
         <h3 class="fw-bold mb-0 text-dark m-0" style="font-size:1.4rem; letter-spacing:-0.5px;">property<span style="color:#a9804b;">rubix</span></h3>
       <?php endif; ?>
     </a>
-    <button type="button" class="drawer-close" id="drawerClose" aria-label="Close menu" onclick="document.getElementById('siteDrawer')?.classList.remove('open'); document.getElementById('drawerOverlay')?.classList.remove('visible'); document.body.style.overflow='';" style="background: #ffffff; border: 1.5px solid #cbd5e1; border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; color: #0f172a; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.15); position: relative; z-index: 99999; pointer-events: auto;">
-      <i class="fas fa-times fs-5" style="pointer-events: none; color: #0f172a;"></i>
+    <button type="button" class="drawer-close" id="drawerClose" aria-label="Close menu" onclick="document.getElementById('siteDrawer')?.classList.remove('open'); document.getElementById('drawerOverlay')?.classList.remove('visible'); document.body.style.overflow='';" ontouchstart="document.getElementById('siteDrawer')?.classList.remove('open'); document.getElementById('drawerOverlay')?.classList.remove('visible'); document.body.style.overflow='';" style="background: #ffffff !important; border: 2px solid #eab308 !important; border-radius: 50% !important; width: 40px !important; height: 40px !important; display: flex !important; align-items: center !important; justify-content: center !important; color: #000000 !important; cursor: pointer !important; box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important; position: relative !important; z-index: 1000001 !important; pointer-events: auto !important;">
+      <i class="fas fa-times fs-5" style="pointer-events: none !important; color: #000000 !important;"></i>
     </button>
   </div>
 
