@@ -31,25 +31,12 @@
 .dev-hero {
     position: relative;
     width: 100%;
-    min-height: 420px;
-    background: linear-gradient(150deg, #0d0d1a 0%, #1a1a2e 50%, #12121f 100%);
+    min-height: 480px;
+    background: linear-gradient(150deg, #0a0a18 0%, #12122a 50%, #0d0d1e 100%);
     overflow: hidden;
     display: flex;
     align-items: flex-end;
     padding-bottom: 0;
-}
-
-/* Animated particle mesh overlay */
-.dev-hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-        radial-gradient(ellipse 600px 400px at 80% 20%, rgba(201,168,76,0.12) 0%, transparent 70%),
-        radial-gradient(ellipse 400px 600px at 10% 80%, rgba(100,80,200,0.1) 0%, transparent 70%),
-        radial-gradient(ellipse 300px 300px at 50% 50%, rgba(201,168,76,0.05) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
 }
 
 /* Grid lines overlay */
@@ -58,17 +45,103 @@
     position: absolute;
     inset: 0;
     background-image:
-        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
     background-size: 60px 60px;
     z-index: 0;
+    pointer-events: none;
 }
 
 .dev-hero-inner {
     position: relative;
     z-index: 2;
     width: 100%;
-    padding: 80px 0 0;
+    padding: 0 0 0;
+}
+
+/* ── Colourful Floating Blobs ─────────────────────── */
+.dev-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    animation: devBlobFloat 8s ease-in-out infinite;
+}
+.dev-blob-1 {
+    width: 380px; height: 380px;
+    background: radial-gradient(circle, rgba(139,92,246,0.45) 0%, transparent 70%);
+    top: -80px; right: 5%;
+    animation-delay: 0s;
+    animation-duration: 9s;
+}
+.dev-blob-2 {
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(6,182,212,0.35) 0%, transparent 70%);
+    top: 40%; left: -60px;
+    animation-delay: 2s;
+    animation-duration: 11s;
+}
+.dev-blob-3 {
+    width: 250px; height: 250px;
+    background: radial-gradient(circle, rgba(236,72,153,0.3) 0%, transparent 70%);
+    bottom: 10%; right: 20%;
+    animation-delay: 4s;
+    animation-duration: 8s;
+}
+.dev-blob-4 {
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(234,179,8,0.3) 0%, transparent 70%);
+    top: 20%; left: 25%;
+    animation-delay: 1s;
+    animation-duration: 12s;
+}
+.dev-blob-5 {
+    width: 180px; height: 180px;
+    background: radial-gradient(circle, rgba(34,197,94,0.25) 0%, transparent 70%);
+    bottom: 20%; left: 10%;
+    animation-delay: 3s;
+    animation-duration: 10s;
+}
+.dev-blob-6 {
+    width: 160px; height: 160px;
+    background: radial-gradient(circle, rgba(249,115,22,0.3) 0%, transparent 70%);
+    top: 60%; right: 8%;
+    animation-delay: 5s;
+    animation-duration: 7s;
+}
+
+@keyframes devBlobFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%       { transform: translate(20px, -25px) scale(1.05); }
+    66%       { transform: translate(-15px, 15px) scale(0.97); }
+}
+
+/* ── Breadcrumb inside Hero ───────────────────────── */
+.dev-hero-breadcrumb {
+    padding: 22px 0 0;
+    margin-bottom: 0;
+}
+.dev-hero-breadcrumb .breadcrumb {
+    margin-bottom: 0;
+    background: none;
+    padding: 0;
+}
+.dev-hero-breadcrumb .breadcrumb-item a {
+    color: rgba(255,255,255,0.55);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+.dev-hero-breadcrumb .breadcrumb-item a:hover { color: var(--dev-gold-lt); }
+.dev-hero-breadcrumb .breadcrumb-item.active {
+    color: var(--dev-gold-lt);
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+.dev-hero-breadcrumb .breadcrumb-item + .breadcrumb-item::before {
+    color: rgba(255,255,255,0.3);
+    content: '/';
 }
 
 /* Floating sparkle decorations */
@@ -465,21 +538,15 @@
 
 <div class="dev-pg">
 
-<!-- ══════════ BREADCRUMB ══════════ -->
-<div style="background:#f4f5f8; border-bottom: 1px solid rgba(0,0,0,0.06);">
-  <div class="container-fluid px-4 px-md-5">
-    <nav aria-label="breadcrumb">
-      <ol class="breadcrumb mb-0 py-3" style="font-size:0.88rem;">
-        <li class="breadcrumb-item"><a href="<?= PUBLIC_URL ?>" class="text-decoration-none" style="color:var(--pr-primary); font-weight:600;"><i class="fas fa-home me-1"></i> Home</a></li>
-        <li class="breadcrumb-item"><a href="<?= PUBLIC_URL ?>developer" class="text-decoration-none" style="color:var(--pr-primary); font-weight:600;">Developers</a></li>
-        <li class="breadcrumb-item active fw-bold text-dark"><?= e($builder['name']) ?></li>
-      </ol>
-    </nav>
-  </div>
-</div>
-
-<!-- ══════════ CINEMATIC HERO BANNER ══════════ -->
+<!-- ══════════ CINEMATIC HERO BANNER (breadcrumb inside) ══════════ -->
 <div class="dev-hero">
+    <!-- Colourful animated blobs -->
+    <div class="dev-blob dev-blob-1"></div>
+    <div class="dev-blob dev-blob-2"></div>
+    <div class="dev-blob dev-blob-3"></div>
+    <div class="dev-blob dev-blob-4"></div>
+    <div class="dev-blob dev-blob-5"></div>
+    <div class="dev-blob dev-blob-6"></div>
     <!-- Sparkle particles -->
     <div class="dev-sparkle"></div>
     <div class="dev-sparkle"></div>
@@ -489,7 +556,18 @@
     <div class="dev-sparkle"></div>
 
     <div class="dev-hero-inner">
+        <!-- Breadcrumb now INSIDE hero -->
         <div class="container px-4 px-md-5">
+            <nav aria-label="breadcrumb" class="dev-hero-breadcrumb">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="<?= PUBLIC_URL ?>"><i class="fas fa-home me-1"></i> Home</a></li>
+                <li class="breadcrumb-item"><a href="<?= PUBLIC_URL ?>developer">Developers</a></li>
+                <li class="breadcrumb-item active"><?= e($builder['name']) ?></li>
+              </ol>
+            </nav>
+        </div>
+
+        <div class="container px-4 px-md-5" style="padding-top:40px;">
             <div class="row align-items-center">
                 <div class="col-lg-7 mb-5">
 
