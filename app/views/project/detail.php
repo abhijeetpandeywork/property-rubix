@@ -1615,6 +1615,11 @@ document.addEventListener("DOMContentLoaded", function() {
     const totIntVal     = document.getElementById('emiTotalInterestVal');
     const totPayVal     = document.getElementById('emiTotalPayableVal');
 
+    // Project price constants — always 80% loan, 20% advance of the real project price
+    const PROJECT_LOAN_DEFAULT = <?= (int)($basePrice * 0.8) ?>;
+    const PROJECT_ADV_DEFAULT  = <?= (int)($basePrice * 0.2) ?>;
+    let emiInitialized = false;
+
     function updateCurrencyDefaults() {
         if (!currSelect || !loanInput) return;
         const opt = currSelect.options[currSelect.selectedIndex];
@@ -1625,33 +1630,32 @@ document.addEventListener("DOMContentLoaded", function() {
         const minVal  = parseFloat(opt.dataset.min || '50000');
         const maxVal  = parseFloat(opt.dataset.max || '100000000');
         const stepVal = parseFloat(opt.dataset.step || '50000');
-        const defVal  = parseFloat(opt.dataset.def || '300000');
 
+        // Update symbol display
         if (symbolAddon) symbolAddon.textContent = symbol.trim();
 
+        // Update range constraints
         loanRange.min  = minVal;
-        loanRange.max  = maxVal;
+        loanRange.max  = Math.max(maxVal, PROJECT_LOAN_DEFAULT * 2);
         loanRange.step = stepVal;
         loanInput.min  = 0;
         loanInput.step = stepVal;
 
-        // Always anchor loan/advance to project price, regardless of currency change
-        const projectLoan = <?= (int)($basePrice * 0.8) ?>;
-        const projectAdv  = <?= (int)($basePrice * 0.2) ?>;
-
-        // If currency changed or uninitialized, reset to project price values
-        if (isNaN(parseFloat(loanInput.value)) || currSelect.dataset.lastSelected !== currSelect.value) {
-            loanInput.value = projectLoan;
-            loanRange.value = projectLoan;
-            currSelect.dataset.lastSelected = currSelect.value;
-        }
-
-        if (advRange) {
-            advRange.max   = Math.round(parseFloat(loanInput.value) * 0.5);
-            advRange.step  = Math.max(500, Math.round(parseFloat(loanInput.value) / 100));
-            // Only reset advance if currency just changed
-            if (currSelect.dataset.lastSelected === currSelect.value && isNaN(parseFloat(advRange.value))) {
-                advRange.value = projectAdv;
+        // On first init: always set loan and advance from project price
+        if (!emiInitialized) {
+            loanInput.value = PROJECT_LOAN_DEFAULT;
+            loanRange.value = PROJECT_LOAN_DEFAULT;
+            if (advRange) {
+                advRange.max   = Math.round(PROJECT_LOAN_DEFAULT * 0.5);
+                advRange.step  = Math.max(500, Math.round(PROJECT_LOAN_DEFAULT / 100));
+                advRange.value = PROJECT_ADV_DEFAULT;
+            }
+            emiInitialized = true;
+        } else {
+            // On currency change: update constraints based on current loan value
+            if (advRange) {
+                advRange.max   = Math.round(parseFloat(loanInput.value) * 0.5);
+                advRange.step  = Math.max(500, Math.round(parseFloat(loanInput.value) / 100));
             }
         }
 
