@@ -1,287 +1,672 @@
-<?php /** Developer Profile View */ ?>
+<?php /** Developer Profile View — Premium Redesign */ ?>
+<?php
+    $totalProjects  = count($projects);
+    $ongoingCount   = count(array_filter($projects, fn($p) => in_array($p['status'], ['under_construction', 'new_launch'])));
+    $completedCount = count(array_filter($projects, fn($p) => $p['status'] === 'ready_to_move'));
+    $yearsActive    = (int)($builder['established_year'] ?? 0) ? (date('Y') - (int)$builder['established_year']) : null;
+    $hasBanner      = !empty($builder['logo']);
+    $initials       = strtoupper(substr(preg_replace('/[^a-zA-Z ]/', '', $builder['name']), 0, 2));
+?>
 <style>
-/* Developer Profile Overhaul Styles */
-.dev-hero-section {
+/* ── Google Font ──────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&display=swap');
+
+/* ── Variables ────────────────────────────────────── */
+:root {
+    --dev-gold:     #c9a84c;
+    --dev-gold-lt:  #f0d080;
+    --dev-dark:     #0d0d1a;
+    --dev-dark2:    #1a1a2e;
+    --dev-charcoal: #2c2c3e;
+    --dev-text-muted: #a0a0b8;
+    --dev-border:   rgba(255,255,255,0.08);
+    --dev-glass:    rgba(255,255,255,0.05);
+    --dev-glass2:   rgba(255,255,255,0.1);
+}
+
+/* ── Font Override ────────────────────────────────── */
+.dev-pg { font-family: 'Outfit', sans-serif; }
+
+/* ── Hero Banner ──────────────────────────────────── */
+.dev-hero {
     position: relative;
-    padding: 60px 0;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    width: 100%;
+    min-height: 420px;
+    background: linear-gradient(150deg, #0d0d1a 0%, #1a1a2e 50%, #12121f 100%);
     overflow: hidden;
-    border-radius: 20px;
-    margin-bottom: 40px;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.02);
+    display: flex;
+    align-items: flex-end;
+    padding-bottom: 0;
 }
 
-.dev-hero-bg-shapes {
+/* Animated particle mesh overlay */
+.dev-hero::before {
+    content: '';
     position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    z-index: 0;
-    opacity: 0.4;
+    inset: 0;
+    background:
+        radial-gradient(ellipse 600px 400px at 80% 20%, rgba(201,168,76,0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 400px 600px at 10% 80%, rgba(100,80,200,0.1) 0%, transparent 70%),
+        radial-gradient(ellipse 300px 300px at 50% 50%, rgba(201,168,76,0.05) 0%, transparent 70%);
     pointer-events: none;
+    z-index: 0;
 }
 
-.dev-shape-1 {
+/* Grid lines overlay */
+.dev-hero::after {
+    content: '';
     position: absolute;
-    top: -100px; right: -50px;
-    width: 300px; height: 300px;
-    background: radial-gradient(circle, var(--pr-primary) 0%, transparent 70%);
-    opacity: 0.15;
-    border-radius: 50%;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    z-index: 0;
 }
 
-.dev-shape-2 {
+.dev-hero-inner {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding: 80px 0 0;
+}
+
+/* Floating sparkle decorations */
+.dev-sparkle {
     position: absolute;
-    bottom: -150px; left: -50px;
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, #f39c12 0%, transparent 70%);
-    opacity: 0.1;
     border-radius: 50%;
+    background: var(--dev-gold);
+    opacity: 0;
+    animation: devSparkle 4s ease-in-out infinite;
+}
+.dev-sparkle:nth-child(1) { width:4px; height:4px; top:15%; left:8%;  animation-delay: 0s;   }
+.dev-sparkle:nth-child(2) { width:6px; height:6px; top:40%; left:20%; animation-delay: 1.2s; }
+.dev-sparkle:nth-child(3) { width:3px; height:3px; top:70%; left:15%; animation-delay: 2.5s; }
+.dev-sparkle:nth-child(4) { width:5px; height:5px; top:25%; right:15%; animation-delay: 0.7s; }
+.dev-sparkle:nth-child(5) { width:4px; height:4px; top:60%; right:25%; animation-delay: 1.8s; }
+.dev-sparkle:nth-child(6) { width:7px; height:7px; top:80%; right:10%; animation-delay: 3.2s; }
+
+@keyframes devSparkle {
+    0%,100% { opacity:0; transform:scale(0.5); }
+    50%      { opacity:0.8; transform:scale(1.2); }
 }
 
-.dev-content-wrapper {
+/* ── Logo ─────────────────────────────────────────── */
+.dev-logo-halo {
+    position: relative;
+    width: 130px;
+    height: 130px;
+    margin-bottom: 28px;
+}
+.dev-logo-halo::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 32px;
+    background: conic-gradient(from 0deg, var(--dev-gold), transparent 40%, var(--dev-gold) 80%, transparent);
+    animation: devRotateHalo 4s linear infinite;
+    opacity: 0.6;
+}
+@keyframes devRotateHalo { to { transform: rotate(360deg); } }
+
+.dev-logo-inner {
     position: relative;
     z-index: 1;
-}
-
-.dev-logo-container {
-    width: 120px;
-    height: 120px;
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    border-radius: 24px;
+    width: 130px;
+    height: 130px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-    margin-bottom: 25px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+    overflow: hidden;
 }
-
-.dev-logo-container:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.12);
-}
-
-.dev-logo-container img {
-    max-height: 80px;
-    max-width: 80px;
-    object-fit: contain;
-}
-
-.dev-logo-fallback {
-    font-size: 2.5rem;
-    font-weight: 800;
-    background: linear-gradient(135deg, var(--pr-primary) 0%, #1a1a2e 100%);
+.dev-logo-inner img { max-width: 90px; max-height: 90px; object-fit: contain; }
+.dev-logo-fallback-txt {
+    font-size: 3rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--dev-gold) 0%, var(--dev-gold-lt) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
-.dev-title {
-    font-size: 2.8rem;
-    font-weight: 800;
-    color: #1a1a2e;
-    letter-spacing: -1px;
-    margin-bottom: 15px;
-    line-height: 1.2;
+/* ── Hero Text ────────────────────────────────────── */
+.dev-hero-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+    margin-bottom: 12px;
+}
+.dev-hero-tagline {
+    font-size: 1.15rem;
+    color: var(--dev-text-muted);
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    margin-bottom: 32px;
+}
+.dev-hero-tagline span {
+    color: var(--dev-gold);
+    font-weight: 700;
 }
 
-.dev-metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 20px;
-    margin-top: 30px;
+/* ── Stat Pills in Hero ───────────────────────────── */
+.dev-hero-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 0;
 }
-
-.dev-metric-card {
-    background: rgba(255, 255, 255, 0.7);
+.dev-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.07);
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 16px;
-    padding: 20px;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 100px;
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    transition: all 0.3s ease;
+}
+.dev-pill:hover {
+    background: rgba(201,168,76,0.15);
+    border-color: rgba(201,168,76,0.4);
+    color: var(--dev-gold-lt);
+    transform: translateY(-2px);
+}
+.dev-pill i { color: var(--dev-gold); font-size: 0.85rem; }
+
+/* ── Hero Wave Divider ────────────────────────────── */
+.dev-hero-wave {
+    position: relative;
+    margin-top: 60px;
+    line-height: 0;
+}
+.dev-hero-wave svg { display: block; width: 100%; }
+
+/* ── Body Section ─────────────────────────────────── */
+.dev-body { background: #f4f5f8; min-height: 400px; }
+
+/* ── Stats Bar ────────────────────────────────────── */
+.dev-stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.07);
+    overflow: hidden;
+    border: 1px solid rgba(0,0,0,0.04);
+    margin-top: -60px;
+    position: relative;
+    z-index: 5;
+}
+.dev-stat-item {
+    padding: 28px 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    border-right: 1px solid rgba(0,0,0,0.06);
+    transition: background 0.3s ease;
+    cursor: default;
+}
+.dev-stat-item:last-child { border-right: none; }
+.dev-stat-item:hover { background: #fafbff; }
+.dev-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.05));
+    color: var(--dev-gold);
     display: flex;
     align-items: center;
-    gap: 15px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+}
+.dev-stat-num {
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--dev-dark2);
+    line-height: 1;
+    font-family: 'Outfit', sans-serif;
+}
+.dev-stat-lbl {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #8a8a9e;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 6px;
 }
 
-.dev-metric-card:hover {
-    transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 12px 25px rgba(0,0,0,0.08);
-    border-color: rgba(255, 255, 255, 0.9);
+/* ── About Card ───────────────────────────────────── */
+.dev-about-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 44px 48px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.04);
+    position: relative;
+    overflow: hidden;
 }
+.dev-about-card::before {
+    content: '"';
+    position: absolute;
+    top: -20px;
+    left: 30px;
+    font-size: 12rem;
+    font-weight: 900;
+    color: rgba(201,168,76,0.05);
+    line-height: 1;
+    font-family: Georgia, serif;
+    pointer-events: none;
+}
+.dev-about-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(201,168,76,0.12), rgba(201,168,76,0.06));
+    color: var(--dev-gold);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 100px;
+    padding: 6px 18px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+}
+.dev-about-title {
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: var(--dev-dark2);
+    line-height: 1.25;
+    margin-bottom: 20px;
+    font-family: 'Outfit', sans-serif;
+}
+.dev-about-text {
+    font-size: 1.05rem;
+    line-height: 1.9;
+    color: #555570;
+}
+.dev-about-text strong { color: var(--dev-dark2); font-weight: 700; }
 
-.dev-metric-icon {
-    width: 48px;
-    height: 48px;
+/* ── Established Badge ────────────────────────────── */
+.dev-est-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--dev-dark2);
+    color: var(--dev-gold-lt);
     border-radius: 12px;
-    background: linear-gradient(135deg, rgba(var(--pr-primary-rgb), 0.1) 0%, rgba(var(--pr-primary-rgb), 0.05) 100%);
-    color: var(--pr-primary);
+    padding: 14px 24px;
+    font-size: 1rem;
+    font-weight: 700;
+    box-shadow: 0 8px 24px rgba(13,13,26,0.25);
+    margin-top: 28px;
+}
+.dev-est-badge i { font-size: 1.2rem; }
+
+/* ── Trust Pillars ────────────────────────────────── */
+.dev-trust-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+.dev-trust-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+    transition: all 0.3s ease;
+    text-align: center;
+}
+.dev-trust-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.09);
+}
+.dev-trust-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--dev-dark2), var(--dev-charcoal));
+    color: var(--dev-gold);
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 1.4rem;
+    margin: 0 auto 16px;
 }
-
-.dev-metric-content {
-    display: flex;
-    flex-direction: column;
-}
-
-.dev-metric-value {
-    font-size: 1.5rem;
+.dev-trust-title {
+    font-size: 0.95rem;
     font-weight: 800;
-    color: #1a1a2e;
-    line-height: 1.1;
+    color: var(--dev-dark2);
+    margin-bottom: 6px;
+    font-family: 'Outfit', sans-serif;
+}
+.dev-trust-text {
+    font-size: 0.82rem;
+    color: #8a8a9e;
+    line-height: 1.6;
 }
 
-.dev-metric-label {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #6c757d;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-top: 4px;
+/* ── Projects Section ─────────────────────────────── */
+.dev-projects-section { padding: 60px 0; }
+.dev-section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 36px;
+    flex-wrap: wrap;
+    gap: 16px;
 }
-
-.dev-description-card {
-    background: #fff;
-    border-radius: 20px;
-    padding: 35px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.04);
-    border: 1px solid rgba(0,0,0,0.02);
-    font-size: 1.05rem;
-    line-height: 1.8;
-    color: #4a4a5a;
-}
-
-.dev-description-card p:last-child {
+.dev-section-title {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--dev-dark2);
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: -0.5px;
+    position: relative;
+    padding-bottom: 12px;
     margin-bottom: 0;
 }
-
-.dev-description-card strong {
-    color: #1a1a2e;
+.dev-section-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 48px; height: 4px;
+    background: linear-gradient(90deg, var(--dev-gold), var(--dev-gold-lt));
+    border-radius: 4px;
+}
+.dev-count-badge {
+    background: linear-gradient(135deg, var(--dev-dark2), var(--dev-charcoal));
+    color: var(--dev-gold-lt);
+    border-radius: 100px;
+    padding: 8px 22px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
 }
 
+/* ── CTA Banner ───────────────────────────────────── */
+.dev-cta-banner {
+    background: linear-gradient(135deg, var(--dev-dark2) 0%, var(--dev-charcoal) 100%);
+    border-radius: 24px;
+    padding: 60px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    margin: 60px 0;
+}
+.dev-cta-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 500px 300px at 70% 50%, rgba(201,168,76,0.15) 0%, transparent 70%);
+    pointer-events: none;
+}
+.dev-cta-banner h3 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    margin-bottom: 12px;
+}
+.dev-cta-banner p { color: var(--dev-text-muted); font-size: 1.05rem; margin-bottom: 28px; }
+.dev-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--dev-gold) 0%, #e0b84a 100%);
+    color: var(--dev-dark2);
+    font-weight: 800;
+    font-size: 1.05rem;
+    padding: 16px 40px;
+    border-radius: 14px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 24px rgba(201,168,76,0.35);
+}
+.dev-cta-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 36px rgba(201,168,76,0.5);
+    color: var(--dev-dark2);
+    text-decoration: none;
+}
+
+/* ── Empty State ──────────────────────────────────── */
+.dev-empty {
+    background: #fff;
+    border-radius: 20px;
+    padding: 70px 40px;
+    text-align: center;
+    border: 2px dashed rgba(0,0,0,0.08);
+}
+
+/* ── Responsive ───────────────────────────────────── */
 @media (max-width: 768px) {
-    .dev-title { font-size: 2.2rem; }
-    .dev-metrics-grid { grid-template-columns: 1fr; }
-    .dev-hero-section { padding: 40px 0; border-radius: 0; }
+    .dev-hero-name  { font-size: 2rem; }
+    .dev-about-card { padding: 28px 24px; }
+    .dev-cta-banner { padding: 40px 24px; }
+    .dev-stats-bar  { grid-template-columns: repeat(2,1fr); }
+    .dev-stat-item  { border-right: none; border-bottom: 1px solid rgba(0,0,0,0.06); }
 }
 </style>
 
-<div class="breadcrumb-section bg-light border-bottom">
-  <div class="container-fluid px-3 px-md-5">
+<div class="dev-pg">
+
+<!-- ══════════ BREADCRUMB ══════════ -->
+<div style="background:#f4f5f8; border-bottom: 1px solid rgba(0,0,0,0.06);">
+  <div class="container-fluid px-4 px-md-5">
     <nav aria-label="breadcrumb">
-      <ol class="breadcrumb mb-0 py-3 font-medium">
-        <li class="breadcrumb-item"><a href="<?= PUBLIC_URL ?>" class="text-decoration-none text-primary"><i class="fas fa-home me-1"></i> Home</a></li>
-        <li class="breadcrumb-item"><a href="<?= PUBLIC_URL ?>developer" class="text-decoration-none text-primary">Developers</a></li>
-        <li class="breadcrumb-item active text-dark fw-bold"><?= e($builder['name']) ?></li>
+      <ol class="breadcrumb mb-0 py-3" style="font-size:0.88rem;">
+        <li class="breadcrumb-item"><a href="<?= PUBLIC_URL ?>" class="text-decoration-none" style="color:var(--pr-primary); font-weight:600;"><i class="fas fa-home me-1"></i> Home</a></li>
+        <li class="breadcrumb-item"><a href="<?= PUBLIC_URL ?>developer" class="text-decoration-none" style="color:var(--pr-primary); font-weight:600;">Developers</a></li>
+        <li class="breadcrumb-item active fw-bold text-dark"><?= e($builder['name']) ?></li>
       </ol>
     </nav>
   </div>
 </div>
 
-<div class="container py-5" style="max-width: 1200px;">
+<!-- ══════════ CINEMATIC HERO BANNER ══════════ -->
+<div class="dev-hero">
+    <!-- Sparkle particles -->
+    <div class="dev-sparkle"></div>
+    <div class="dev-sparkle"></div>
+    <div class="dev-sparkle"></div>
+    <div class="dev-sparkle"></div>
+    <div class="dev-sparkle"></div>
+    <div class="dev-sparkle"></div>
 
-  <!-- Premium Ad Banner (If applicable) -->
-  <div class="mb-5">
-    <?php require __DIR__ . '/../partials/_advertise_banner.php'; ?>
-  </div>
+    <div class="dev-hero-inner">
+        <div class="container px-4 px-md-5">
+            <div class="row align-items-center">
+                <div class="col-lg-7 mb-5">
 
-  <!-- Hero Section (Glassmorphism & Branding) -->
-  <div class="dev-hero-section">
-      <div class="dev-hero-bg-shapes">
-          <div class="dev-shape-1"></div>
-          <div class="dev-shape-2"></div>
-      </div>
-      
-      <div class="container dev-content-wrapper px-4 px-md-5">
-          <div class="row align-items-center">
-              
-              <!-- Left: Branding & Metrics -->
-              <div class="col-lg-6 mb-5 mb-lg-0 pr-lg-5">
-                  <div class="dev-logo-container">
-                    <?php if ($builder['logo']): ?>
-                      <img src="<?= upload($builder['logo']) ?>" alt="<?= e($builder['name']) ?>">
-                    <?php else: ?>
-                      <span class="dev-logo-fallback"><?= e(strtoupper(substr($builder['name'], 0, 2))) ?></span>
-                    <?php endif; ?>
-                  </div>
-                  
-                  <h1 class="dev-title"><?= e($builder['name']) ?></h1>
-                  <p class="text-muted mb-0 fs-5">Leading the way in premium real estate development.</p>
+                    <!-- Rotating Gold Halo Logo -->
+                    <div class="dev-logo-halo">
+                        <div class="dev-logo-inner">
+                            <?php if ($builder['logo']): ?>
+                                <img src="<?= upload($builder['logo']) ?>" alt="<?= e($builder['name']) ?>">
+                            <?php else: ?>
+                                <span class="dev-logo-fallback-txt"><?= e($initials) ?></span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
 
-                  <!-- Interactive Trust Metrics -->
-                  <div class="dev-metrics-grid">
-                      <div class="dev-metric-card">
-                          <div class="dev-metric-icon"><i class="fas fa-building"></i></div>
-                          <div class="dev-metric-content">
-                              <span class="dev-metric-value"><?= count($projects) ?></span>
-                              <span class="dev-metric-label">Total Projects</span>
-                          </div>
-                      </div>
-                      
-                      <div class="dev-metric-card">
-                          <div class="dev-metric-icon"><i class="fas fa-award"></i></div>
-                          <div class="dev-metric-content">
-                              <span class="dev-metric-value"><?= (int)$builder['established_year'] ? (date('Y') - $builder['established_year']) : 'N/A' ?></span>
-                              <span class="dev-metric-label">Years of Trust</span>
-                          </div>
-                      </div>
-                      
-                      <div class="dev-metric-card">
-                          <div class="dev-metric-icon"><i class="fas fa-hard-hat"></i></div>
-                          <div class="dev-metric-content">
-                              <span class="dev-metric-value"><?= count(array_filter($projects, fn($p) => in_array($p['status'], ['under_construction', 'new_launch']))) ?></span>
-                              <span class="dev-metric-label">Ongoing</span>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              
-              <!-- Right: Description Card -->
-              <div class="col-lg-6 pl-lg-4">
-                  <div class="dev-description-card">
-                    <?php if (trim($builder['description'])): ?>
-                      <p><strong><?= e($builder['name']) ?></strong> <?= nl2br(e($builder['description'])) ?></p>
-                    <?php else: ?>
-                      <p><strong><?= e($builder['name']) ?></strong> is a prominent real estate developer, with a rich legacy spanning over several decades. The company has earned a strong reputation for its innovative approach to residential, commercial, and mixed-use developments.</p>
-                      <p>The company's portfolio includes residential complexes, integrated townships, IT parks, and commercial projects across major cities. <strong><?= e($builder['name']) ?></strong> is committed to creating sustainable and modern living spaces, with a focus on design excellence, superior construction quality, and timely delivery.</p>
-                      <p>Consistently striving to enhance the living experience through thoughtful designs, cutting-edge technology, and world-class amenities. With numerous awards and accolades to its name, the company continues to lead the industry by shaping vibrant communities that offer both luxury and affordability.</p>
-                    <?php endif; ?>
-                  </div>
-              </div>
-              
-          </div>
-      </div>
-  </div>
+                    <h1 class="dev-hero-name"><?= e($builder['name']) ?></h1>
+                    <p class="dev-hero-tagline">
+                        <?php if ($yearsActive): ?>
+                            <span><?= $yearsActive ?>+ Years</span> of Landmark Real Estate Excellence
+                        <?php else: ?>
+                            Building <span>Premium</span> Real Estate Across India & Beyond
+                        <?php endif; ?>
+                    </p>
 
-  <div class="d-flex align-items-center justify-content-between mb-4 mt-5">
-      <h2 class="fw-bold mb-0" style="font-size: 2.2rem; color: #1a1a2e; letter-spacing: -0.5px;">
-          <i class="fas fa-city text-primary me-2"></i> Featured Projects
-      </h2>
-      <div class="d-none d-md-block">
-          <span class="badge bg-light text-dark border px-3 py-2 fs-6 rounded-pill">
-              <?= count($projects) ?> properties found
-          </span>
-      </div>
-  </div>
+                    <!-- Quick stat pills -->
+                    <div class="dev-hero-pills">
+                        <span class="dev-pill"><i class="fas fa-building"></i> <?= $totalProjects ?> Projects</span>
+                        <?php if ($ongoingCount): ?><span class="dev-pill"><i class="fas fa-hard-hat"></i> <?= $ongoingCount ?> Ongoing</span><?php endif; ?>
+                        <?php if ($completedCount): ?><span class="dev-pill"><i class="fas fa-check-circle"></i> <?= $completedCount ?> Ready to Move</span><?php endif; ?>
+                        <?php if (!empty($builder['country_name'])): ?><span class="dev-pill"><i class="fas fa-globe"></i> <?= e($builder['country_name']) ?></span><?php endif; ?>
+                    </div>
+                </div>
 
-  <?php if ($projects): ?>
-  <div class="row g-4 mb-5">
-    <?php foreach ($projects as $p): ?>
-    <div class="col-lg-6 col-xl-4">
-      <?php require __DIR__ . '/../partials/_property_card.php'; ?>
+                <!-- Right: Hero visual accent -->
+                <div class="col-lg-5 d-none d-lg-flex justify-content-end align-items-center pb-4">
+                    <div style="width:260px; height:260px; border-radius:40px; background: rgba(201,168,76,0.07); border:1px solid rgba(201,168,76,0.12); display:flex; align-items:center; justify-content:center; backdrop-filter:blur(10px); position:relative; overflow:hidden;">
+                        <div style="position:absolute; inset:0; background: radial-gradient(circle at 60% 40%, rgba(201,168,76,0.15) 0%, transparent 60%);"></div>
+                        <div style="text-align:center; position:relative; z-index:1;">
+                            <div style="font-size:5rem; font-weight:900; color:rgba(201,168,76,0.25); font-family:'Outfit',sans-serif; line-height:1;"><?= $totalProjects ?></div>
+                            <div style="font-size:0.75rem; font-weight:800; color:rgba(201,168,76,0.5); text-transform:uppercase; letter-spacing:3px;">Properties</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wave transition -->
+        <div class="dev-hero-wave">
+            <svg viewBox="0 0 1440 80" preserveAspectRatio="none" height="80">
+                <path d="M0,40 C360,90 1080,-10 1440,40 L1440,80 L0,80 Z" fill="#f4f5f8"/>
+            </svg>
+        </div>
     </div>
-    <?php endforeach; ?>
-  </div>
-  <?php else: ?>
-  <div class="text-center py-5 bg-light rounded-3 border border-dashed">
-      <i class="fas fa-search-location fa-3x text-muted mb-3 opacity-50"></i>
-      <h4 class="fw-bold text-dark mb-1">No Projects Found</h4>
-      <p class="text-muted">There are currently no listed projects for this developer.</p>
-  </div>
-  <?php endif; ?>
 </div>
+
+<!-- ══════════ BODY ══════════ -->
+<div class="dev-body">
+    <div class="container px-4 px-md-5">
+
+        <!-- ─ Floating Stats Bar ─ -->
+        <div class="dev-stats-bar mb-5">
+            <div class="dev-stat-item">
+                <div class="dev-stat-icon"><i class="fas fa-building"></i></div>
+                <div class="dev-stat-num"><?= $totalProjects ?></div>
+                <div class="dev-stat-lbl">Total Projects</div>
+            </div>
+            <?php if ($yearsActive): ?>
+            <div class="dev-stat-item">
+                <div class="dev-stat-icon"><i class="fas fa-clock"></i></div>
+                <div class="dev-stat-num"><?= $yearsActive ?>+</div>
+                <div class="dev-stat-lbl">Years of Trust</div>
+            </div>
+            <?php endif; ?>
+            <div class="dev-stat-item">
+                <div class="dev-stat-icon"><i class="fas fa-hard-hat"></i></div>
+                <div class="dev-stat-num"><?= $ongoingCount ?></div>
+                <div class="dev-stat-lbl">Ongoing Projects</div>
+            </div>
+            <div class="dev-stat-item">
+                <div class="dev-stat-icon"><i class="fas fa-key"></i></div>
+                <div class="dev-stat-num"><?= $completedCount ?></div>
+                <div class="dev-stat-lbl">Ready to Move</div>
+            </div>
+        </div>
+
+        <!-- ─ Ad Banner ─ -->
+        <div class="mb-5">
+            <?php require __DIR__ . '/../partials/_advertise_banner.php'; ?>
+        </div>
+
+        <!-- ─ About + Trust Pillars ─ -->
+        <div class="row g-4 mb-5 align-items-start">
+            <div class="col-lg-7">
+                <div class="dev-about-card">
+                    <div class="dev-about-label"><i class="fas fa-star-half-alt"></i> About the Developer</div>
+                    <h2 class="dev-about-title">Crafting Landmark Properties <br>for <?= $yearsActive ? $yearsActive . '+ Years' : 'Generations' ?></h2>
+                    <div class="dev-about-text">
+                        <?php if (trim($builder['description'])): ?>
+                            <p><strong><?= e($builder['name']) ?></strong> <?= nl2br(e($builder['description'])) ?></p>
+                        <?php else: ?>
+                            <p><strong><?= e($builder['name']) ?></strong> is one of the most distinguished real estate developers in the country, with an enduring legacy of crafting exceptional residential, commercial, and township projects that stand as benchmarks for quality, design, and innovation.</p>
+                            <p>With a portfolio spanning major cities and featuring world-class amenities, <?= e($builder['name']) ?> brings together architectural excellence and superior construction quality to deliver homes that people are truly proud to call their own.</p>
+                            <p>Committed to sustainability, customer satisfaction, and timely delivery, the company continues to lead the real estate sector by building communities that offer both luxury and lasting value.</p>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ((int)($builder['established_year'] ?? 0)): ?>
+                    <div class="dev-est-badge">
+                        <i class="fas fa-flag"></i> Established in <?= (int)$builder['established_year'] ?> — <?= $yearsActive ?> Years of Excellence
+                    </div>
+                    <?php endif; ?>
+                    <?php if (!empty($builder['website'])): ?>
+                    <a href="<?= e($builder['website']) ?>" target="_blank" rel="noopener" class="dev-cta-btn mt-4 d-inline-flex" style="margin-top:20px !important;">
+                        <i class="fas fa-globe"></i> Visit Official Website
+                    </a>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="dev-trust-grid">
+                    <div class="dev-trust-card">
+                        <div class="dev-trust-icon"><i class="fas fa-award"></i></div>
+                        <div class="dev-trust-title">Award Winning</div>
+                        <div class="dev-trust-text">Recognized nationally for excellence in design and quality</div>
+                    </div>
+                    <div class="dev-trust-card">
+                        <div class="dev-trust-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div class="dev-trust-title">RERA Compliant</div>
+                        <div class="dev-trust-text">All projects registered and fully transparent with buyers</div>
+                    </div>
+                    <div class="dev-trust-card">
+                        <div class="dev-trust-icon"><i class="fas fa-leaf"></i></div>
+                        <div class="dev-trust-title">Eco-Friendly</div>
+                        <div class="dev-trust-text">Committed to green, sustainable building practices</div>
+                    </div>
+                    <div class="dev-trust-card">
+                        <div class="dev-trust-icon"><i class="fas fa-handshake"></i></div>
+                        <div class="dev-trust-title">Customer First</div>
+                        <div class="dev-trust-text">Dedicated customer care from booking to possession</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ─ Projects Section ─ -->
+        <div class="dev-projects-section" id="projects">
+            <div class="dev-section-header">
+                <h2 class="dev-section-title">Featured Projects</h2>
+                <span class="dev-count-badge"><i class="fas fa-layer-group me-2"></i><?= $totalProjects ?> Properties</span>
+            </div>
+
+            <?php if ($projects): ?>
+            <div class="row g-4 mb-5">
+                <?php foreach ($projects as $p): ?>
+                <div class="col-lg-6 col-xl-4">
+                    <?php require __DIR__ . '/../partials/_property_card.php'; ?>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <?php else: ?>
+            <div class="dev-empty">
+                <i class="fas fa-city fa-3x mb-3" style="color:#d0d0e0;"></i>
+                <h4 class="fw-bold mb-2" style="color:var(--dev-dark2);">No Projects Listed Yet</h4>
+                <p class="text-muted">Check back soon — new projects from <?= e($builder['name']) ?> are being added.</p>
+            </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- ─ CTA Bottom Banner ─ -->
+        <div class="dev-cta-banner">
+            <h3>Interested in a <?= e($builder['name']) ?> Property?</h3>
+            <p>Talk to our experts and get personalised pricing, brochures, and site visit assistance — absolutely free.</p>
+            <a href="<?= PUBLIC_URL ?>contact" class="dev-cta-btn">
+                <i class="fas fa-paper-plane"></i> Enquire Now — It's Free
+            </a>
+        </div>
+
+    </div><!-- /container -->
+</div><!-- /dev-body -->
+
+</div><!-- /dev-pg -->
