@@ -12,8 +12,9 @@ $row    = [];
 // ── Delete
 if ($action === 'delete' && $id) {
     csrfCheck();
-    // Update project count for builder
-    $bid = $pdo->prepare("SELECT builder_id FROM projects WHERE id=?")->execute([$id]) ? $pdo->query("SELECT builder_id FROM projects WHERE id=$id")->fetchColumn() : null;
+    $stmt = $pdo->prepare("SELECT builder_id FROM projects WHERE id=?");
+    $stmt->execute([$id]);
+    $bid = $stmt->fetchColumn();
     crudDelete($pdo, 'projects', $id, BASE_URL . 'admin/projects/');
 }
 
