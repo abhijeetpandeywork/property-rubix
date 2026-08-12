@@ -14,17 +14,58 @@ if ($cSlug === 'india') {
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
 .hero-title { font-family: 'Outfit', sans-serif; letter-spacing: -1px; text-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-.city-card { border-radius: 16px; padding: 35px 25px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 10px 30px rgba(0,0,0,0.03); background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); }
-.city-card-link:hover .city-card { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(229,175,83,0.15); border-color: rgba(229,175,83,0.4); background: #fff; }
+.city-card-link,
+.city-card-link:focus,
+.city-card-link:active,
+.city-card-link:focus-visible,
+.city-card-link:hover {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+  text-decoration: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.city-card { 
+  border-radius: 16px; 
+  padding: 35px 25px; 
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  border: 1px solid rgba(0,0,0,0.08); 
+  box-shadow: 0 10px 30px rgba(0,0,0,0.04); 
+  background: #ffffff; 
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+.city-card-link:hover .city-card,
+.city-card-link:focus .city-card,
+.city-card-link:active .city-card { 
+  transform: translateY(-8px); 
+  box-shadow: 0 20px 40px rgba(229,175,83,0.18); 
+  border-color: rgba(229,175,83,0.4); 
+  background: #ffffff; 
+}
 .city-card-border { height: 4px; background: linear-gradient(90deg, var(--pr-primary), #d49830); transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease; border-radius: 16px 16px 0 0; }
-.city-card-link:hover .city-card-border { transform: scaleX(1); }
+.city-card-link:hover .city-card-border,
+.city-card-link:focus .city-card-border,
+.city-card-link:active .city-card-border { transform: scaleX(1); }
 .city-icon { width: 55px; height: 55px; border-radius: 14px; background: rgba(229,175,83,0.1); color: var(--pr-primary); font-size: 1.5rem; transition: all 0.4s ease; }
-.city-card-link:hover .city-icon { background: linear-gradient(135deg, var(--pr-primary), #d49830); color: white; transform: rotate(10deg) scale(1.1); box-shadow: 0 10px 20px rgba(229,175,83,0.3); }
+.city-card-link:hover .city-icon,
+.city-card-link:focus .city-icon,
+.city-card-link:active .city-icon { background: linear-gradient(135deg, var(--pr-primary), #d49830); color: white; transform: rotate(10deg) scale(1.1); box-shadow: 0 10px 20px rgba(229,175,83,0.3); }
 .city-name { font-family: 'Outfit', sans-serif; font-size: 1.5rem; transition: color 0.3s ease; }
-.city-card-link:hover .city-name { color: var(--pr-primary) !important; }
+.city-card-link:hover .city-name,
+.city-card-link:focus .city-name,
+.city-card-link:active .city-name { color: var(--pr-primary) !important; }
 .explore-text { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; transition: all 0.3s ease; color: #64748b; }
-.city-card-link:hover .explore-text { color: var(--pr-primary); }
-.city-card-link:hover .explore-text i { transform: translateX(8px); }
+.city-card-link:hover .explore-text,
+.city-card-link:focus .explore-text,
+.city-card-link:active .explore-text { color: var(--pr-primary); }
+.city-card-link:hover .explore-text i,
+.city-card-link:focus .explore-text i,
+.city-card-link:active .explore-text i { transform: translateX(8px); }
 </style>
 
 <!-- Cinematic Hero Section -->

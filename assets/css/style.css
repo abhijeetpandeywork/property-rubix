@@ -1169,3 +1169,37 @@ img { max-width: 100%; height: auto; }
 .modal-content.glass-panel {
   background: var(--glass-bg-hover);
 }
+
+/* ── Reset Focus Outline & Tap Highlight on Card Links ───── */
+.state-card-link,
+.city-card-link,
+.country-image-card,
+.location-card,
+a.state-card-link,
+a.city-card-link,
+a.country-image-card {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.state-card-link:focus, .state-card-link:active, .state-card-link:focus-visible,
+.city-card-link:focus, .city-card-link:active, .city-card-link:focus-visible,
+.country-image-card:focus, .country-image-card:active, .country-image-card:focus-visible {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.state-card, .city-card, .country-image-card {
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}

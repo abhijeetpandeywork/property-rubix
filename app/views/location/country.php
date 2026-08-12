@@ -19,17 +19,58 @@ if (!empty($country['bg_image'])) {
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
 .hero-title { font-family: 'Outfit', sans-serif; letter-spacing: -1px; text-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-.state-card { border-radius: 16px; padding: 35px 25px; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 10px 30px rgba(0,0,0,0.03); background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); }
-.state-card-link:hover .state-card { transform: translateY(-10px); box-shadow: 0 20px 40px rgba(229,175,83,0.15); border-color: rgba(229,175,83,0.4); background: #fff; }
+.state-card-link,
+.state-card-link:focus,
+.state-card-link:active,
+.state-card-link:focus-visible,
+.state-card-link:hover {
+  outline: none !important;
+  outline-offset: 0 !important;
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+  text-decoration: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.state-card { 
+  border-radius: 16px; 
+  padding: 35px 25px; 
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+  border: 1px solid rgba(0,0,0,0.08); 
+  box-shadow: 0 10px 30px rgba(0,0,0,0.04); 
+  background: #ffffff; 
+  outline: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+.state-card-link:hover .state-card,
+.state-card-link:focus .state-card,
+.state-card-link:active .state-card { 
+  transform: translateY(-8px); 
+  box-shadow: 0 20px 40px rgba(229,175,83,0.18); 
+  border-color: rgba(229,175,83,0.4); 
+  background: #ffffff; 
+}
 .state-card-border { height: 4px; background: linear-gradient(90deg, var(--pr-primary), #d49830); transform: scaleX(0); transform-origin: left; transition: transform 0.4s ease; border-radius: 16px 16px 0 0; }
-.state-card-link:hover .state-card-border { transform: scaleX(1); }
+.state-card-link:hover .state-card-border,
+.state-card-link:focus .state-card-border,
+.state-card-link:active .state-card-border { transform: scaleX(1); }
 .state-icon { width: 55px; height: 55px; border-radius: 14px; background: rgba(229,175,83,0.1); color: var(--pr-primary); font-size: 1.5rem; transition: all 0.4s ease; }
-.state-card-link:hover .state-icon { background: linear-gradient(135deg, var(--pr-primary), #d49830); color: white; transform: rotate(10deg) scale(1.1); box-shadow: 0 10px 20px rgba(229,175,83,0.3); }
+.state-card-link:hover .state-icon,
+.state-card-link:focus .state-icon,
+.state-card-link:active .state-icon { background: linear-gradient(135deg, var(--pr-primary), #d49830); color: white; transform: rotate(10deg) scale(1.1); box-shadow: 0 10px 20px rgba(229,175,83,0.3); }
 .state-name { font-family: 'Outfit', sans-serif; font-size: 1.5rem; transition: color 0.3s ease; }
-.state-card-link:hover .state-name { color: var(--pr-primary) !important; }
+.state-card-link:hover .state-name,
+.state-card-link:focus .state-name,
+.state-card-link:active .state-name { color: var(--pr-primary) !important; }
 .explore-text { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; transition: all 0.3s ease; color: #64748b; }
-.state-card-link:hover .explore-text { color: var(--pr-primary); }
-.state-card-link:hover .explore-text i { transform: translateX(8px); }
+.state-card-link:hover .explore-text,
+.state-card-link:focus .explore-text,
+.state-card-link:active .explore-text { color: var(--pr-primary); }
+.state-card-link:hover .explore-text i,
+.state-card-link:focus .explore-text i,
+.state-card-link:active .explore-text i { transform: translateX(8px); }
 </style>
 
 <!-- Cinematic Hero Section -->
