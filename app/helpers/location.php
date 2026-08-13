@@ -43,14 +43,17 @@ function initUserLocation() {
 
     // If we got a code (e.g. 'IN', 'AE'), find it in DB
     if ($countryCode) {
-        $stmt = $pdo->prepare("SELECT * FROM countries WHERE iso_code = ? AND status = 'active' LIMIT 1");
-        $stmt->execute([$countryCode]);
-        $country = $stmt->fetch();
+        $country = null;
+        try {
+            $stmt = $pdo->prepare("SELECT * FROM countries WHERE iso_code = ? AND status = 'active' LIMIT 1");
+            $stmt->execute([$countryCode]);
+            $country = $stmt->fetch();
+        } catch (Exception $e) {
+            // iso_code column probably doesn't exist
+        }
         
-        // If we don't have an exact iso_code match, try name (if iso_code is missing in DB schema)
-        // Wait, does our DB have iso_code? Let's check or fallback.
+        // If we don't have an exact iso_code match, try name/slug mapping
         if (!$country) {
-            // Some databases only have 'name' or 'slug'. Let's map common ones if iso_code is missing
             $map = ['IN' => 'india', 'AE' => 'uae', 'US' => 'usa', 'CA' => 'canada', 'GB' => 'uk'];
             if (isset($map[$countryCode])) {
                 $stmt = $pdo->prepare("SELECT * FROM countries WHERE slug = ? AND status = 'active' LIMIT 1");
