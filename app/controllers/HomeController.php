@@ -6,35 +6,57 @@ class HomeController extends Controller {
     public function index(array $params = []): void {
         $pdo = db();
 
-        $activeCountry = getActiveCountry();
-        $countryId = $activeCountry['id'] ?? 0;
+        $activeLocation = getActiveLocation();
+        $countryId = $activeLocation['country']['id'] ?? 0;
+        $cityId = $activeLocation['city']['id'] ?? 0;
 
         // Featured projects
-        $stmtProj = $pdo->prepare(
-            "SELECT p.*, b.name AS builder_name, c.name AS city_name,
+        $projQuery = "
+             SELECT p.*, b.name AS builder_name, c.name AS city_name,
                     s.name AS state_name, co.name AS country_name, co.slug AS country_slug, s.slug AS state_slug, c.slug AS city_slug
              FROM projects p
              LEFT JOIN builders b ON b.id = p.builder_id
              LEFT JOIN cities c   ON c.id = p.city_id
              LEFT JOIN states s   ON s.id = c.state_id
              LEFT JOIN countries co ON co.id = s.country_id
-             WHERE p.is_featured = 1 AND co.id = ?
-             ORDER BY p.sort_order, p.created_at DESC
-             LIMIT 9"
-        );
-        $stmtProj->execute([$countryId]);
+             WHERE p.is_featured = 1 
+        ";
+        $projParams = [];
+        
+        if ($cityId) {
+            $projQuery .= " AND c.id = ? ";
+            $projParams[] = $cityId;
+        } else {
+            $projQuery .= " AND co.id = ? ";
+            $projParams[] = $countryId;
+        }
+        $projQuery .= " ORDER BY p.sort_order, p.created_at DESC LIMIT 9";
+        
+        $stmtProj = $pdo->prepare($projQuery);
+        $stmtProj->execute($projParams);
         $featuredProjects = $stmtProj->fetchAll();
 
-        // Builders for this country
-        $stmtBuild = $pdo->prepare(
-            "SELECT b.*, co.name AS country_name, co.slug AS country_slug
+        // Builders for this country (or active city)
+        $buildQuery = "
+             SELECT b.*, co.name AS country_name, co.slug AS country_slug
              FROM builders b
              LEFT JOIN countries co ON co.id = b.country_id
-             WHERE b.status = 'active' AND b.country_id = ?
-             ORDER BY co.sort_order, b.name
-             LIMIT 40"
-        );
-        $stmtBuild->execute([$countryId]);
+             WHERE b.status = 'active'
+        ";
+        $buildParams = [];
+        
+        if ($cityId) {
+            // Only builders who have projects in this city
+            $buildQuery .= " AND b.id IN (SELECT DISTINCT builder_id FROM projects WHERE city_id = ?) ";
+            $buildParams[] = $cityId;
+        } else {
+            $buildQuery .= " AND b.country_id = ? ";
+            $buildParams[] = $countryId;
+        }
+        $buildQuery .= " ORDER BY co.sort_order, b.name LIMIT 40";
+        
+        $stmtBuild = $pdo->prepare($buildQuery);
+        $stmtBuild->execute($buildParams);
         $builders = $stmtBuild->fetchAll();
 
         // Cities for the active country (for tabs)

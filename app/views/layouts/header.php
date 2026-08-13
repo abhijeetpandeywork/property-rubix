@@ -35,14 +35,14 @@ $siteName = getSetting('site_name') ?: 'PropertyRubix';
     <!-- Right actions -->
     <div class="header-actions d-flex align-items-center gap-3">
       <?php
-      $activeCountry = getActiveCountry();
-      $currentCountryName = $activeCountry['name'] ?? 'Global';
+      $activeLocation = getActiveLocation();
+      $currentLocName = $activeLocation['display_name'];
       ?>
-      <!-- Country selector -->
+      <!-- Location selector -->
       <div class="country-selector d-flex align-items-center me-3">
-        <a href="<?= PUBLIC_URL ?>select-country" class="btn btn-link text-decoration-none p-0 d-flex flex-column align-items-center" style="line-height:1.2; color: #000;">
-          <i class="fas fa-globe fs-4 mb-1"></i> 
-          <span class="fw-bold" style="font-size:11px;"><?= $currentCountryName ?></span>
+        <a href="<?= PUBLIC_URL ?>select-location" class="btn btn-link text-decoration-none p-0 d-flex flex-column align-items-center" style="line-height:1.2; color: #000;">
+          <i class="fas fa-map-marker-alt fs-4 mb-1"></i> 
+          <span class="fw-bold" style="font-size:11px;"><?= $currentLocName ?></span>
         </a>
       </div>
 

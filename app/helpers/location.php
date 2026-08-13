@@ -13,6 +13,11 @@ function initUserLocation() {
     if (!empty($_SESSION['active_country_id']) && !empty($_SESSION['active_country_slug'])) {
         return;
     }
+    
+    // Default city to null on auto-detect
+    unset($_SESSION['active_city_id']);
+    unset($_SESSION['active_city_name']);
+    unset($_SESSION['active_city_slug']);
 
     $pdo = db();
     $countryCode = null;
@@ -98,6 +103,21 @@ function getActiveCountry() {
     ];
 }
 
+function getActiveLocation() {
+    $country = getActiveCountry();
+    $city = [
+        'id'   => $_SESSION['active_city_id'] ?? null,
+        'name' => $_SESSION['active_city_name'] ?? null,
+        'slug' => $_SESSION['active_city_slug'] ?? null
+    ];
+    
+    return [
+        'country' => $country,
+        'city'    => $city,
+        // Helper string for UI display (e.g., 'Gurugram' or 'India')
+        'display_name' => $city['name'] ?? $country['name']
+    ];
+}
 function setActiveCountryBySlug($slug) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
@@ -113,6 +133,43 @@ function setActiveCountryBySlug($slug) {
         $_SESSION['active_country_name'] = $country['name'];
         $_SESSION['active_country_slug'] = $country['slug'];
         $_SESSION['active_country_flag'] = $country['flag_icon'] ?? '';
+        
+        // Reset city since a whole country was selected
+        unset($_SESSION['active_city_id'], $_SESSION['active_city_name'], $_SESSION['active_city_slug']);
+        return true;
+    }
+    
+    return false;
+}
+
+function setActiveCityBySlug($slug) {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    
+    $pdo = db();
+    // Get city and its parent country
+    $stmt = $pdo->prepare("
+        SELECT c.*, s.country_id, co.name as country_name, co.slug as country_slug, co.flag_icon 
+        FROM cities c
+        JOIN states s ON s.id = c.state_id
+        JOIN countries co ON co.id = s.country_id
+        WHERE c.slug = ? AND c.status = 'active' LIMIT 1
+    ");
+    $stmt->execute([$slug]);
+    $city = $stmt->fetch();
+    
+    if ($city) {
+        // Set City
+        $_SESSION['active_city_id']   = $city['id'];
+        $_SESSION['active_city_name'] = $city['name'];
+        $_SESSION['active_city_slug'] = $city['slug'];
+        
+        // Also set Country automatically
+        $_SESSION['active_country_id']   = $city['country_id'];
+        $_SESSION['active_country_name'] = $city['country_name'];
+        $_SESSION['active_country_slug'] = $city['country_slug'];
+        $_SESSION['active_country_flag'] = $city['flag_icon'] ?? '';
         return true;
     }
     

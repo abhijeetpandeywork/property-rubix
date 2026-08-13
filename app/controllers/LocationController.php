@@ -23,27 +23,27 @@ class LocationController extends Controller {
         ]);
     }
 
-    public function selectCountry(array $params = []): void {
+    public function selectLocation(array $params = []): void {
         $pdo = db();
         
-        // Fetch active countries grouped by continent
-        // Note: we use TRY/CATCH in case the continent column doesn't exist yet on live DB
-        // If it fails, fallback to grouping all under 'Global'
-        try {
-            $countries = $pdo->query("
-                SELECT id, name, slug, continent, flag_icon 
-                FROM countries 
-                WHERE status='active' 
-                ORDER BY continent ASC, sort_order ASC, name ASC
-            ")->fetchAll();
-        } catch (Exception $e) {
-            $countries = $pdo->query("
-                SELECT id, name, slug, 'Global' AS continent, flag_icon 
-                FROM countries 
-                WHERE status='active' 
-                ORDER BY sort_order ASC, name ASC
-            ")->fetchAll();
-        }
+        // Fetch active countries
+        $countries = $pdo->query("
+            SELECT id, name, slug, flag_icon 
+            FROM countries 
+            WHERE status='active' 
+            ORDER BY sort_order ASC, name ASC
+        ")->fetchAll();
+        
+        // Fetch popular active cities (limit 24 for the grid)
+        $popularCities = $pdo->query("
+            SELECT c.id, c.name, c.slug, c.image, co.name AS country_name, co.flag_icon
+            FROM cities c
+            JOIN states s ON s.id = c.state_id
+            JOIN countries co ON co.id = s.country_id
+            WHERE c.status='active' 
+            ORDER BY c.sort_order ASC, c.name ASC
+            LIMIT 24
+        ")->fetchAll();
 
         $grouped = [];
         foreach ($countries as $c) {
@@ -57,7 +57,6 @@ class LocationController extends Controller {
         // Real stats from DB
         $countryCount  = count($countries);
         $projectCount  = 0;
-        $propertyCount = 0;
         $cityCount     = 0;
         try {
             $projectCount  = (int)$pdo->query("SELECT COUNT(*) FROM projects")->fetchColumn();
@@ -66,18 +65,19 @@ class LocationController extends Controller {
 
         $happyFamilies = getSetting('happy_families_count') ?: '10,000';
 
-        $this->view('location/select_country', [
-            'pageTitle'      => 'Select Your Region',
-            'metaDesc'       => 'Select your region or continent to browse properties.',
-            'regions'        => $grouped,
+        $this->view('location/select_location', [
+            'pageTitle'      => 'Select Your Location',
+            'metaDesc'       => 'Select your city or country to browse local properties.',
+            'countries'      => $countries,
+            'popularCities'  => $popularCities,
             'heroBannerUrl'  => getSetting('select_country_banner')
                                 ? upload(getSetting('select_country_banner'))
                                 : asset('img/world-map.png'),
             'stats' => [
-                ['num' => $countryCount,    'label' => 'Countries'],
+                ['num' => $cityCount . '+',  'label' => 'Cities'],
                 ['num' => $projectCount . '+', 'label' => 'Projects'],
                 ['num' => $happyFamilies . '+', 'label' => 'Happy Families'],
-                ['num' => $cityCount . '+',  'label' => 'Cities'],
+                ['num' => $countryCount,    'label' => 'Countries'],
             ],
         ]);
     }
@@ -87,8 +87,15 @@ class LocationController extends Controller {
         if ($slug) {
             setActiveCountryBySlug($slug);
         }
-        
-        // Redirect back to home
+        header("Location: " . PUBLIC_URL);
+        exit;
+    }
+
+    public function setLocation(array $params = []): void {
+        $slug = $params['slug'] ?? '';
+        if ($slug) {
+            setActiveCityBySlug($slug);
+        }
         header("Location: " . PUBLIC_URL);
         exit;
     }
