@@ -59,7 +59,7 @@ $canonicalUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https
     --pr-secondary: <?= e($branding['secondary_color'] ?? '#0f172a') ?>;
 }
 html, body {
-    overflow-x: hidden;
+    overflow-x: clip;
     width: 100%;
     position: relative;
 }
