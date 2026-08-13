@@ -36,7 +36,7 @@ class LocationController extends Controller {
         
         // Fetch popular active cities (limit 24 for the grid)
         $popularCities = $pdo->query("
-            SELECT c.id, c.name, c.slug, c.image, co.name AS country_name, co.flag_icon
+            SELECT c.id, c.name, c.slug, co.name AS country_name, co.flag_icon
             FROM cities c
             JOIN states s ON s.id = c.state_id
             JOIN countries co ON co.id = s.country_id
