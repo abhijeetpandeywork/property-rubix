@@ -82,6 +82,17 @@ class LocationController extends Controller {
         ]);
     }
 
+    public function setCountry(array $params = []): void {
+        $slug = $params['slug'] ?? '';
+        if ($slug) {
+            setActiveCountryBySlug($slug);
+        }
+        
+        // Redirect back to home
+        header("Location: " . PUBLIC_URL);
+        exit;
+    }
+
     public function country(array $params): void {
         $pdo     = db();
         $country = $pdo->prepare("SELECT * FROM countries WHERE slug=? AND status='active'");

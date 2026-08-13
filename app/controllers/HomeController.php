@@ -6,8 +6,11 @@ class HomeController extends Controller {
     public function index(array $params = []): void {
         $pdo = db();
 
+        $activeCountry = getActiveCountry();
+        $countryId = $activeCountry['id'] ?? 0;
+
         // Featured projects
-        $featuredProjects = $pdo->query(
+        $stmtProj = $pdo->prepare(
             "SELECT p.*, b.name AS builder_name, c.name AS city_name,
                     s.name AS state_name, co.name AS country_name, co.slug AS country_slug, s.slug AS state_slug, c.slug AS city_slug
              FROM projects p
@@ -15,33 +18,39 @@ class HomeController extends Controller {
              LEFT JOIN cities c   ON c.id = p.city_id
              LEFT JOIN states s   ON s.id = c.state_id
              LEFT JOIN countries co ON co.id = s.country_id
-             WHERE p.is_featured = 1
+             WHERE p.is_featured = 1 AND co.id = ?
              ORDER BY p.sort_order, p.created_at DESC
              LIMIT 9"
-        )->fetchAll();
+        );
+        $stmtProj->execute([$countryId]);
+        $featuredProjects = $stmtProj->fetchAll();
 
-        // Builders grouped by country
-        $builders = $pdo->query(
+        // Builders for this country
+        $stmtBuild = $pdo->prepare(
             "SELECT b.*, co.name AS country_name, co.slug AS country_slug
              FROM builders b
              LEFT JOIN countries co ON co.id = b.country_id
-             WHERE b.status = 'active'
+             WHERE b.status = 'active' AND b.country_id = ?
              ORDER BY co.sort_order, b.name
              LIMIT 40"
-        )->fetchAll();
+        );
+        $stmtBuild->execute([$countryId]);
+        $builders = $stmtBuild->fetchAll();
 
-        // Cities by country (for tabs)
-        $countries = $pdo->query(
+        // Cities for the active country (for tabs)
+        $stmtCities = $pdo->prepare(
             "SELECT co.id, co.name, co.slug, co.flag_icon,
                     GROUP_CONCAT(DISTINCT CONCAT(c.name,'|',c.slug,'|',s.slug) ORDER BY c.name SEPARATOR ';;') AS cities_raw
              FROM countries co
              JOIN states s ON s.country_id = co.id
              JOIN cities c ON c.state_id = s.id
-             WHERE co.status = 'active' AND c.status = 'active'
+             WHERE co.status = 'active' AND c.status = 'active' AND co.id = ?
              GROUP BY co.id
              ORDER BY co.sort_order
              LIMIT 4"
-        )->fetchAll();
+        );
+        $stmtCities->execute([$countryId]);
+        $countries = $stmtCities->fetchAll();
 
         // Parse cities per country
         foreach ($countries as &$country) {

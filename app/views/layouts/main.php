@@ -253,22 +253,7 @@ html, body {
             <div class="col-12">
               <div class="input-group">
                 <select name="phone_code" class="form-select fw-bold shadow-none" style="max-width:110px;">
-                  <option value="+91" selected>🇮🇳 +91</option>
-                  <option value="+1">🇺🇸 +1</option>
-                  <option value="+1">🇨🇦 +1</option>
-                  <option value="+44">🇬🇧 +44</option>
-                  <option value="+971">🇦🇪 +971</option>
-                  <option value="+61">🇦🇺 +61</option>
-                  <option value="+65">🇸🇬 +65</option>
-                  <option value="+60">🇲🇾 +60</option>
-                  <option value="+49">🇩🇪 +49</option>
-                  <option value="+33">🇫🇷 +33</option>
-                  <option value="+966">🇸🇦 +966</option>
-                  <option value="+974">🇶🇦 +974</option>
-                  <option value="+965">🇰🇼 +965</option>
-                  <option value="+880">🇧🇩 +880</option>
-                  <option value="+92">🇵🇰 +92</option>
-                  <option value="+977">🇳🇵 +977</option>
+                  <?= getCountryPhoneCodeOptions() ?>
                 </select>
                 <input type="tel" class="form-control" name="phone" placeholder="Phone Number" required pattern="[0-9]{7,15}">
               </div>

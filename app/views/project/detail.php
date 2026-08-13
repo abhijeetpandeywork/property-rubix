@@ -1480,38 +1480,7 @@ body {
           <div class="mb-3">
             <div class="input-group input-group-lg">
               <select name="phone_code" class="form-select fw-bold" style="max-width:130px; border-radius:12px 0 0 12px; background:#f9f9f9; border:1px solid #eaeaea; border-right:0;">
-                <option value="+91" selected>🇮🇳 +91</option>
-                <option value="+1">🇺🇸 +1</option>
-                <option value="+1">🇨🇦 +1</option>
-                <option value="+44">🇬🇧 +44</option>
-                <option value="+971">🇦🇪 +971</option>
-                <option value="+61">🇦🇺 +61</option>
-                <option value="+65">🇸🇬 +65</option>
-                <option value="+60">🇲🇾 +60</option>
-                <option value="+49">🇩🇪 +49</option>
-                <option value="+33">🇫🇷 +33</option>
-                <option value="+39">🇮🇹 +39</option>
-                <option value="+34">🇪🇸 +34</option>
-                <option value="+31">🇳🇱 +31</option>
-                <option value="+41">🇨🇭 +41</option>
-                <option value="+81">🇯🇵 +81</option>
-                <option value="+82">🇰🇷 +82</option>
-                <option value="+86">🇨🇳 +86</option>
-                <option value="+7">🇷🇺 +7</option>
-                <option value="+55">🇧🇷 +55</option>
-                <option value="+52">🇲🇽 +52</option>
-                <option value="+27">🇿🇦 +27</option>
-                <option value="+234">🇳🇬 +234</option>
-                <option value="+20">🇪🇬 +20</option>
-                <option value="+966">🇸🇦 +966</option>
-                <option value="+974">🇶🇦 +974</option>
-                <option value="+965">🇰🇼 +965</option>
-                <option value="+968">🇴🇲 +968</option>
-                <option value="+973">🇧🇭 +973</option>
-                <option value="+880">🇧🇩 +880</option>
-                <option value="+92">🇵🇰 +92</option>
-                <option value="+94">🇱🇰 +94</option>
-                <option value="+977">🇳🇵 +977</option>
+                <?= getCountryPhoneCodeOptions() ?>
               </select>
               <input type="tel" class="form-control fw-bold shadow-none" name="phone" placeholder="Phone Number" required pattern="[0-9]{7,14}" style="border-radius:0 12px 12px 0; background:#f9f9f9; border:1px solid #eaeaea; border-left:0;">
             </div>
@@ -1566,38 +1535,7 @@ ob_start();
           <div class="mb-3">
             <div class="input-group input-group-lg">
               <select name="phone_code" class="form-select fw-bold" style="max-width:130px; border-radius:12px 0 0 12px; background:#f9f9f9; border:1px solid #eaeaea; border-right:0;">
-                <option value="+91" selected>🇮🇳 +91</option>
-                <option value="+1">🇺🇸 +1</option>
-                <option value="+1">🇨🇦 +1</option>
-                <option value="+44">🇬🇧 +44</option>
-                <option value="+971">🇦🇪 +971</option>
-                <option value="+61">🇦🇺 +61</option>
-                <option value="+65">🇸🇬 +65</option>
-                <option value="+60">🇲🇾 +60</option>
-                <option value="+49">🇩🇪 +49</option>
-                <option value="+33">🇫🇷 +33</option>
-                <option value="+39">🇮🇹 +39</option>
-                <option value="+34">🇪🇸 +34</option>
-                <option value="+31">🇳🇱 +31</option>
-                <option value="+41">🇨🇭 +41</option>
-                <option value="+81">🇯🇵 +81</option>
-                <option value="+82">🇰🇷 +82</option>
-                <option value="+86">🇨🇳 +86</option>
-                <option value="+7">🇷🇺 +7</option>
-                <option value="+55">🇧🇷 +55</option>
-                <option value="+52">🇲🇽 +52</option>
-                <option value="+27">🇿🇦 +27</option>
-                <option value="+234">🇳🇬 +234</option>
-                <option value="+20">🇪🇬 +20</option>
-                <option value="+966">🇸🇦 +966</option>
-                <option value="+974">🇶🇦 +974</option>
-                <option value="+965">🇰🇼 +965</option>
-                <option value="+968">🇴🇲 +968</option>
-                <option value="+973">🇧🇭 +973</option>
-                <option value="+880">🇧🇩 +880</option>
-                <option value="+92">🇵🇰 +92</option>
-                <option value="+94">🇱🇰 +94</option>
-                <option value="+977">🇳🇵 +977</option>
+                <?= getCountryPhoneCodeOptions() ?>
               </select>
               <input type="tel" class="form-control fw-bold shadow-none" name="phone" placeholder="Phone Number *" required pattern="[0-9]{7,14}" style="border-radius:0 12px 12px 0; background:#f9f9f9; border:1px solid #eaeaea; border-left:0;">
             </div>

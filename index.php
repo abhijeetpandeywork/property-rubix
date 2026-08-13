@@ -15,6 +15,7 @@ require_once APP_PATH . 'helpers/upload.php';
 require_once APP_PATH . 'helpers/pagination.php';
 require_once APP_PATH . 'helpers/settings.php';
 require_once APP_PATH . 'helpers/api_auth.php';
+require_once APP_PATH . 'helpers/location.php';
 require_once APP_PATH . 'core/View.php';
 require_once APP_PATH . 'core/Controller.php';
 require_once APP_PATH . 'core/Router.php';
@@ -28,6 +29,7 @@ foreach (glob(APP_PATH . 'controllers/*.php') as $controllerFile) {
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+initUserLocation();
 
 // Initialise router and define routes
 $router = new Router();
@@ -45,6 +47,7 @@ $router->get('/property/{slug}', 'PropertyController', 'detail');
 
 // Location drill-down
 $router->get('/select-country', 'LocationController', 'selectCountry');
+$router->get('/set-country/{slug}', 'LocationController', 'setCountry');
 $router->get('/location', 'LocationController', 'index');
 $router->get('/location/{country}', 'LocationController', 'country');
 $router->get('/location/{country}/{state}', 'LocationController', 'state');

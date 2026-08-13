@@ -35,21 +35,8 @@ $siteName = getSetting('site_name') ?: 'PropertyRubix';
     <!-- Right actions -->
     <div class="header-actions d-flex align-items-center gap-3">
       <?php
-      $currentCountryName = 'Global'; // Default
-      $uri = $_SERVER['REQUEST_URI'] ?? '';
-      if (preg_match('#/location/([^/?]+)#', $uri, $m)) {
-          $slug = strtolower($m[1]);
-          $countryMap = [
-              'india' => 'India',
-              'uae' => 'UAE',
-              'usa' => 'USA',
-              'canada' => 'Canada',
-              'uk' => 'UK'
-          ];
-          if (isset($countryMap[$slug])) {
-              $currentCountryName = $countryMap[$slug];
-          }
-      }
+      $activeCountry = getActiveCountry();
+      $currentCountryName = $activeCountry['name'] ?? 'Global';
       ?>
       <!-- Country selector -->
       <div class="country-selector d-flex align-items-center me-3">
