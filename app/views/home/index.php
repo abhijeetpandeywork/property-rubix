@@ -49,7 +49,11 @@ if (empty($sliders)) {
         <a href="<?= PUBLIC_URL ?>projects" class="btn btn-lg px-5 py-3 fw-bold shadow-lg" style="background: var(--pr-primary); color: white; border: 2px solid var(--pr-primary); border-radius: 50px; font-size: 1.15rem; transition: all 0.3s; backdrop-filter: blur(5px);">
           Explore Projects <i class="fas fa-building ms-2"></i>
         </a>
-        <a href="<?= PUBLIC_URL ?>location" class="btn btn-lg px-5 py-3 fw-bold shadow-lg" style="background: rgba(255,255,255,0.1); color: white; border: 2px solid white; border-radius: 50px; font-size: 1.15rem; transition: all 0.3s; backdrop-filter: blur(5px);">
+        <?php 
+          $activeLoc = getActiveLocation();
+          $locLink = !empty($activeLoc['country']['slug']) ? PUBLIC_URL . 'location/' . e($activeLoc['country']['slug']) : PUBLIC_URL . 'location';
+        ?>
+        <a href="<?= $locLink ?>" class="btn btn-lg px-5 py-3 fw-bold shadow-lg" style="background: rgba(255,255,255,0.1); color: white; border: 2px solid white; border-radius: 50px; font-size: 1.15rem; transition: all 0.3s; backdrop-filter: blur(5px);">
           Explore Locations <i class="fas fa-map-marked-alt ms-2"></i>
         </a>
       </div>

@@ -45,7 +45,7 @@ $siteName = getSetting('site_name') ?: 'PropertyRubix';
       <h5 class="fw-bold text-white mb-3" style="font-size: 1.1rem;">Useful links</h5>
       <div class="d-flex gap-4 flex-wrap">
         <a href="<?= PUBLIC_URL ?>developer" class="text-white text-decoration-none" style="font-size: 0.95rem;">Search by developer</a>
-        <a href="<?= PUBLIC_URL ?>location" class="text-white text-decoration-none" style="font-size: 0.95rem;">Search by location</a>
+        <a href="<?= PUBLIC_URL ?>select-location" class="text-white text-decoration-none" style="font-size: 0.95rem;">Search by region</a>
       </div>
     </div>
     

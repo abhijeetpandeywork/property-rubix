@@ -111,11 +111,15 @@ function getActiveLocation() {
         'slug' => $_SESSION['active_city_slug'] ?? null
     ];
     
+    $flag = $country['flag'] ?? '🌐';
+    $name = $city['name'] ?? $country['name'];
+
     return [
         'country' => $country,
         'city'    => $city,
-        // Helper string for UI display (e.g., 'Gurugram' or 'India')
-        'display_name' => $city['name'] ?? $country['name']
+        'flag'    => $flag,
+        'name'    => $name,
+        'display_name' => $name
     ];
 }
 function setActiveCountryBySlug($slug) {

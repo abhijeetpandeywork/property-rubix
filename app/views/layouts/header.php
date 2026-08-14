@@ -37,12 +37,13 @@ $siteName = getSetting('site_name') ?: 'PropertyRubix';
       <?php
       $activeLocation = getActiveLocation();
       $currentLocName = $activeLocation['display_name'];
+      $currentLocFlag = $activeLocation['flag'] ?: '🌐';
       ?>
-      <!-- Location selector -->
+      <!-- Location / Region selector -->
       <div class="country-selector d-flex align-items-center me-3">
-        <a href="<?= PUBLIC_URL ?>select-location" class="btn btn-link text-decoration-none p-0 d-flex flex-column align-items-center" style="line-height:1.2; color: #000;">
-          <i class="fas fa-map-marker-alt fs-4 mb-1"></i> 
-          <span class="fw-bold" style="font-size:11px;"><?= $currentLocName ?></span>
+        <a href="<?= PUBLIC_URL ?>select-location" class="btn btn-link text-decoration-none p-0 d-flex flex-column align-items-center" style="line-height:1.2; color: #000;" title="Search by Region / Country">
+          <span style="font-size: 1.25rem; line-height: 1;" class="mb-1"><i class="fas fa-globe"></i></span>
+          <span class="fw-bold" style="font-size:11px; white-space: nowrap;"><?= e($currentLocName) ?></span>
         </a>
       </div>
 

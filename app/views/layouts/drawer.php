@@ -29,7 +29,7 @@ $igUrl  = getSetting('social_instagram', '#');
     <a href="<?= PUBLIC_URL ?>about-us"      class="text-dark text-decoration-none" style="font-size: 0.95rem;">About Us</a>
     <a href="<?= PUBLIC_URL ?>blog"          class="text-dark text-decoration-none" style="font-size: 0.95rem;">Blogs</a>
     <a href="<?= PUBLIC_URL ?>contact-us"    class="text-dark text-decoration-none" style="font-size: 0.95rem;">Contact Us</a>
-    <a href="<?= PUBLIC_URL ?>location"      class="text-dark text-decoration-none" style="font-size: 0.95rem;">Search By Location</a>
+    <a href="<?= PUBLIC_URL ?>select-location" class="text-dark text-decoration-none" style="font-size: 0.95rem;">Search By Region</a>
     <a href="<?= PUBLIC_URL ?>developer"     class="text-dark text-decoration-none" style="font-size: 0.95rem;">Search By Developer</a>
   </nav>
 
