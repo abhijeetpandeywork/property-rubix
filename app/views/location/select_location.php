@@ -1,394 +1,399 @@
 <?php
 /**
  * Select Region Page — Luxury Continent-Based Architecture
- * Allows visitors to seamlessly choose their continent & country
+ * Original Premium Left/Right Split Layout with Clear Background Map & Animated Continent Pills
  */
-$hasBanner      = !empty($heroBannerUrl);
-$stats          = $stats ?? [];
-$activeCountry  = $activeLocation['country'] ?? [];
-$activeSlug     = strtolower($activeCountry['slug'] ?? '');
+$hasBanner = !empty($heroBannerUrl);
+$stats     = $stats ?? [];
+$activeSlug= strtolower($activeLocation['country']['slug'] ?? '');
 ?>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;600;800;900&display=swap');
 
+/* ── Page shell ─ */
 .scr-page {
     position: relative;
     min-height: 100vh;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    overflow-x: hidden;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+    isolation: isolate;
     display: flex;
     flex-direction: column;
-    background: #080a10;
-    color: #ffffff;
+    background: #0d1117;
 }
 
+/* ── Background image — High clarity ─────────────────────── */
 .scr-bg {
     position: absolute;
     inset: 0;
-    z-index: 0;
+    z-index: -2;
     <?php if ($hasBanner): ?>
     background-image: url('<?= e($heroBannerUrl) ?>');
     background-size: cover;
-    background-position: center;
+    background-position: center 30%;
     background-repeat: no-repeat;
-    opacity: 0.15;
     <?php else: ?>
-    background: radial-gradient(circle at 80% 20%, rgba(247, 203, 70, 0.08) 0%, transparent 50%),
-                radial-gradient(circle at 20% 80%, rgba(30, 58, 138, 0.2) 0%, transparent 60%),
-                #080a10;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0f172a 100%);
     <?php endif; ?>
 }
 
+/* ── Dark gradient overlay — left darker for vertical text, right transparent for map clarity ── */
+.scr-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    <?php if ($hasBanner): ?>
+    background: linear-gradient(
+        100deg,
+        rgba(8,8,12,0.92) 0%,
+        rgba(8,8,12,0.70) 35%,
+        rgba(8,8,12,0.30) 70%,
+        rgba(8,8,12,0.12) 100%
+    );
+    <?php endif; ?>
+}
+
+/* ── Inner layout ────────────────────────── */
 .scr-inner {
     position: relative;
     z-index: 1;
     flex: 1;
     display: flex;
-    flex-direction: column;
+    align-items: flex-start;
     padding: 130px 6% 80px;
-    max-width: 1400px;
-    margin: 0 auto;
-    width: 100%;
+    gap: 80px;
 }
 
-.scr-header-wrap {
-    margin-bottom: 45px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: flex-end;
-    gap: 30px;
+/* ── LEFT: Vertical Headline column ───────────────── */
+.scr-left {
+    flex: 0 0 320px;
+    position: sticky;
+    top: 130px;
 }
 
 .scr-eyebrow {
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: rgba(247,203,70,0.12);
-    border: 1px solid rgba(247,203,70,0.35);
+    background: rgba(247,203,70,0.15);
+    border: 1px solid rgba(247,203,70,0.40);
     border-radius: 50px;
-    padding: 7px 18px;
-    font-size: 0.75rem;
+    padding: 7px 16px;
+    font-size: 0.70rem;
     font-weight: 700;
-    letter-spacing: 2px;
+    letter-spacing: 2.5px;
     text-transform: uppercase;
     color: #f7cb46;
-    margin-bottom: 16px;
+    margin-bottom: 28px;
 }
 
 .scr-headline {
-    font-family: 'Outfit', sans-serif;
-    font-size: clamp(2.4rem, 4.5vw, 3.8rem);
-    font-weight: 800;
-    line-height: 1.1;
+    font-size: clamp(2.8rem, 4.5vw, 4.2rem);
+    font-weight: 300;
+    line-height: 1.0;
     color: #ffffff;
-    letter-spacing: -1px;
+    letter-spacing: -2px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.6);
     margin: 0;
+}
+.scr-headline strong {
+    font-weight: 900;
+    display: block;
+    color: #ffffff;
+    text-shadow: 0 0 40px rgba(247,203,70,0.3), 0 2px 20px rgba(0,0,0,0.8);
 }
 .scr-headline .accent {
     color: #f7cb46;
 }
 
-.scr-search-box {
+.scr-subtext {
+    margin-top: 22px;
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.65;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.5);
+    max-width: 280px;
+}
+
+.scr-divider {
+    width: 48px;
+    height: 3px;
+    background: linear-gradient(90deg, #f7cb46, transparent);
+    border-radius: 2px;
+    margin-top: 28px;
+}
+
+/* ── RIGHT: Continents & Countries ─────────────────────── */
+.scr-right {
+    flex: 1;
+    min-width: 0;
+    padding-top: 6px;
+}
+
+/* Search bar */
+.scr-search-wrap {
     position: relative;
-    width: 100%;
-    max-width: 440px;
+    margin-bottom: 30px;
+    max-width: 500px;
 }
 .scr-search-input {
     width: 100%;
-    height: 56px;
-    background: rgba(255, 255, 255, 0.07);
-    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    height: 50px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 50px;
-    padding: 0 24px 0 54px;
+    padding: 0 20px 0 48px;
     color: #ffffff;
-    font-size: 1rem;
+    font-size: 0.95rem;
     outline: none;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.3s ease;
     backdrop-filter: blur(10px);
 }
 .scr-search-input:focus {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.15);
     border-color: #f7cb46;
-    box-shadow: 0 0 25px rgba(247, 203, 70, 0.25);
+    box-shadow: 0 0 20px rgba(247, 203, 70, 0.25);
 }
 .scr-search-icon {
     position: absolute;
-    left: 20px;
+    left: 18px;
     top: 50%;
     transform: translateY(-50%);
     color: #f7cb46;
-    font-size: 1.15rem;
+    font-size: 1rem;
     pointer-events: none;
 }
 
-/* ── Continent Sections ── */
-.scr-continent-sec {
-    margin-bottom: 45px;
+.scr-continent {
+    margin-bottom: 34px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: scrFadeUp 0.5s ease forwards;
 }
-.scr-continent-title {
-    font-family: 'Outfit', sans-serif;
-    font-size: 1.35rem;
-    font-weight: 700;
-    color: #ffffff;
-    letter-spacing: 0.5px;
-    margin-bottom: 20px;
+.scr-continent:nth-child(1) { animation-delay: 0.10s; }
+.scr-continent:nth-child(2) { animation-delay: 0.20s; }
+.scr-continent:nth-child(3) { animation-delay: 0.30s; }
+.scr-continent:nth-child(4) { animation-delay: 0.40s; }
+.scr-continent:nth-child(5) { animation-delay: 0.50s; }
+.scr-continent:nth-child(6) { animation-delay: 0.60s; }
+
+@keyframes scrFadeUp {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.scr-continent-label {
     display: flex;
     align-items: center;
     gap: 12px;
+    font-size: 0.70rem;
+    font-weight: 800;
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.60);
+    margin-bottom: 14px;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
 }
-.scr-continent-title::after {
+.scr-continent-label::after {
     content: '';
     flex: 1;
     height: 1px;
-    background: linear-gradient(90deg, rgba(255,255,255,0.15), transparent);
+    background: rgba(255,255,255,0.15);
 }
 
-.scr-country-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+.scr-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
-.scr-country-card {
-    position: relative;
-    background: rgba(255, 255, 255, 0.035);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 24px;
+/* Country pill — glassmorphic animated button */
+.scr-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 24px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 50px;
     text-decoration: none;
     color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.2px;
     backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    text-shadow: 0 1px 6px rgba(0,0,0,0.6);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
     overflow: hidden;
 }
-.scr-country-card::before {
+.scr-pill::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(247, 203, 70, 0.15) 0%, transparent 100%);
+    background: linear-gradient(135deg, rgba(247,203,70,0.25) 0%, transparent 65%);
     opacity: 0;
-    transition: opacity 0.35s ease;
+    transition: opacity 0.25s ease;
 }
-.scr-country-card:hover {
-    transform: translateY(-5px);
-    border-color: rgba(247, 203, 70, 0.6);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), 0 0 25px rgba(247, 203, 70, 0.18);
+.scr-pill:hover {
+    background: rgba(247,203,70,0.2);
+    border-color: rgba(247,203,70,0.85);
     color: #ffffff;
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 10px 28px rgba(247,203,70,0.3), 0 4px 12px rgba(0,0,0,0.35);
+    text-decoration: none;
 }
-.scr-country-card:hover::before {
-    opacity: 1;
-}
+.scr-pill:hover::before { opacity: 1; }
 
-.scr-card-left {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    position: relative;
-    z-index: 1;
-}
-.scr-flag-badge {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.8rem;
-    transition: transform 0.3s ease;
-}
-.scr-country-card:hover .scr-flag-badge {
-    transform: scale(1.1) rotate(4deg);
-    background: rgba(247, 203, 70, 0.2);
-    border-color: #f7cb46;
-}
-
-.scr-country-info h3 {
-    margin: 0 0 4px;
-    font-size: 1.2rem;
-    font-weight: 700;
-    letter-spacing: -0.2px;
-    color: #ffffff;
-}
-.scr-country-meta {
-    font-size: 0.8rem;
-    color: rgba(255, 255, 255, 0.55);
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.scr-country-meta span {
-    color: #f7cb46;
-}
-
-.scr-card-action {
-    position: relative;
-    z-index: 1;
-    width: 36px;
-    height: 36px;
+.scr-pill-dot {
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.06);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-}
-.scr-country-card:hover .scr-card-action {
     background: #f7cb46;
-    color: #080a10;
-    transform: translateX(4px);
+    flex-shrink: 0;
+    box-shadow: 0 0 8px rgba(247,203,70,0.85);
+    transition: transform 0.25s ease;
+}
+.scr-pill:hover .scr-pill-dot {
+    transform: scale(1.3);
+    box-shadow: 0 0 14px rgba(247,203,70,1);
 }
 
-.scr-active-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    background: #22c55e;
-    color: #ffffff;
+.scr-pill-active-tag {
     font-size: 0.65rem;
     font-weight: 800;
-    padding: 3px 8px;
-    border-radius: 20px;
+    background: #22c55e;
+    color: #fff;
+    padding: 2px 7px;
+    border-radius: 12px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-left: 8px;
+    margin-left: 4px;
 }
 
-/* ── Stats Bar ── */
+/* ── Stats bar ───────────────── */
 .scr-stats {
     position: relative;
     z-index: 1;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(10, 12, 18, 0.85);
-    backdrop-filter: blur(20px);
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    border-top: 1px solid rgba(255,255,255,0.10);
+    background: rgba(8,8,12,0.75);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
 }
+
 .scr-stat {
     padding: 24px 20px;
     text-align: center;
-    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    border-right: 1px solid rgba(255,255,255,0.08);
 }
 .scr-stat:last-child { border-right: none; }
+
 .scr-stat-num {
     display: block;
-    font-family: 'Outfit', sans-serif;
-    font-size: 1.9rem;
+    font-size: 1.8rem;
     font-weight: 800;
     color: #f7cb46;
     line-height: 1;
+    text-shadow: 0 0 20px rgba(247,203,70,0.4);
 }
 .scr-stat-label {
     display: block;
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.70rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.50);
     text-transform: uppercase;
     letter-spacing: 1.5px;
-    margin-top: 6px;
+    margin-top: 5px;
 }
 
-@media (max-width: 768px) {
+/* ── Responsive ─────────────────────────── */
+@media (max-width: 860px) {
     .scr-inner {
-        padding: 100px 5% 50px;
-    }
-    .scr-header-wrap {
         flex-direction: column;
-        align-items: flex-start;
-        gap: 20px;
+        gap: 30px;
+        padding: 110px 6% 60px;
     }
-    .scr-search-box {
-        max-width: 100%;
-    }
-    .scr-country-grid {
-        grid-template-columns: 1fr;
-    }
+    .scr-left { flex: none; width: 100%; position: static; }
+    .scr-headline { font-size: 2.8rem; }
+    .scr-subtext { max-width: 100%; }
+}
+@media (max-width: 480px) {
+    .scr-headline { font-size: 2.2rem; }
+    .scr-pill { font-size: 0.88rem; padding: 10px 18px; }
+    .scr-stat-num { font-size: 1.5rem; }
 }
 </style>
 
 <div class="scr-page">
     <div class="scr-bg"></div>
+    <div class="scr-overlay"></div>
 
     <div class="scr-inner">
-        
-        <!-- Header & Search -->
-        <div class="scr-header-wrap">
-            <div>
-                <div class="scr-eyebrow">
-                    <i class="fas fa-globe"></i>
-                    Global Real Estate Hub
-                </div>
-                <h1 class="scr-headline">
-                    Search by <span class="accent">Region</span>
-                </h1>
-                <p class="text-white-50 mt-2 mb-0" style="font-size: 1.05rem;">
-                    Select your country or region to discover local properties and developers.
-                </p>
+
+        <!-- LEFT — Headline vertically aligned -->
+        <div class="scr-left">
+            <div class="scr-eyebrow">
+                <i class="fas fa-globe"></i>
+                Global Properties
             </div>
 
-            <div class="scr-search-box">
+            <h1 class="scr-headline">
+                Select<br>
+                <strong>Your<br><span class="accent">Region</span></strong>
+            </h1>
+
+            <p class="scr-subtext">
+                Explore premium real estate across continents. Choose your region to tailor your experience.
+            </p>
+            <div class="scr-divider"></div>
+        </div>
+
+        <!-- RIGHT — Search & Continents list -->
+        <div class="scr-right">
+            
+            <div class="scr-search-wrap">
                 <i class="fas fa-search scr-search-icon"></i>
                 <input type="text" class="scr-search-input" id="regionSearchInput" placeholder="Search country or continent...">
             </div>
-        </div>
 
-        <!-- Continents & Countries -->
-        <div id="regionsContainer">
-            <?php if (!empty($continents)): ?>
-                <?php foreach ($continents as $continentName => $countryList): ?>
-                    <div class="scr-continent-sec" data-continent="<?= strtolower(e($continentName)) ?>">
-                        <div class="scr-continent-title">
-                            <span><?= e($continentName) ?></span>
+            <div id="continentsList">
+                <?php if (empty($continents)): ?>
+                    <p style="color:rgba(255,255,255,0.6)">No regions available at the moment.</p>
+                <?php else: ?>
+                    <?php foreach ($continents as $continentName => $countryList): ?>
+                        <div class="scr-continent" data-continent="<?= strtolower(e($continentName)) ?>">
+                            <div class="scr-continent-label">
+                                <?= e($continentName) ?>
+                            </div>
+                            <div class="scr-pills">
+                                <?php foreach ($countryList as $c): ?>
+                                    <?php $isCurrent = ($activeSlug === strtolower($c['slug'])); ?>
+                                    <a href="<?= PUBLIC_URL ?>set-country/<?= e($c['slug']) ?>" 
+                                       class="scr-pill" 
+                                       data-name="<?= strtolower(e($c['name'])) ?>"
+                                       data-continent="<?= strtolower(e($continentName)) ?>"
+                                       title="Explore <?= e($c['name']) ?> Properties">
+                                        <span class="scr-pill-dot"></span>
+                                        <span><?= e($c['flag_icon'] ?: '🌐') ?> <?= e($c['name']) ?></span>
+                                        <?php if ($isCurrent): ?>
+                                            <span class="scr-pill-active-tag">Active</span>
+                                        <?php endif; ?>
+                                    </a>
+                                <?php endforeach; ?>
+                            </div>
                         </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </div>
 
-                        <div class="scr-country-grid">
-                            <?php foreach ($countryList as $c): ?>
-                                <?php $isCurrent = ($activeSlug === strtolower($c['slug'])); ?>
-                                <a href="<?= PUBLIC_URL ?>set-country/<?= e($c['slug']) ?>" 
-                                   class="scr-country-card" 
-                                   data-name="<?= strtolower(e($c['name'])) ?>"
-                                   data-continent="<?= strtolower(e($continentName)) ?>"
-                                   title="Browse <?= e($c['name']) ?> Properties">
-                                    <div class="scr-card-left">
-                                        <div class="scr-flag-badge">
-                                            <?= e($c['flag_icon'] ?: '🌐') ?>
-                                        </div>
-                                        <div class="scr-country-info">
-                                            <h3>
-                                                <?= e($c['name']) ?>
-                                                <?php if ($isCurrent): ?>
-                                                    <span class="scr-active-tag">Active</span>
-                                                <?php endif; ?>
-                                            </h3>
-                                            <div class="scr-country-meta">
-                                                <span><?= (int)($c['project_count'] ?? 0) ?></span> Properties Listed
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="scr-card-action">
-                                        <i class="fas fa-arrow-right"></i>
-                                    </div>
-                                </a>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php else: ?>
-                <p class="text-white-50">No regions found.</p>
-            <?php endif; ?>
         </div>
-
     </div>
 
-    <!-- Bottom Real Stats -->
+    <!-- BOTTOM — Real stats bar -->
     <?php if (!empty($stats)): ?>
     <div class="scr-stats">
         <?php foreach ($stats as $s): ?>
@@ -404,32 +409,31 @@ $activeSlug     = strtolower($activeCountry['slug'] ?? '');
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('regionSearchInput');
-    const sections    = document.querySelectorAll('.scr-continent-sec');
-    const cards       = document.querySelectorAll('.scr-country-card');
+    const continents  = document.querySelectorAll('.scr-continent');
 
     searchInput.addEventListener('input', function(e) {
         const query = e.target.value.toLowerCase().trim();
 
-        sections.forEach(sec => {
-            let hasVisibleCard = false;
-            const secCards = sec.querySelectorAll('.scr-country-card');
+        continents.forEach(cont => {
+            let hasMatch = false;
+            const pills = cont.querySelectorAll('.scr-pill');
 
-            secCards.forEach(card => {
-                const name = card.getAttribute('data-name');
-                const cont = card.getAttribute('data-continent');
+            pills.forEach(pill => {
+                const name = pill.getAttribute('data-name');
+                const continentName = pill.getAttribute('data-continent');
 
-                if (name.includes(query) || cont.includes(query)) {
-                    card.style.display = 'flex';
-                    hasVisibleCard = true;
+                if (name.includes(query) || continentName.includes(query)) {
+                    pill.style.display = 'inline-flex';
+                    hasMatch = true;
                 } else {
-                    card.style.display = 'none';
+                    pill.style.display = 'none';
                 }
             });
 
-            if (hasVisibleCard) {
-                sec.style.display = '';
+            if (hasMatch) {
+                cont.style.display = '';
             } else {
-                sec.style.display = 'none';
+                cont.style.display = 'none';
             }
         });
     });
