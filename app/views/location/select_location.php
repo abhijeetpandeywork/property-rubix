@@ -378,7 +378,8 @@ $activeSlug= strtolower($activeLocation['country']['slug'] ?? '');
                                        data-continent="<?= strtolower(e($continentName)) ?>"
                                        title="Explore <?= e($c['name']) ?> Properties">
                                         <span class="scr-pill-dot"></span>
-                                        <span><?= e($c['flag_icon'] ?: '🌐') ?> <?= e($c['name']) ?></span>
+                                        <span class="scr-pill-flag"><?= e($c['flag_icon'] ?: '🌐') ?></span>
+                                        <span class="scr-pill-name"><?= e($c['name']) ?></span>
                                         <?php if ($isCurrent): ?>
                                             <span class="scr-pill-active-tag">Active</span>
                                         <?php endif; ?>
