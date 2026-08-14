@@ -35,7 +35,18 @@ class ProjectController extends Controller {
         }
         if ($type)   { $where[] = 'p.type = ?';     $args[] = $type; }
         if ($status) { $where[] = 'p.status = ?';   $args[] = $status; }
-        if ($cityId) { $where[] = 'p.city_id = ?';  $args[] = $cityId; }
+        if ($cityId) { 
+            $where[] = 'p.city_id = ?';  
+            $args[] = $cityId; 
+        } else {
+            // Apply country filter from active session if country is selected
+            $activeLoc = getActiveLocation();
+            $countryId = $activeLoc['country']['id'] ?? 0;
+            if ($countryId) {
+                $where[] = 'co.id = ?';
+                $args[] = $countryId;
+            }
+        }
         if ($bhk) {
             if (strtolower($bhk) === 'studio') {
                 $where[] = 'p.unit_types LIKE ?'; $args[] = '%studio%';
@@ -66,6 +77,7 @@ class ProjectController extends Controller {
              LEFT JOIN builders b    ON b.id = p.builder_id
              LEFT JOIN cities c      ON c.id = p.city_id
              LEFT JOIN states s      ON s.id = c.state_id
+             LEFT JOIN countries co  ON co.id = s.country_id
              LEFT JOIN localities l  ON l.id = p.locality_id
              WHERE $whereStr"
         );

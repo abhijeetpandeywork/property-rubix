@@ -24,16 +24,20 @@ if (empty($sliders)) {
   
   <div class="container-fluid px-3 px-md-5 d-flex flex-column align-items-center justify-content-center" style="padding-top: 60px; position: relative; z-index: 2;">
     <div class="hero-content anim-fade-up w-100" style="max-width: 800px; padding: 0;">
+      <?php 
+        $activeLoc = getActiveLocation();
+        $countryName = $activeLoc['country']['name'] ?? '';
+      ?>
       <h1 class="hero-headline text-white mb-4" style="font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 800; text-shadow: 0 4px 6px rgba(0,0,0,0.3); line-height: 1.3;">
         The <span style="background: #2b2013; color: #fff; padding: 0 16px; border-radius: 8px; display: inline-block;">X Factor</span><br>
-        in Property Search
+        in <?= $countryName ? e($countryName) . ' ' : '' ?>Property Search
       </h1>
       
       <div class="mt-4 mx-auto position-relative" style="max-width: 700px;" id="smartSearchContainer">
         <!-- Search Input -->
         <form action="<?= PUBLIC_URL ?>projects" method="get" class="d-flex align-items-center bg-white" style="border-radius: 50px; padding: 5px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); border: 2px solid rgba(229,175,83,0.5);">
           <div class="px-3 text-muted"><i class="fas fa-search fs-5"></i></div>
-          <input type="text" name="q" id="smartSearchInput" class="form-control border-0 shadow-none fw-500" placeholder="Search by city, developer, neighborhood, or project..." style="height: 55px; font-size: 1.15rem; background: transparent; color: #333;" autocomplete="off" required>
+          <input type="text" name="q" id="smartSearchInput" class="form-control border-0 shadow-none fw-500" placeholder="Search by city, developer, neighborhood in <?= $countryName ? e($countryName) : 'your region' ?>..." style="height: 55px; font-size: 1.15rem; background: transparent; color: #333;" autocomplete="off" required>
           <button type="submit" class="btn rounded-pill px-5" style="height: 55px; font-weight: 700; font-size: 1.1rem; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none; box-shadow: 0 4px 15px rgba(245,158,11,0.4); transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(245,158,11,0.6)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(245,158,11,0.4)';">Search</button>
         </form>
 
